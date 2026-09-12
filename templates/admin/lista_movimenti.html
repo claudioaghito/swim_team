@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Movimenti contabili{% endblock %}
+{% block content %}
+<h1>Movimenti contabili</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Pannello Admin</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_movimento') }}">+ Nuovo movimento</a>
+</div>
+
+<div class="card">
+    <form method="POST" action="{{ url_for('admin.elimina_movimenti') }}"
+          onsubmit="return confirm('Eliminare i movimenti selezionati?');">
+        <input type="hidden" name="next" value="{{ url_for('admin.lista_movimenti') }}">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" onclick="document.querySelectorAll('.mov-check').forEach(c => c.checked = this.checked)"></th>
+                    <th>Data</th>
+                    <th>Atleta</th>
+                    <th>Causale</th>
+                    <th>Importo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in movimenti %}
+                <tr>
+                    <td><input type="checkbox" class="mov-check" name="movimento_ids" value="{{ m.id }}"></td>
+                    <td>{{ m.data.strftime('%d/%m/%Y') }}</td>
+                    <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=m.atleta.id) }}">{{ m.atleta.nome_completo }}</a></td>
+                    <td>{{ m.causale }}</td>
+                    <td class="saldo-cell {{ 'positivo' if m.importo >= 0 else 'negativo' }}">{{ "%.2f"|format(m.importo) }} €</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">Nessun movimento registrato.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if movimenti %}
+            <button type="submit" class="btn-danger" style="margin-top:16px;">Elimina selezionati</button>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

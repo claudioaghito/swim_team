@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Pannello Admin{% endblock %}
+{% block content %}
+<h1>Pannello Amministratore</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.lista_atleti') }}">Atleti</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">+ Nuovo allenamento</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">Tornei</a>
+    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">+ Nuovo Torneo</a>
+    <a class="btn" href="{{ url_for('admin.lista_movimenti') }}">Movimenti contabili</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_messaggio') }}">+ Nuovo messaggio</a>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Atleti ({{ atleti|length }})</h3>
+        <ul>
+            {% for a in atleti %}
+                {% set saldo = a.saldo_attuale() %}
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_completo }}</a> — saldo: <span class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</span></li>
+            {% else %}
+                <li>Nessun atleta registrato.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>Prossimi allenamenti</h3>
+        <ul>
+            {% for al in prossimi_allenamenti %}
+                <li>{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</li>
+            {% else %}
+                <li>Nessun allenamento programmato.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>Prossime gare</h3>
+        <ul>
+            {% for g in prossime_gare %}
+                <li>
+                    <a href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">{{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo }})</a>
+                    {% if g.lista_tipologie %}<br><small>{{ g.lista_tipologie|join(', ') }}</small>{% endif %}
+                </li>
+            {% else %}
+                <li>Nessuna gara programmata.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card warning">
+        <h3>Atleti con saldo negativo</h3>
+        <ul>
+            {% for a in atleti_in_debito %}
+                <li>{{ a.nome_completo }}: <span class="saldo-cell negativo">{{ "%.2f"|format(a.saldo_attuale()) }} €</span></li>
+            {% else %}
+                <li>Nessuno, tutti in regola 🎉</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

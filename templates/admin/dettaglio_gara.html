@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ gara.nome }}{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">&larr; Tornei</a>
+    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=gara.id) }}">Modifica torneo</a>
+</div>
+
+<div class="card">
+    <h2>{{ gara.nome }}</h2>
+    <p>
+        <strong>Data:</strong> {{ gara.data.strftime('%d/%m/%Y') }}<br>
+        <strong>Luogo:</strong> {{ gara.luogo or '-' }}<br>
+        <strong>Quota gara:</strong> {{ "%.2f"|format(gara.quota_gara or 0) }} €<br>
+        <strong>Quota staffetta:</strong> {{ "%.2f"|format(gara.quota_staffetta or 0) }} €<br>
+        {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}<br>{% endif %}
+        <strong>Tipologie disponibili:</strong> {{ gara.lista_tipologie|join(', ') }}
+    </p>
+</div>
+
+<div class="card">
+    <h3>Iscrizioni atleti ({{ scelte_per_atleta|length }})</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Atleta</th>
+                <th>Gare scelte</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for atleta, scelte in scelte_per_atleta.items() %}
+            <tr>
+                <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
+                <td>{{ scelte|join(', ') }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

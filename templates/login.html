@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Accedi{% endblock %}
+{% block content %}
+<div class="card login-card">
+    <h2>Accedi</h2>
+    <form method="POST">
+        <label for="username">Nome utente</label>
+        <input type="text" id="username" name="username" required autofocus>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Entra</button>
+    </form>
+</div>
+{% endblock %}

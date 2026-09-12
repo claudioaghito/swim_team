@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Modifica {{ atleta.nome_completo }}{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">&larr; {{ atleta.nome_completo }}</a>
+</div>
+<div class="card">
+    <h2>Modifica atleta</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <label>Nome</label>
+        <input type="text" name="nome" value="{{ atleta.nome }}" required>
+
+        <label>Cognome</label>
+        <input type="text" name="cognome" value="{{ atleta.cognome }}" required>
+
+        <label>Data di nascita</label>
+        <input type="date" name="data_nascita" value="{{ atleta.data_nascita.isoformat() if atleta.data_nascita else '' }}">
+
+        <label>Nome utente</label>
+        <input type="text" name="username" value="{{ atleta.username }}" required>
+
+        <label>Nuova password (lascia vuoto per non modificarla)</label>
+        <input type="password" name="password">
+
+        <label>Email (opzionale)</label>
+        <input type="email" name="email" value="{{ atleta.email or '' }}">
+
+        <label>Cartellino (immagine)</label>
+        {% if atleta.cartellino_file %}
+            <p><small>Attuale: <a href="{{ url_for('admin.cartellino_atleta', atleta_id=atleta.id) }}" target="_blank">visualizza</a></small></p>
+        {% endif %}
+        <input type="file" name="cartellino" accept=".png,.jpg,.jpeg,.gif,.webp">
+
+        <label>Certificato medico (PDF)</label>
+        {% if atleta.certificato_medico_file %}
+            <p><small>Attuale: <a href="{{ url_for('admin.certificato_atleta', atleta_id=atleta.id) }}" target="_blank">visualizza</a></small></p>
+        {% endif %}
+        <input type="file" name="certificato_medico" accept=".pdf">
+
+        <button type="submit">Salva modifiche</button>
+    </form>
+</div>
+{% endblock %}

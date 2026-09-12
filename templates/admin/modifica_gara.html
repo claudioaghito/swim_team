@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Modifica Torneo{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; Torneo</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">Tutti i tornei</a>
+</div>
+<div class="card">
+    <h2>Modifica Torneo</h2>
+    <form method="POST">
+        <label>Nome torneo</label>
+        <input type="text" name="nome" value="{{ gara.nome }}" required>
+
+        <label>Data</label>
+        <input type="date" name="data" value="{{ gara.data.isoformat() }}" required>
+
+        <label>Luogo</label>
+        <input type="text" name="luogo" value="{{ gara.luogo or '' }}">
+
+        <label>Quota gara (€)</label>
+        <input type="number" step="0.01" name="quota_gara" value="{{ gara.quota_gara }}">
+
+        <label>Quota staffetta (€)</label>
+        <input type="number" step="0.01" name="quota_staffetta" value="{{ gara.quota_staffetta }}">
+
+        <label>Scadenza iscrizione</label>
+        <input type="date" name="scadenza_iscrizione" value="{{ gara.scadenza_iscrizione.isoformat() if gara.scadenza_iscrizione else '' }}">
+
+        <label>Tipologie di gara</label>
+        <div class="checkbox-list">
+            {% for tipo in tipi_gara_base %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="tipologie" value="{{ tipo }}" {% if tipo in gara.lista_tipologie %}checked{% endif %}> {{ tipo }}
+                </label>
+            {% endfor %}
+        </div>
+
+        <label>Altre tipologie (facoltativo, separate da virgola)</label>
+        <input type="text" name="altre_tipologie" value="{{ tipi_extra }}" placeholder="es. 400 SL, Staffetta 4x50">
+
+        <button type="submit">Salva modifiche</button>
+    </form>
+</div>
+{% endblock %}

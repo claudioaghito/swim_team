@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Nuovo Messaggio{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Pannello Admin</a>
+</div>
+<div class="card">
+    <h2>Nuovo messaggio</h2>
+    <form method="POST">
+        <label>Destinatario</label>
+        <select name="destinatario_id">
+            <option value="">Tutta la squadra (comunicazione generale)</option>
+            {% for a in atleti %}
+                <option value="{{ a.id }}">{{ a.nome_completo }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Testo</label>
+        <textarea name="testo" rows="4" required></textarea>
+
+        <button type="submit">Invia</button>
+    </form>
+</div>
+{% endblock %}

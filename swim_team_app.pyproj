@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4CC0C6C5-6628-4B36-8292-640E2562AB1E}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>app.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>swim_team_app</Name>
+    <RootNamespace>swim_team_app</RootNamespace>
+    <InterpreterId>MSBuild|venv|$(MSBuildProjectFullPath)</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <Environment>FLASK_APP=app.py
+FLASK_DEBUG=1</Environment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugSymbols>false</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="admin.py" />
+    <Compile Include="app.py" />
+    <Compile Include="athlete.py" />
+    <Compile Include="auth.py" />
+    <Compile Include="config.py" />
+    <Compile Include="extensions.py" />
+    <Compile Include="models.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="avvia.ps1" />
+    <Content Include=".gitignore" />
+    <Content Include="README.md" />
+    <Content Include="requirements.txt" />
+    <Content Include="static\css\style.css" />
+    <Content Include="templates\base.html" />
+    <Content Include="templates\login.html" />
+    <Content Include="templates\admin\dashboard.html" />
+    <Content Include="templates\admin\lista_atleti.html" />
+    <Content Include="templates\admin\dettaglio_atleta.html" />
+    <Content Include="templates\admin\modifica_atleta.html" />
+    <Content Include="templates\admin\nuova_gara.html" />
+    <Content Include="templates\admin\nuovo_allenamento.html" />
+    <Content Include="templates\admin\nuovo_atleta.html" />
+    <Content Include="templates\admin\nuovo_messaggio.html" />
+    <Content Include="templates\admin\nuovo_movimento.html" />
+    <Content Include="templates\admin\lista_movimenti.html" />
+    <Content Include="templates\athlete\dashboard.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="venv\">
+      <Id>venv</Id>
+      <Version>3.14</Version>
+      <Description>venv (Python 3.14 64-bit)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="static\" />
+    <Folder Include="static\css\" />
+    <Folder Include="templates\" />
+    <Folder Include="templates\admin\" />
+    <Folder Include="templates\athlete\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

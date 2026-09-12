@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Nuovo Allenamento{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Pannello Admin</a>
+</div>
+<div class="card">
+    <h2>Nuovo allenamento</h2>
+    <form method="POST">
+        <label>Data</label>
+        <input type="date" name="data" required>
+
+        <label>Gruppo</label>
+        <input type="text" name="gruppo" placeholder="es. Agonisti">
+
+        <label>Sede</label>
+        <input type="text" name="sede">
+
+        <label>Descrizione</label>
+        <textarea name="descrizione" rows="3"></textarea>
+
+        <button type="submit">Crea allenamento</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Atleti{% endblock %}
+{% block content %}
+<h1>Atleti</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Pannello Admin</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_atleta') }}">+ Nuovo atleta</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="search-form">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per nome, cognome o utente...">
+        <button type="submit">Cerca</button>
+    </form>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Età</th>
+                <th>Utente</th>
+                <th>Saldo</th>
+                <th>Cartellino</th>
+                <th>Certificato medico</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in atleti %}
+            {% set saldo = a.saldo_attuale() %}
+            <tr>
+                <td>{{ a.nome }}</td>
+                <td>{{ a.cognome }}</td>
+                <td>{{ a.eta if a.eta is not none else "-" }}</td>
+                <td>{{ a.username }}</td>
+                <td class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</td>
+                <td>{{ "Sì" if a.cartellino_file else "-" }}</td>
+                <td>{{ "Sì" if a.certificato_medico_file else "-" }}</td>
+                <td class="table-actions">
+                    <a class="btn" href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">Apri</a>
+                    <a class="btn" href="{{ url_for('admin.modifica_atleta', atleta_id=a.id) }}">Modifica</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">Nessun atleta trovato.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

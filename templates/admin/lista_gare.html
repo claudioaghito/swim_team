@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Tornei{% endblock %}
+{% block content %}
+<h1>Tornei</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Pannello Admin</a>
+    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">+ Nuovo Torneo</a>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Nome</th>
+                <th>Luogo</th>
+                <th>Quota gara</th>
+                <th>Quota staffetta</th>
+                <th>Tipologie</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in gare %}
+            <tr>
+                <td>{{ g.data.strftime('%d/%m/%Y') }}</td>
+                <td>{{ g.nome }}</td>
+                <td>{{ g.luogo or '-' }}</td>
+                <td>{{ "%.2f"|format(g.quota_gara or 0) }} €</td>
+                <td>{{ "%.2f"|format(g.quota_staffetta or 0) }} €</td>
+                <td>{{ g.lista_tipologie|join(', ') }}</td>
+                <td class="table-actions">
+                    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">Apri</a>
+                    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=g.id) }}">Modifica</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">Nessun torneo creato.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

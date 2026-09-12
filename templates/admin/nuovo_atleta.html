@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Nuovo Atleta{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.lista_atleti') }}">&larr; Atleti</a>
+</div>
+<div class="card">
+    <h2>Nuovo utente</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <label>Nome</label>
+        <input type="text" name="nome" required>
+
+        <label>Cognome</label>
+        <input type="text" name="cognome" required>
+
+        <label>Data di nascita</label>
+        <input type="date" name="data_nascita">
+
+        <label>Nome utente</label>
+        <input type="text" name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <label>Email (opzionale)</label>
+        <input type="email" name="email">
+
+        <label>Ruolo</label>
+        <select name="ruolo">
+            <option value="atleta" selected>Atleta</option>
+            <option value="admin">Amministratore</option>
+        </select>
+
+        <label>Cartellino (immagine, opzionale)</label>
+        <input type="file" name="cartellino" accept=".png,.jpg,.jpeg,.gif,.webp">
+
+        <label>Certificato medico (PDF, opzionale)</label>
+        <input type="file" name="certificato_medico" accept=".pdf">
+
+        <button type="submit">Crea utente</button>
+    </form>
+</div>
+{% endblock %}

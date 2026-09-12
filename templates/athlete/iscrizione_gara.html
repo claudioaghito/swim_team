@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Iscrizione {{ gara.nome }}{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+</div>
+
+<div class="card">
+    <h2>{{ gara.nome }}</h2>
+    <p>
+        <strong>Data:</strong> {{ gara.data.strftime('%d/%m/%Y') }}<br>
+        <strong>Luogo:</strong> {{ gara.luogo or '-' }}<br>
+        <strong>Quota gara:</strong> {{ "%.2f"|format(gara.quota_gara or 0) }} €<br>
+        <strong>Quota staffetta:</strong> {{ "%.2f"|format(gara.quota_staffetta or 0) }} €<br>
+        {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}{% endif %}
+    </p>
+</div>
+
+<div class="card">
+    <h3>Seleziona le gare a cui vuoi partecipare</h3>
+    <form method="POST">
+        <div class="checkbox-list">
+            {% for tipo in gara.lista_tipologie %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="tipologie" value="{{ tipo }}" {% if tipo in scelte_attuali %}checked{% endif %}> {{ tipo }}
+                </label>
+            {% else %}
+                <p>Nessuna tipologia di gara disponibile per questo torneo.</p>
+            {% endfor %}
+        </div>
+        <button type="submit">Salva le mie scelte</button>
+    </form>
+</div>
+{% endblock %}

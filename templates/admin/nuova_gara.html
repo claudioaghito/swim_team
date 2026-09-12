@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Nuovo Torneo{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Pannello Admin</a>
+</div>
+<div class="card">
+    <h2>Nuovo Torneo</h2>
+    <form method="POST">
+        <label>Nome torneo</label>
+        <input type="text" name="nome" required>
+
+        <label>Data</label>
+        <input type="date" name="data" required>
+
+        <label>Luogo</label>
+        <input type="text" name="luogo">
+
+        <label>Quota gara (€)</label>
+        <input type="number" step="0.01" name="quota_gara" value="0">
+
+        <label>Quota staffetta (€)</label>
+        <input type="number" step="0.01" name="quota_staffetta" value="0">
+
+        <label>Scadenza iscrizione</label>
+        <input type="date" name="scadenza_iscrizione">
+
+        <label>Tipologie di gara</label>
+        <div class="checkbox-list">
+            {% for tipo in tipi_gara_base %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="tipologie" value="{{ tipo }}"> {{ tipo }}
+                </label>
+            {% endfor %}
+        </div>
+
+        <label>Altre tipologie (facoltativo, separate da virgola)</label>
+        <input type="text" name="altre_tipologie" placeholder="es. 400 SL, Staffetta 4x50">
+
+        <button type="submit">Crea torneo</button>
+    </form>
+</div>
+{% endblock %}
