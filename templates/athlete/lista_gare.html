@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Tornei{% endblock %}
+{% block content %}
+<h1>Tornei</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Nome</th>
+                <th>Luogo</th>
+                <th>Iscrizioni</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in gare %}
+            <tr>
+                <td>{{ g.data.strftime('%d/%m/%Y') }}</td>
+                <td>{{ g.nome }}</td>
+                <td>{{ g.luogo or '-' }}</td>
+                <td>{{ "aperte" if g.iscrizioni_aperte else "chiuse" }}</td>
+                <td>
+                    <a class="btn" href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">
+                        {{ "Seleziona le tue gare" if g.iscrizioni_aperte else "Vedi le tue iscrizioni" }}
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">Nessun torneo disponibile.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

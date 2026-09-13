@@ -38,6 +38,13 @@ def dashboard():
     )
 
 
+@athlete_bp.route("/gare")
+@login_required
+def lista_gare():
+    gare = Gara.query.order_by(Gara.data.desc()).all()
+    return render_template("athlete/lista_gare.html", gare=gare)
+
+
 @athlete_bp.route("/gare/<int:gara_id>/iscrizione", methods=["GET", "POST"])
 @login_required
 def iscrizione_gara(gara_id):
