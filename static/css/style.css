@@ -172,3 +172,5 @@ form button, form input[type="submit"] { margin-top: 16px; }
 
 ul { padding-left: 20px; margin: 8px 0; }
 li { margin-bottom: 4px; }
+
+.preserve-lines { white-space: pre-line; }

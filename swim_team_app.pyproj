@@ -55,6 +55,7 @@ FLASK_DEBUG=1</Environment>
     <Content Include="templates\admin\modifica_allenamento.html" />
     <Content Include="templates\admin\nuovo_atleta.html" />
     <Content Include="templates\admin\nuovo_messaggio.html" />
+    <Content Include="templates\admin\lista_messaggi.html" />
     <Content Include="templates\admin\nuovo_movimento.html" />
     <Content Include="templates\admin\lista_movimenti.html" />
     <Content Include="templates\admin\lista_gare.html" />
@@ -66,6 +67,7 @@ FLASK_DEBUG=1</Environment>
     <Content Include="templates\athlete\lista_gare.html" />
     <Content Include="templates\athlete\iscrizione_gara.html" />
     <Content Include="templates\athlete\lista_movimenti.html" />
+    <Content Include="templates\athlete\lista_messaggi.html" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="venv\">

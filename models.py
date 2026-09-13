@@ -170,7 +170,23 @@ class Messaggio(db.Model):
 
     mittente = db.relationship("User", foreign_keys=[mittente_id])
     destinatario = db.relationship("User", foreign_keys=[destinatario_id])
+    nascosto_da = db.relationship(
+        "MessaggioNascosto", backref="messaggio", lazy=True, cascade="all, delete-orphan"
+    )
 
     @property
     def is_comunicazione_generale(self):
         return self.destinatario_id is None
+
+
+class MessaggioNascosto(db.Model):
+    """Traccia quali comunicazioni generali un atleta ha eliminato dalla propria vista."""
+    __tablename__ = "messaggi_nascosti"
+
+    id = db.Column(db.Integer, primary_key=True)
+    messaggio_id = db.Column(db.Integer, db.ForeignKey("messaggi.id"), nullable=False)
+    atleta_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint("messaggio_id", "atleta_id", name="uq_messaggio_nascosto"),
+    )

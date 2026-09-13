@@ -527,3 +527,22 @@ def nuovo_messaggio():
         return redirect(url_for("admin.dashboard"))
 
     return render_template("admin/nuovo_messaggio.html", atleti=atleti)
+
+
+@admin_bp.route("/messaggi")
+@login_required
+@admin_required
+def lista_messaggi():
+    messaggi = Messaggio.query.order_by(Messaggio.data.desc()).all()
+    return render_template("admin/lista_messaggi.html", messaggi=messaggi)
+
+
+@admin_bp.route("/messaggi/<int:messaggio_id>/elimina", methods=["POST"])
+@login_required
+@admin_required
+def elimina_messaggio(messaggio_id):
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    db.session.delete(messaggio)
+    db.session.commit()
+    flash("Messaggio eliminato.", "success")
+    return redirect(url_for("admin.lista_messaggi"))

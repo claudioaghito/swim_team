@@ -15,7 +15,7 @@
         {% if allenamento.ora_fine %}<strong>Ora fine:</strong> {{ allenamento.ora_fine.strftime('%H:%M') }}<br>{% endif %}
     </p>
     {% if allenamento.descrizione %}
-        <p><strong>Descrizione:</strong><br>{{ allenamento.descrizione }}</p>
+        <p><strong>Descrizione:</strong><br><span class="preserve-lines">{{ allenamento.descrizione }}</span></p>
     {% endif %}
     <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella finestra di stampa del browser.</small></p>
 </div>

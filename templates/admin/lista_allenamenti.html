@@ -25,7 +25,7 @@
                 <td>{{ al.data.strftime('%d/%m/%Y') }}</td>
                 <td>{{ al.gruppo or '-' }}</td>
                 <td>{{ al.sede or '-' }}</td>
-                <td>{{ al.descrizione or '-' }}</td>
+                <td class="preserve-lines">{{ al.descrizione or '-' }}</td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">👁️ Apri</a>
                     <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=al.id) }}">✏️ Modifica</a>

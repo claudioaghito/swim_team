@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Messaggi{% endblock %}
+{% block content %}
+<h1>✉️ Messaggi</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_messaggio') }}">➕✉️ Nuovo messaggio</a>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Mittente</th>
+                <th>Destinatario</th>
+                <th>Testo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in messaggi %}
+            <tr>
+                <td>{{ m.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ m.mittente.nome_completo }}</td>
+                <td>{{ "Tutta la squadra" if m.is_comunicazione_generale else m.destinatario.nome_completo }}</td>
+                <td class="preserve-lines">{{ m.testo }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.elimina_messaggio', messaggio_id=m.id) }}"
+                          onsubmit="return confirm('Eliminare questo messaggio?');">
+                        <button type="submit" class="btn-danger">🗑️ Elimina</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">Nessun messaggio inviato.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

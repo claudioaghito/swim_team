@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Messaggi{% endblock %}
+{% block content %}
+<h1>✉️ Messaggi</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+</div>
+
+<div class="card">
+    <ul>
+        {% for m in messaggi %}
+            <li>
+                <strong>{{ m.mittente.nome_completo }}</strong>
+                {% if m.is_comunicazione_generale %}<em>(a tutti)</em>{% endif %}
+                — <span class="preserve-lines">{{ m.testo }}</span>
+                <form method="POST" action="{{ url_for('athlete.elimina_messaggio', messaggio_id=m.id) }}"
+                      onsubmit="return confirm('Eliminare questo messaggio?');" style="display:inline;">
+                    <input type="hidden" name="next" value="{{ url_for('athlete.lista_messaggi') }}">
+                    <button type="submit" class="btn-danger">🗑️</button>
+                </form>
+            </li>
+        {% else %}
+            <li>Nessun messaggio.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

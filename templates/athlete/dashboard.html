@@ -55,12 +55,18 @@
                 <li>
                     <strong>{{ m.mittente.nome_completo }}</strong>
                     {% if m.is_comunicazione_generale %}<em>(a tutti)</em>{% endif %}
-                    — {{ m.testo }}
+                    — <span class="preserve-lines">{{ m.testo }}</span>
+                    <form method="POST" action="{{ url_for('athlete.elimina_messaggio', messaggio_id=m.id) }}"
+                          onsubmit="return confirm('Eliminare questo messaggio?');" style="display:inline;">
+                        <input type="hidden" name="next" value="{{ url_for('athlete.dashboard') }}">
+                        <button type="submit" class="btn-danger">🗑️</button>
+                    </form>
                 </li>
             {% else %}
                 <li>Nessun messaggio.</li>
             {% endfor %}
         </ul>
+        <a href="{{ url_for('athlete.lista_messaggi') }}">Vedi tutti i messaggi &rarr;</a>
     </div>
 </div>
 {% endblock %}

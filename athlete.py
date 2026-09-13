@@ -1,12 +1,21 @@
 from datetime import datetime
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 
 from extensions import db
-from models import Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara
+from models import (
+    Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
+)
 
 athlete_bp = Blueprint("athlete", __name__, url_prefix="/atleta")
+
+
+def _messaggi_visibili_query():
+    nascosti = db.session.query(MessaggioNascosto.messaggio_id).filter_by(atleta_id=current_user.id)
+    return Messaggio.query.filter(
+        (Messaggio.destinatario_id == current_user.id) | (Messaggio.destinatario_id.is_(None))
+    ).filter(~Messaggio.id.in_(nascosti))
 
 
 @athlete_bp.route("/")
@@ -24,9 +33,7 @@ def dashboard():
         atleta_id=current_user.id
     ).order_by(MovimentoContabile.data.desc()).limit(5).all()
 
-    messaggi = Messaggio.query.filter(
-        (Messaggio.destinatario_id == current_user.id) | (Messaggio.destinatario_id.is_(None))
-    ).order_by(Messaggio.data.desc()).limit(10).all()
+    messaggi = _messaggi_visibili_query().order_by(Messaggio.data.desc()).limit(10).all()
 
     return render_template(
         "athlete/dashboard.html",
@@ -36,6 +43,33 @@ def dashboard():
         saldo=current_user.saldo_attuale(),
         messaggi=messaggi,
     )
+
+
+@athlete_bp.route("/messaggi")
+@login_required
+def lista_messaggi():
+    messaggi = _messaggi_visibili_query().order_by(Messaggio.data.desc()).all()
+    return render_template("athlete/lista_messaggi.html", messaggi=messaggi)
+
+
+@athlete_bp.route("/messaggi/<int:messaggio_id>/elimina", methods=["POST"])
+@login_required
+def elimina_messaggio(messaggio_id):
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    if messaggio.destinatario_id not in (None, current_user.id):
+        abort(403)
+
+    if messaggio.destinatario_id == current_user.id:
+        db.session.delete(messaggio)
+    elif not MessaggioNascosto.query.filter_by(
+        messaggio_id=messaggio.id, atleta_id=current_user.id
+    ).first():
+        db.session.add(MessaggioNascosto(messaggio_id=messaggio.id, atleta_id=current_user.id))
+
+    db.session.commit()
+    flash("Messaggio eliminato.", "success")
+    next_url = request.form.get("next") or url_for("athlete.dashboard")
+    return redirect(next_url)
 
 
 @athlete_bp.route("/movimenti")
