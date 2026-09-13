@@ -61,11 +61,11 @@ class User(db.Model, UserMixin):
 
     def categoria_master(self, anno_stagione):
         """Categoria Master FIN: eta agonistica = anno di fine stagione - anno di nascita,
-        arrotondata per difetto al multiplo di 5 piu' vicino (minimo M25)."""
+        arrotondata per difetto al multiplo di 5 piu' vicino (minimo M20)."""
         if not self.data_nascita:
             return None
         eta_agonistica = anno_stagione - self.data_nascita.year
-        if eta_agonistica < 25:
+        if eta_agonistica < 20:
             return None
         fascia = (eta_agonistica // 5) * 5
         return f"M{fascia}"
