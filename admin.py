@@ -88,6 +88,35 @@ def dashboard():
     )
 
 
+@admin_bp.route("/profilo", methods=["GET", "POST"])
+@login_required
+@admin_required
+def profilo():
+    if request.method == "POST":
+        password_attuale = request.form.get("password_attuale", "")
+        if not current_user.check_password(password_attuale):
+            flash("Password attuale non corretta.", "danger")
+            return redirect(url_for("admin.profilo"))
+
+        username = request.form["username"].strip()
+        esistente = User.query.filter_by(username=username).first()
+        if esistente and esistente.id != current_user.id:
+            flash("Nome utente già esistente.", "danger")
+            return redirect(url_for("admin.profilo"))
+
+        current_user.username = username
+
+        nuova_password = request.form.get("nuova_password", "").strip()
+        if nuova_password:
+            current_user.set_password(nuova_password)
+
+        db.session.commit()
+        flash("Credenziali aggiornate.", "success")
+        return redirect(url_for("admin.profilo"))
+
+    return render_template("admin/profilo.html")
+
+
 @admin_bp.route("/atleti")
 @login_required
 @admin_required

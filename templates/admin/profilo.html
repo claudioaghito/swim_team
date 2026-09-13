@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Modifica credenziali{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
+</div>
+<div class="card">
+    <h2>Modifica credenziali di accesso</h2>
+    <form method="POST">
+        <label>Nome utente</label>
+        <input type="text" name="username" value="{{ current_user.username }}" required>
+
+        <label>Nuova password (lascia vuoto per non modificarla)</label>
+        <input type="password" name="nuova_password">
+
+        <label>Password attuale (obbligatoria per confermare le modifiche)</label>
+        <input type="password" name="password_attuale" required>
+
+        <button type="submit">Salva modifiche</button>
+    </form>
+</div>
+{% endblock %}
