@@ -18,7 +18,7 @@
                 <li>Nessun movimento registrato.</li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('athlete.lista_movimenti') }}">Vedi tutti i movimenti &rarr;</a>
+        <a class="btn" style="margin-top:8px;" href="{{ url_for('athlete.lista_movimenti') }}">Vedi tutti i movimenti &rarr;</a>
     </div>
 
     <div class="card">
@@ -30,7 +30,7 @@
                 <li>Nessun allenamento programmato.</li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('athlete.lista_allenamenti') }}">Vedi tutti gli allenamenti &rarr;</a>
+        <a class="btn" style="margin-top:8px;" href="{{ url_for('athlete.lista_allenamenti') }}">Vedi tutti gli allenamenti &rarr;</a>
     </div>
 
     <div class="card">
@@ -45,7 +45,7 @@
                 <li>Nessuna gara programmata.</li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('athlete.lista_gare') }}">Vedi tutti i tornei &rarr;</a>
+        <a class="btn" style="margin-top:8px;" href="{{ url_for('athlete.lista_gare') }}">Vedi tutti i tornei &rarr;</a>
     </div>
 
     <div class="card">
@@ -66,7 +66,7 @@
                 <li>Nessun messaggio.</li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('athlete.lista_messaggi') }}">Vedi tutti i messaggi &rarr;</a>
+        <a class="btn" style="margin-top:8px;" href="{{ url_for('athlete.lista_messaggi') }}">Vedi tutti i messaggi &rarr;</a>
     </div>
 </div>
 {% endblock %}
