@@ -49,6 +49,20 @@ def lista_movimenti():
     )
 
 
+@athlete_bp.route("/allenamenti")
+@login_required
+def lista_allenamenti():
+    allenamenti = Allenamento.query.order_by(Allenamento.data.desc()).all()
+    return render_template("athlete/lista_allenamenti.html", allenamenti=allenamenti)
+
+
+@athlete_bp.route("/allenamenti/<int:allenamento_id>")
+@login_required
+def dettaglio_allenamento(allenamento_id):
+    allenamento = Allenamento.query.get_or_404(allenamento_id)
+    return render_template("athlete/dettaglio_allenamento.html", allenamento=allenamento)
+
+
 @athlete_bp.route("/gare")
 @login_required
 def lista_gare():

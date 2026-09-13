@@ -294,6 +294,51 @@ def nuovo_allenamento():
     return render_template("admin/nuovo_allenamento.html")
 
 
+@admin_bp.route("/allenamenti")
+@login_required
+@admin_required
+def lista_allenamenti():
+    allenamenti = Allenamento.query.order_by(Allenamento.data.desc()).all()
+    return render_template("admin/lista_allenamenti.html", allenamenti=allenamenti)
+
+
+@admin_bp.route("/allenamenti/<int:allenamento_id>")
+@login_required
+@admin_required
+def dettaglio_allenamento(allenamento_id):
+    allenamento = Allenamento.query.get_or_404(allenamento_id)
+    return render_template("admin/dettaglio_allenamento.html", allenamento=allenamento)
+
+
+@admin_bp.route("/allenamenti/<int:allenamento_id>/modifica", methods=["GET", "POST"])
+@login_required
+@admin_required
+def modifica_allenamento(allenamento_id):
+    allenamento = Allenamento.query.get_or_404(allenamento_id)
+
+    if request.method == "POST":
+        allenamento.data = datetime.strptime(request.form["data"], "%Y-%m-%d").date()
+        allenamento.gruppo = request.form.get("gruppo", "")
+        allenamento.sede = request.form.get("sede", "")
+        allenamento.descrizione = request.form.get("descrizione", "")
+        db.session.commit()
+        flash("Allenamento aggiornato.", "success")
+        return redirect(url_for("admin.dettaglio_allenamento", allenamento_id=allenamento.id))
+
+    return render_template("admin/modifica_allenamento.html", allenamento=allenamento)
+
+
+@admin_bp.route("/allenamenti/<int:allenamento_id>/elimina", methods=["POST"])
+@login_required
+@admin_required
+def elimina_allenamento(allenamento_id):
+    allenamento = Allenamento.query.get_or_404(allenamento_id)
+    db.session.delete(allenamento)
+    db.session.commit()
+    flash("Allenamento eliminato.", "success")
+    return redirect(url_for("admin.lista_allenamenti"))
+
+
 @admin_bp.route("/gare/nuova", methods=["GET", "POST"])
 @login_required
 @admin_required

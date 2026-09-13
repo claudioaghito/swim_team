@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Allenamenti{% endblock %}
+{% block content %}
+<h1>🏊 Allenamenti</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Gruppo</th>
+                <th>Sede</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for al in allenamenti %}
+            <tr>
+                <td>{{ al.data.strftime('%d/%m/%Y') }}</td>
+                <td>{{ al.gruppo or '-' }}</td>
+                <td>{{ al.sede or '-' }}</td>
+                <td>
+                    <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}">👁️ Apri</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Nessun allenamento registrato.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

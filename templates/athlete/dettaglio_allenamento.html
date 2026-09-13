@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Allenamento {{ allenamento.data.strftime('%d/%m/%Y') }}{% endblock %}
+{% block content %}
+<div class="actions no-print">
+    <a class="btn" href="{{ url_for('athlete.lista_allenamenti') }}">&larr; Allenamenti</a>
+    <button type="button" class="btn" onclick="window.print()">🖨️ Stampa / Esporta PDF</button>
+</div>
+
+<div class="card">
+    <h2>🏊 Allenamento del {{ allenamento.data.strftime('%d/%m/%Y') }}</h2>
+    <p>
+        <strong>Gruppo:</strong> {{ allenamento.gruppo or '-' }}<br>
+        <strong>Sede:</strong> {{ allenamento.sede or '-' }}<br>
+        {% if allenamento.ora_inizio %}<strong>Ora inizio:</strong> {{ allenamento.ora_inizio.strftime('%H:%M') }}<br>{% endif %}
+        {% if allenamento.ora_fine %}<strong>Ora fine:</strong> {{ allenamento.ora_fine.strftime('%H:%M') }}<br>{% endif %}
+    </p>
+    {% if allenamento.descrizione %}
+        <p><strong>Descrizione:</strong><br>{{ allenamento.descrizione }}</p>
+    {% endif %}
+    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella finestra di stampa del browser.</small></p>
+</div>
+
+<style>
+@media print {
+    .no-print, .navbar, .flash { display: none !important; }
+    .card { box-shadow: none; border: none; }
+}
+</style>
+{% endblock %}

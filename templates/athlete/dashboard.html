@@ -25,11 +25,12 @@
         <h3>🏊 Prossimi allenamenti</h3>
         <ul>
             {% for al in prossimi_allenamenti %}
-                <li>{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</li>
+                <li><a href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</a></li>
             {% else %}
                 <li>Nessun allenamento programmato.</li>
             {% endfor %}
         </ul>
+        <a href="{{ url_for('athlete.lista_allenamenti') }}">Vedi tutti gli allenamenti &rarr;</a>
     </div>
 
     <div class="card">

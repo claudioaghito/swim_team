@@ -5,6 +5,7 @@
 
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.lista_atleti') }}">👥 Atleti</a>
+    <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">🏊 Allenamenti</a>
     <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">➕🏊 Nuovo allenamento</a>
     <a class="btn" href="{{ url_for('admin.lista_gare') }}">🏆 Tornei</a>
     <a class="btn" href="{{ url_for('admin.nuova_gara') }}">➕🏆 Nuovo Torneo</a>
@@ -26,14 +27,15 @@
     </div>
 
     <div class="card">
-        <h3>Prossimi allenamenti</h3>
+        <h3>🏊 Prossimi allenamenti</h3>
         <ul>
             {% for al in prossimi_allenamenti %}
-                <li>{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</li>
+                <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</a></li>
             {% else %}
                 <li>Nessun allenamento programmato.</li>
             {% endfor %}
         </ul>
+        <a href="{{ url_for('admin.lista_allenamenti') }}">Vedi tutti gli allenamenti &rarr;</a>
     </div>
 
     <div class="card">

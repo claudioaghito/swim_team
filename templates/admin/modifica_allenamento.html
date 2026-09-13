@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Modifica Allenamento{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=allenamento.id) }}">&larr; Allenamento</a>
+    <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">🏊 Tutti gli allenamenti</a>
+</div>
+<div class="card">
+    <h2>✏️ Modifica allenamento</h2>
+    <form method="POST">
+        <label>Data</label>
+        <input type="date" name="data" value="{{ allenamento.data.isoformat() }}" required>
+
+        <label>Gruppo</label>
+        <input type="text" name="gruppo" value="{{ allenamento.gruppo or '' }}" placeholder="es. Agonisti">
+
+        <label>Sede</label>
+        <input type="text" name="sede" value="{{ allenamento.sede or '' }}">
+
+        <label>Descrizione</label>
+        <textarea name="descrizione" rows="3">{{ allenamento.descrizione or '' }}</textarea>
+
+        <button type="submit">💾 Salva modifiche</button>
+    </form>
+</div>
+{% endblock %}
