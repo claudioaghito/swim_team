@@ -3,6 +3,10 @@
 {% block content %}
 <h1>Ciao, {{ current_user.nome }}!</h1>
 
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.lista_gare') }}">Tornei &amp; iscrizioni gare</a>
+</div>
+
 <div class="grid">
     <div class="card">
         <h3>Il tuo saldo</h3>

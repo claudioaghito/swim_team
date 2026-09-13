@@ -21,25 +21,36 @@
 
 <div class="card">
     <h3>Iscrizioni atleti ({{ scelte_per_atleta|length }})</h3>
+    <div style="overflow-x:auto;">
     <table class="table">
         <thead>
             <tr>
-                <th>Atleta</th>
-                <th>Gare scelte</th>
+                <th>Nome Cognome</th>
+                {% for i in range(max_gare) %}
+                    <th>Gara {{ i + 1 }}</th>
+                    <th>Tempo {{ i + 1 }}</th>
+                {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for atleta, iscrizioni in scelte_per_atleta.items() %}
             <tr>
                 <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
-                <td>
-                    {% for iscrizione in iscrizioni %}{{ iscrizione.stile }}{% if iscrizione.tempo_ottenuto %} ({{ iscrizione.tempo_ottenuto }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
-                </td>
+                {% for i in range(max_gare) %}
+                    {% if i < iscrizioni|length %}
+                        <td>{{ iscrizioni[i].stile }}</td>
+                        <td>{{ iscrizioni[i].tempo_ottenuto or '-' }}</td>
+                    {% else %}
+                        <td>-</td>
+                        <td>-</td>
+                    {% endif %}
+                {% endfor %}
             </tr>
             {% else %}
-            <tr><td colspan="2">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
+            <tr><td colspan="{{ 1 + max_gare * 2 }}">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}

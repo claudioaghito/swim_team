@@ -317,8 +317,13 @@ def dettaglio_gara(gara_id):
     for iscrizione in iscrizioni:
         scelte_per_atleta.setdefault(iscrizione.atleta, []).append(iscrizione)
 
+    max_gare = max((len(v) for v in scelte_per_atleta.values()), default=0)
+
     return render_template(
-        "admin/dettaglio_gara.html", gara=gara, scelte_per_atleta=scelte_per_atleta
+        "admin/dettaglio_gara.html",
+        gara=gara,
+        scelte_per_atleta=scelte_per_atleta,
+        max_gare=max_gare,
     )
 
 
