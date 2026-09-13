@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Derthona Nuoto Master{% endblock %}</title>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem("theme");
+                if (stored === "light" || stored === "dark") {
+                    document.documentElement.setAttribute("data-theme", stored);
+                }
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -12,16 +22,20 @@
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Derthona Nuoto Master" class="brand-logo">
             DERTHONA NUOTO MASTER
         </span>
-        {% if current_user.is_authenticated %}
-            <span class="user-info">
-                {{ current_user.nome_completo }}
-                {% if current_user.is_admin %}
-                    <a href="{{ url_for('admin.dashboard') }}">🏠 Home</a>
-                    <a href="{{ url_for('admin.profilo') }}">🔑 Modifica credenziali</a>
-                {% endif %}
-                <a href="{{ url_for('auth.logout') }}">🚪 Esci</a>
-            </span>
-        {% endif %}
+        <div class="navbar-right">
+            {% if current_user.is_authenticated %}
+                <span class="user-info">
+                    {{ current_user.nome_completo }}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}">🏠 Home</a>
+                        <a href="{{ url_for('admin.profilo') }}">🔑 Modifica credenziali</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}">🚪 Esci</a>
+                </span>
+            {% endif %}
+            <button type="button" id="theme-toggle" class="theme-toggle" onclick="toggleTheme()"
+                    aria-label="Cambia tema chiaro/scuro" title="Cambia tema chiaro/scuro">🌙</button>
+        </div>
     </nav>
 
     <main class="container">
@@ -35,5 +49,25 @@
 
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        function _isDarkActive() {
+            var explicit = document.documentElement.getAttribute("data-theme");
+            if (explicit === "dark") return true;
+            if (explicit === "light") return false;
+            return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        }
+        function _updateThemeIcon() {
+            var btn = document.getElementById("theme-toggle");
+            if (btn) btn.textContent = _isDarkActive() ? "☀️" : "🌙";
+        }
+        function toggleTheme() {
+            var next = _isDarkActive() ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", next);
+            try { localStorage.setItem("theme", next); } catch (e) {}
+            _updateThemeIcon();
+        }
+        _updateThemeIcon();
+    </script>
 </body>
 </html>

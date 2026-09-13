@@ -40,7 +40,7 @@
                     <th>Gara {{ i + 1 }}</th>
                     <th>Tempo {{ i + 1 }}</th>
                 {% endfor %}
-                <th>Quota gara</th>
+                <th class="no-print">Quota gara</th>
                 <th class="no-print"></th>
             </tr>
         </thead>
@@ -58,7 +58,7 @@
                         <td>-</td>
                     {% endif %}
                 {% endfor %}
-                <td>
+                <td class="no-print">
                     {% if quota and quota.movimento_id %}
                         {{ "%.2f"|format(quota.importo) }} € <span class="status-dot green" title="Addebitata"></span>
                     {% else %}
