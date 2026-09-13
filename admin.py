@@ -396,7 +396,6 @@ def lista_gare():
 def dettaglio_gara(gara_id):
     gara = Gara.query.get_or_404(gara_id)
     scelte_per_atleta = gara.iscrizioni_per_atleta()
-    max_gare = max((len(v) for v in scelte_per_atleta.values()), default=0)
 
     quote_per_atleta = {
         q.atleta_id: q
@@ -407,7 +406,6 @@ def dettaglio_gara(gara_id):
         "admin/dettaglio_gara.html",
         gara=gara,
         scelte_per_atleta=scelte_per_atleta,
-        max_gare=max_gare,
         quote_per_atleta=quote_per_atleta,
     )
 

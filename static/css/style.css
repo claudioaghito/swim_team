@@ -92,6 +92,10 @@ body {
 
 img { max-width: 100%; }
 
+a { color: var(--blue); }
+a:visited { color: var(--blue); }
+a:hover { color: var(--blue-dark); }
+
 h1, h2, h3 { line-height: 1.25; }
 h1 { font-size: 1.6em; margin: 0 0 16px; }
 h2 { font-size: 1.25em; margin-top: 0; }
@@ -293,4 +297,29 @@ li { margin-bottom: 4px; }
     .table th, .table td { padding: 8px 6px; font-size: 0.9em; }
 
     .checkbox-list { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+}
+
+/* Stampa/PDF: sempre chiara e leggibile su carta bianca, a prescindere dal tema attivo a schermo */
+@media print {
+    :root {
+        --blue-dark: #0b5394 !important;
+        --blue: #1565c0 !important;
+        --green: #1a7a3c !important;
+        --red: #cc4b37 !important;
+        --ink: #1a1a1a !important;
+        --muted: #5f6b76 !important;
+        --border: #d7dbe0 !important;
+        --bg: #ffffff !important;
+        --card-bg: #ffffff !important;
+        --input-bg: #ffffff !important;
+        --input-border: #cfd6dc !important;
+        --label-color: #33404a !important;
+        --table-header-bg: #e8f1fb !important;
+        --table-header-text: #0b5394 !important;
+        --table-hover-bg: #ffffff !important;
+        --checkbox-bg: #f8fafc !important;
+        --shadow-color: rgba(15,23,42,0.06) !important;
+    }
+    body { background: #ffffff !important; color: #1a1a1a !important; }
+    a, a:visited { color: #0b5394 !important; }
 }

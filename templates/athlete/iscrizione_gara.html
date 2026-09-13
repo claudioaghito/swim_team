@@ -84,28 +84,23 @@
         <thead>
             <tr>
                 <th>Nome Cognome</th>
-                {% for i in range(max_gare) %}
-                    <th>Gara {{ i + 1 }}</th>
-                    <th>Tempo {{ i + 1 }}</th>
-                {% endfor %}
+                <th>Gara</th>
+                <th>Tempo</th>
             </tr>
         </thead>
         <tbody>
             {% for atleta, iscrizioni in scelte_per_atleta.items() %}
-            <tr>
-                <td>{{ atleta.nome_completo }}</td>
-                {% for i in range(max_gare) %}
-                    {% if i < iscrizioni|length %}
-                        <td>{{ iscrizioni[i].stile }}</td>
-                        <td>{{ iscrizioni[i].tempo_ottenuto or '-' }}</td>
-                    {% else %}
-                        <td>-</td>
-                        <td>-</td>
+                {% for iscrizione in iscrizioni %}
+                <tr>
+                    {% if loop.first %}
+                        <td rowspan="{{ iscrizioni|length }}">{{ atleta.nome_completo }}</td>
                     {% endif %}
+                    <td>{{ iscrizione.stile }}</td>
+                    <td>{{ iscrizione.tempo_ottenuto or '-' }}</td>
+                </tr>
                 {% endfor %}
-            </tr>
             {% else %}
-            <tr><td colspan="{{ 1 + max_gare * 2 }}">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
+            <tr><td colspan="3">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
             {% endfor %}
         </tbody>
     </table>

@@ -139,12 +139,10 @@ def iscrizione_gara(gara_id):
         return redirect(url_for("athlete.dashboard"))
 
     scelte_per_atleta = gara.iscrizioni_per_atleta()
-    max_gare = max((len(v) for v in scelte_per_atleta.values()), default=0)
 
     return render_template(
         "athlete/iscrizione_gara.html",
         gara=gara,
         iscrizioni_correnti=iscrizioni_correnti,
         scelte_per_atleta=scelte_per_atleta,
-        max_gare=max_gare,
     )
