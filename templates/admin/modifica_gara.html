@@ -40,14 +40,14 @@
 
         <label>Programma gare (PDF)</label>
         {% if gara.programma_gare_file %}
-            <p><a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">📄 Apri programma attuale</a></p>
+            <p><a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri programma attuale</a></p>
         {% endif %}
         <input type="file" name="programma_gare" accept="application/pdf">
 
         <label>Nota per gli atleti (visibile solo in visualizzazione)</label>
         <textarea name="note" rows="3" placeholder="es. Ritrovo alle 8:00, portare cartellino...">{{ gara.note or '' }}</textarea>
 
-        <button type="submit">💾 Salva modifiche</button>
+        <button type="submit">{{ icon('salva') }} Salva modifiche</button>
     </form>
 </div>
 {% endblock %}

@@ -55,12 +55,12 @@
     </div>
 
     <div class="card warning">
-        <h3>⚠️ Atleti con saldo negativo ({{ atleti_in_debito|length }})</h3>
+        <h3>{{ icon('warning') }} Atleti con saldo negativo ({{ atleti_in_debito|length }})</h3>
         <ul>
             {% for a in atleti_in_debito %}
                 <li>{{ a.nome_completo }}: <span class="saldo-cell negativo">{{ "%.2f"|format(a.saldo_attuale()) }} €</span></li>
             {% else %}
-                <li>Nessuno, tutti in regola 🎉</li>
+                <li>Nessuno, tutti in regola {{ icon('tromba-festa') }}</li>
             {% endfor %}
         </ul>
     </div>

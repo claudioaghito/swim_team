@@ -24,11 +24,11 @@
     </div>
 
     <div class="card">
-        <h3>🪪 Cartellino</h3>
+        <h3>{{ icon('cartellino') }} Cartellino</h3>
         {% if atleta.cartellino_file %}
             <img src="{{ url_for('admin.cartellino_atleta', atleta_id=atleta.id) }}" alt="Cartellino" class="cartellino-img" id="cartellino-img">
             <div class="actions no-print">
-                <button type="button" class="btn" onclick="window.print()">🖨️ Stampa cartellino</button>
+                <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa cartellino</button>
             </div>
         {% else %}
             <p>Nessun cartellino caricato.</p>
@@ -36,11 +36,11 @@
     </div>
 
     <div class="card no-print">
-        <h3>📄 Certificato medico</h3>
+        <h3>{{ icon('crea-pdf') }} Certificato medico</h3>
         {% if atleta.certificato_medico_file %}
             <p>
                 <a class="btn" href="{{ url_for('admin.certificato_atleta', atleta_id=atleta.id) }}" target="_blank">
-                    📄 Apri / Stampa certificato
+                    {{ icon('crea-pdf') }} Apri / Stampa certificato
                 </a>
             </p>
             <p><small>Il certificato si apre in una nuova scheda: usa il comando di stampa del visualizzatore PDF del browser.</small></p>

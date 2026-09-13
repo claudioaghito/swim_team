@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}La mia area{% endblock %}
 {% block content %}
-<h1>👋 Ciao, {{ current_user.nome }}!</h1>
+<h1>{{ icon('saluto') }} Ciao, {{ current_user.nome }}!</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.lista_gare') }}">{{ icon('tornei') }} Tornei &amp; iscrizioni gare</a>
@@ -40,7 +40,7 @@
                 <li>
                     {{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo }})
                     {% if g.scadenza_vicina %}<span class="status-dot red" title="Iscrizioni in scadenza"></span><small>iscrizioni in scadenza</small>{% endif %}
-                    — <a href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">{% if g.iscrizioni_aperte %}✅ Seleziona le tue gare{% else %}{{ icon('apri') }} Vedi le tue iscrizioni{% endif %}</a>
+                    — <a href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">{% if g.iscrizioni_aperte %}{{ icon('conferma') }} Seleziona le tue gare{% else %}{{ icon('apri') }} Vedi le tue iscrizioni{% endif %}</a>
                 </li>
             {% else %}
                 <li>Nessuna gara programmata.</li>

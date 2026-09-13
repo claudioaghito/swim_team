@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-nuovo-movimento" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="100%" stop-color="#0891B2"/>
+    </linearGradient>
+    <radialGradient id="gloss-nuovo-movimento" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-nuovo-movimento" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0891B2" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-nuovo-movimento" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-nuovo-movimento)" filter="url(#shadow-nuovo-movimento)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-nuovo-movimento)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-nuovo-movimento)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <rect x="16" y="22" width="56" height="56" rx="12"/>
+           <path d="M30 54V38l8 8 8-8v16" fill="none" stroke="#0891B2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+           <path d="M56 38v16" fill="none" stroke="#0891B2" stroke-width="6" stroke-linecap="round"/>
+           <circle cx="78" cy="76" r="15" fill="#22C55E"/><path d="M78 69v14M71 76h14" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+</svg>

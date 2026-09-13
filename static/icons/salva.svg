@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-salva" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5B9DF9"/>
+      <stop offset="100%" stop-color="#3B7BEF"/>
+    </linearGradient>
+    <radialGradient id="gloss-salva" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-salva" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#3B7BEF" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-salva" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-salva)" filter="url(#shadow-salva)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-salva)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-salva)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <path d="M24 16h38l14 14v50a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4V20a4 4 0 0 1 4-4Z"/>
+           <rect x="34" y="16" width="24" height="18" rx="3" fill="#3B7BEF"/>
+           <rect x="30" y="54" width="32" height="20" rx="2" fill="#3B7BEF"/>
+  </g>
+</svg>

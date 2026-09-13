@@ -40,14 +40,14 @@
                 </td>
                 <td>
                     {% if g.programma_gare_file %}
-                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">📄 Apri PDF</a>
+                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri PDF</a>
                     {% else %}
                         -
                     {% endif %}
                 </td>
                 <td>
                     <a class="btn" href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">
-                        {% if g.iscrizioni_aperte %}✅ Seleziona le tue gare{% else %}{{ icon('apri') }} Vedi le tue iscrizioni{% endif %}
+                        {% if g.iscrizioni_aperte %}{{ icon('conferma') }} Seleziona le tue gare{% else %}{{ icon('apri') }} Vedi le tue iscrizioni{% endif %}
                     </a>
                 </td>
             </tr>

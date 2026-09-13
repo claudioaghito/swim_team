@@ -5,8 +5,8 @@
 
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
-    <a class="btn" href="{{ url_for('admin.nuovo_movimento') }}">➕💶 Nuovo movimento</a>
-    <a class="btn" href="{{ url_for('admin.esporta_movimenti') }}">📥 Esporta CSV</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_movimento') }}">{{ icon('nuovo-movimento') }} Nuovo movimento</a>
+    <a class="btn" href="{{ url_for('admin.esporta_movimenti') }}">{{ icon('download') }} Esporta CSV</a>
 </div>
 
 <div class="card">

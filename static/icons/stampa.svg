@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-stampa" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#94A3B8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <radialGradient id="gloss-stampa" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-stampa" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#475569" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-stampa" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-stampa)" filter="url(#shadow-stampa)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-stampa)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-stampa)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <rect x="30" y="14" width="40" height="22" rx="2"/>
+           <rect x="16" y="34" width="68" height="30" rx="6"/>
+           <rect x="30" y="56" width="40" height="26" rx="2" fill="#475569"/>
+           <rect x="36" y="64" width="28" height="4" fill="#fff"/>
+           <rect x="36" y="72" width="28" height="4" fill="#fff"/>
+           <circle cx="74" cy="42" r="3" fill="#475569"/>
+  </g>
+</svg>

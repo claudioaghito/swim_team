@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-warning" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <radialGradient id="gloss-warning" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-warning" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#D97706" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-warning" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-warning)" filter="url(#shadow-warning)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-warning)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-warning)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <path d="M50 16 88 82H12L50 16Z"/>
+           <rect x="46" y="42" width="8" height="20" rx="3" fill="#D97706"/>
+           <circle cx="50" cy="70" r="5" fill="#D97706"/>
+  </g>
+</svg>

@@ -45,7 +45,7 @@
                 </td>
                 <td>
                     {% if g.programma_gare_file %}
-                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">📄 Apri PDF</a>
+                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri PDF</a>
                     {% else %}
                         -
                     {% endif %}

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-saluto" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <radialGradient id="gloss-saluto" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-saluto" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#F59E0B" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-saluto" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-saluto)" filter="url(#shadow-saluto)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-saluto)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-saluto)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <path d="M40 78c-10-2-18-10-20-22l-4-18a5 5 0 0 1 9.7-2.3l3.3 12"
+             fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+           <path d="M38 46 33 24a5 5 0 0 1 9.7-2.6L47 38"/>
+           <path d="M47 38 44 20a5 5 0 0 1 9.7-2.4L58 36"/>
+           <path d="M58 36 56 22a5 5 0 0 1 9.7-2l4.3 15"/>
+           <path d="M70 35l4 14c3 11-1 22-11 28l-9 5" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -15,7 +15,7 @@
         {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}<br>{% endif %}
         <strong>Programma gare:</strong>
         {% if gara.programma_gare_file %}
-            <a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">📄 Apri PDF</a>
+            <a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri PDF</a>
         {% else %}
             non ancora caricato
         {% endif %}
@@ -27,7 +27,7 @@
 
 {% if gara.iscrizioni_aperte %}
 <div class="card">
-    <h3>✅ Seleziona le gare a cui vuoi partecipare</h3>
+    <h3>{{ icon('conferma') }} Seleziona le gare a cui vuoi partecipare</h3>
     <form method="POST">
         <table class="table">
             <thead>
@@ -49,12 +49,12 @@
                 {% endfor %}
             </tbody>
         </table>
-        <button type="submit">💾 Salva le mie scelte</button>
+        <button type="submit">{{ icon('salva') }} Salva le mie scelte</button>
     </form>
 </div>
 {% else %}
 <div class="card warning">
-    <h3>🔒 Iscrizioni chiuse</h3>
+    <h3>{{ icon('lucchetto') }} Iscrizioni chiuse</h3>
     <p>Le iscrizioni a questo torneo sono scadute: non è più possibile scegliere o modificare le gare.</p>
     <table class="table">
         <thead>

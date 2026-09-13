@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-invio-messaggio" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34D8C8"/>
+      <stop offset="100%" stop-color="#0EA5A0"/>
+    </linearGradient>
+    <radialGradient id="gloss-invio-messaggio" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-invio-messaggio" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0EA5A0" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-invio-messaggio" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-invio-messaggio)" filter="url(#shadow-invio-messaggio)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-invio-messaggio)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-invio-messaggio)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <path d="M16 50 82 18 60 84 48 58 16 50Z"/>
+           <path d="M48 58 82 18" fill="none" stroke="#0EA5A0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>
