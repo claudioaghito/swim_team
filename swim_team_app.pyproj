@@ -40,6 +40,7 @@ FLASK_DEBUG=1</Environment>
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="static\css\style.css" />
+    <Content Include="static\img\logo.png" />
     <Content Include="templates\base.html" />
     <Content Include="templates\login.html" />
     <Content Include="templates\admin\dashboard.html" />
@@ -74,6 +75,7 @@ FLASK_DEBUG=1</Environment>
   <ItemGroup>
     <Folder Include="static\" />
     <Folder Include="static\css\" />
+    <Folder Include="static\img\" />
     <Folder Include="templates\" />
     <Folder Include="templates\admin\" />
     <Folder Include="templates\athlete\" />

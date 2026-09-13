@@ -18,7 +18,8 @@ body {
     margin-left: 16px;
     text-decoration: underline;
 }
-.brand { font-weight: bold; font-size: 1.2em; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.2em; }
+.brand-logo { height: 40px; width: auto; background: white; border-radius: 6px; padding: 2px; }
 .container { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
 .card {
     background: white;

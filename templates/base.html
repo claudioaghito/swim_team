@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestione Squadra Nuoto{% endblock %}</title>
+    <title>{% block title %}Derthona Nuoto Master{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <nav class="navbar">
-        <span class="brand">🏊 Squadra Nuoto</span>
+        <span class="brand">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Derthona Nuoto Master" class="brand-logo">
+            DERTHONA NUOTO MASTER
+        </span>
         {% if current_user.is_authenticated %}
             <span class="user-info">
                 {{ current_user.nome_completo }}
