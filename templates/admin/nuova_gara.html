@@ -6,7 +6,7 @@
 </div>
 <div class="card">
     <h2>Nuovo Torneo</h2>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <label>Nome torneo</label>
         <input type="text" name="nome" required>
 
@@ -36,6 +36,9 @@
 
         <label>Altre tipologie (facoltativo, separate da virgola)</label>
         <input type="text" name="altre_tipologie" placeholder="es. 400 SL, Staffetta 4x50">
+
+        <label>Programma gare (PDF)</label>
+        <input type="file" name="programma_gare" accept="application/pdf">
 
         <button type="submit">Crea torneo</button>
     </form>

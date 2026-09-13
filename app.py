@@ -17,6 +17,7 @@ def create_app(config_class=Config):
 
     os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "cartellini"), exist_ok=True)
     os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "certificati"), exist_ok=True)
+    os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "programmi_gare"), exist_ok=True)
 
     from auth import auth_bp
     from admin import admin_bp

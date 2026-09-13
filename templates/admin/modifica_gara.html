@@ -7,7 +7,7 @@
 </div>
 <div class="card">
     <h2>Modifica Torneo</h2>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <label>Nome torneo</label>
         <input type="text" name="nome" value="{{ gara.nome }}" required>
 
@@ -37,6 +37,12 @@
 
         <label>Altre tipologie (facoltativo, separate da virgola)</label>
         <input type="text" name="altre_tipologie" value="{{ tipi_extra }}" placeholder="es. 400 SL, Staffetta 4x50">
+
+        <label>Programma gare (PDF)</label>
+        {% if gara.programma_gare_file %}
+            <p><a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">Apri programma attuale</a></p>
+        {% endif %}
+        <input type="file" name="programma_gare" accept="application/pdf">
 
         <button type="submit">Salva modifiche</button>
     </form>

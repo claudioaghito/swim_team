@@ -81,3 +81,7 @@ form button { margin-top: 16px; }
 .checkbox-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; margin-top: 4px; }
 .checkbox-item { display: flex; align-items: center; gap: 6px; font-weight: normal; margin-top: 0; }
 .checkbox-item input { width: auto; margin-top: 0; }
+
+.status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+.status-dot.green { background: #1a7a3c; }
+.status-dot.red { background: #cc4b37; }

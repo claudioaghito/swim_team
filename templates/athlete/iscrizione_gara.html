@@ -12,7 +12,13 @@
         <strong>Luogo:</strong> {{ gara.luogo or '-' }}<br>
         <strong>Quota gara:</strong> {{ "%.2f"|format(gara.quota_gara or 0) }} €<br>
         <strong>Quota staffetta:</strong> {{ "%.2f"|format(gara.quota_staffetta or 0) }} €<br>
-        {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}{% endif %}
+        {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}<br>{% endif %}
+        <strong>Programma gare:</strong>
+        {% if gara.programma_gare_file %}
+            <a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">Apri PDF</a>
+        {% else %}
+            non ancora caricato
+        {% endif %}
     </p>
 </div>
 

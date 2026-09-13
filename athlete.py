@@ -22,7 +22,7 @@ def dashboard():
 
     movimenti = MovimentoContabile.query.filter_by(
         atleta_id=current_user.id
-    ).order_by(MovimentoContabile.data.desc()).all()
+    ).order_by(MovimentoContabile.data.desc()).limit(5).all()
 
     messaggi = Messaggio.query.filter(
         (Messaggio.destinatario_id == current_user.id) | (Messaggio.destinatario_id.is_(None))
@@ -35,6 +35,17 @@ def dashboard():
         movimenti=movimenti,
         saldo=current_user.saldo_attuale(),
         messaggi=messaggi,
+    )
+
+
+@athlete_bp.route("/movimenti")
+@login_required
+def lista_movimenti():
+    movimenti = MovimentoContabile.query.filter_by(
+        atleta_id=current_user.id
+    ).order_by(MovimentoContabile.data.desc()).all()
+    return render_template(
+        "athlete/lista_movimenti.html", movimenti=movimenti, saldo=current_user.saldo_attuale()
     )
 
 

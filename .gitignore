@@ -2,7 +2,7 @@ venv/
 __pycache__/
 *.pyc
 instance/*.db
-instance/*.db.bak
+instance/*.db.bak*
 instance/uploads/
 .env
 .vs/

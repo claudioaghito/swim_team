@@ -18,6 +18,8 @@
                 <th>Quota gara</th>
                 <th>Quota staffetta</th>
                 <th>Tipologie</th>
+                <th>Iscritti</th>
+                <th>Programma</th>
                 <th></th>
             </tr>
         </thead>
@@ -30,13 +32,24 @@
                 <td>{{ "%.2f"|format(g.quota_gara or 0) }} €</td>
                 <td>{{ "%.2f"|format(g.quota_staffetta or 0) }} €</td>
                 <td>{{ g.lista_tipologie|join(', ') }}</td>
+                <td>
+                    {% set n_iscritti = g.iscrizioni|map(attribute='atleta_id')|unique|list|length %}
+                    <span class="status-dot {{ 'green' if n_iscritti > 0 else 'red' }}"></span>{{ n_iscritti }}
+                </td>
+                <td>
+                    {% if g.programma_gare_file %}
+                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">Apri PDF</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">Apri</a>
                     <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=g.id) }}">Modifica</a>
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="7">Nessun torneo creato.</td></tr>
+            <tr><td colspan="9">Nessun torneo creato.</td></tr>
             {% endfor %}
         </tbody>
     </table>

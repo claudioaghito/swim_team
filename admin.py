@@ -286,6 +286,18 @@ def nuova_gara():
             tipologie_gara=",".join(tipologie),
         )
         db.session.add(gara)
+        db.session.flush()
+
+        try:
+            gara.programma_gare_file = _salva_upload(
+                request.files.get("programma_gare"), "programmi_gare", f"programma_{gara.id}",
+                current_app.config["ALLOWED_PDF_EXT"],
+            )
+        except ValueError as e:
+            db.session.rollback()
+            flash(str(e), "danger")
+            return redirect(url_for("admin.nuova_gara"))
+
         db.session.commit()
         flash("Torneo creato.", "success")
         return redirect(url_for("admin.dashboard"))
@@ -350,6 +362,18 @@ def modifica_gara(gara_id):
         )
         gara.tipologie_gara = ",".join(tipologie)
 
+        try:
+            nuovo_programma = _salva_upload(
+                request.files.get("programma_gare"), "programmi_gare", f"programma_{gara.id}",
+                current_app.config["ALLOWED_PDF_EXT"],
+            )
+            if nuovo_programma:
+                gara.programma_gare_file = nuovo_programma
+        except ValueError as e:
+            db.session.rollback()
+            flash(str(e), "danger")
+            return redirect(url_for("admin.modifica_gara", gara_id=gara.id))
+
         db.session.commit()
         flash("Torneo aggiornato.", "success")
         return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
@@ -358,6 +382,16 @@ def modifica_gara(gara_id):
     return render_template(
         "admin/modifica_gara.html", gara=gara, tipi_gara_base=TIPI_GARA_BASE, tipi_extra=tipi_extra
     )
+
+
+@admin_bp.route("/gare/<int:gara_id>/programma")
+@login_required
+def programma_gara(gara_id):
+    gara = Gara.query.get_or_404(gara_id)
+    if not gara.programma_gare_file:
+        abort(404)
+    cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "programmi_gare")
+    return send_from_directory(cartella, gara.programma_gare_file)
 
 
 @admin_bp.route("/movimenti")

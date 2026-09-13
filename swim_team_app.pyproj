@@ -52,7 +52,13 @@ FLASK_DEBUG=1</Environment>
     <Content Include="templates\admin\nuovo_messaggio.html" />
     <Content Include="templates\admin\nuovo_movimento.html" />
     <Content Include="templates\admin\lista_movimenti.html" />
+    <Content Include="templates\admin\lista_gare.html" />
+    <Content Include="templates\admin\dettaglio_gara.html" />
+    <Content Include="templates\admin\modifica_gara.html" />
     <Content Include="templates\athlete\dashboard.html" />
+    <Content Include="templates\athlete\lista_gare.html" />
+    <Content Include="templates\athlete\iscrizione_gara.html" />
+    <Content Include="templates\athlete\lista_movimenti.html" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="venv\">

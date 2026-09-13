@@ -104,6 +104,7 @@ class Gara(db.Model):
     scadenza_iscrizione = db.Column(db.Date)
     note = db.Column(db.Text)
     tipologie_gara = db.Column(db.Text)  # tipi di gara offerti, separati da virgola (es. "50 SL,100 DO")
+    programma_gare_file = db.Column(db.String(255))  # nome file PDF, in UPLOAD_FOLDER/programmi_gare
 
     iscrizioni = db.relationship("IscrizioneGara", backref="gara", lazy=True, cascade="all, delete-orphan")
 
