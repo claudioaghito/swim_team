@@ -456,6 +456,24 @@ def conferma_quota_gara(gara_id, atleta_id):
     return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
 
 
+@admin_bp.route("/gare/<int:gara_id>/quota/<int:atleta_id>/annulla", methods=["POST"])
+@login_required
+@admin_required
+def annulla_quota_gara(gara_id, atleta_id):
+    gara = Gara.query.get_or_404(gara_id)
+    quota = QuotaTorneo.query.filter_by(atleta_id=atleta_id, gara_id=gara.id).first_or_404()
+
+    if quota.movimento_id:
+        movimento = MovimentoContabile.query.get(quota.movimento_id)
+        if movimento:
+            db.session.delete(movimento)
+
+    db.session.delete(quota)
+    db.session.commit()
+    flash("Quota gara annullata: il movimento contabile è stato rimosso.", "success")
+    return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
+
+
 @admin_bp.route("/gare/<int:gara_id>/modifica", methods=["GET", "POST"])
 @login_required
 @admin_required
