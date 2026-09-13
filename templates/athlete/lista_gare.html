@@ -14,7 +14,9 @@
                 <th>Data</th>
                 <th>Nome</th>
                 <th>Luogo</th>
-                <th>Iscrizioni</th>
+                <th>Stato iscrizioni</th>
+                <th>Iscritti</th>
+                <th>Programma</th>
                 <th></th>
             </tr>
         </thead>
@@ -26,13 +28,24 @@
                 <td>{{ g.luogo or '-' }}</td>
                 <td>{{ "aperte" if g.iscrizioni_aperte else "chiuse" }}</td>
                 <td>
+                    {% set n_iscritti = g.iscrizioni|map(attribute='atleta_id')|unique|list|length %}
+                    <span class="status-dot {{ 'green' if n_iscritti > 0 else 'red' }}"></span>{{ n_iscritti }}
+                </td>
+                <td>
+                    {% if g.programma_gare_file %}
+                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">Apri PDF</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
                     <a class="btn" href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">
                         {{ "Seleziona le tue gare" if g.iscrizioni_aperte else "Vedi le tue iscrizioni" }}
                     </a>
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="5">Nessun torneo disponibile.</td></tr>
+            <tr><td colspan="7">Nessun torneo disponibile.</td></tr>
             {% endfor %}
         </tbody>
     </table>

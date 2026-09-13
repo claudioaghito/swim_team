@@ -10,7 +10,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from extensions import db
-from models import User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara
+from models import User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -318,17 +318,7 @@ def lista_gare():
 @admin_required
 def dettaglio_gara(gara_id):
     gara = Gara.query.get_or_404(gara_id)
-    iscrizioni = (
-        IscrizioneGara.query.filter_by(gara_id=gara.id)
-        .join(User)
-        .order_by(User.cognome, User.nome)
-        .all()
-    )
-
-    scelte_per_atleta = {}
-    for iscrizione in iscrizioni:
-        scelte_per_atleta.setdefault(iscrizione.atleta, []).append(iscrizione)
-
+    scelte_per_atleta = gara.iscrizioni_per_atleta()
     max_gare = max((len(v) for v in scelte_per_atleta.values()), default=0)
 
     return render_template(

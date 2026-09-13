@@ -120,6 +120,12 @@ class Gara(db.Model):
             return True
         return datetime.utcnow().date() <= self.scadenza_iscrizione
 
+    def iscrizioni_per_atleta(self):
+        raggruppate = {}
+        for iscrizione in self.iscrizioni:
+            raggruppate.setdefault(iscrizione.atleta, []).append(iscrizione)
+        return dict(sorted(raggruppate.items(), key=lambda kv: (kv[0].cognome, kv[0].nome)))
+
     def __repr__(self):
         return f"<Gara {self.nome} {self.data}>"
 
