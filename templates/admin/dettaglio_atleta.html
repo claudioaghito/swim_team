@@ -19,6 +19,7 @@
             {{ atleta.data_nascita.strftime('%d/%m/%Y') if atleta.data_nascita else "-" }}
             {% if atleta.eta is not none %}({{ atleta.eta }} anni){% endif %}
         </p>
+        <p><strong>Categoria:</strong> {{ atleta.categoria_master(anno_stagione) or "-" }}</p>
         {% set saldo = atleta.saldo_attuale() %}
         <p><strong>Saldo:</strong> <span class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</span></p>
     </div>

@@ -3,6 +3,10 @@
 {% block content %}
 <h1>{{ icon('saluto') }} Ciao, {{ current_user.nome }}!</h1>
 
+{% if categoria %}
+    <p>La tua categoria: <strong>{{ categoria }}</strong></p>
+{% endif %}
+
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.lista_gare') }}">{{ icon('tornei') }} Tornei &amp; iscrizioni gare</a>
 </div>

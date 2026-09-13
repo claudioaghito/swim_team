@@ -28,6 +28,7 @@
                     {{ current_user.nome_completo }}
                     {% if current_user.is_admin %}
                         <a href="{{ url_for('admin.dashboard') }}">{{ icon('home') }} Home</a>
+                        <a href="{{ url_for('admin.impostazioni') }}">⚙️ Impostazioni</a>
                         <a href="{{ url_for('admin.profilo') }}">{{ icon('modifica-credenziali') }} Modifica credenziali</a>
                     {% endif %}
                     <a href="{{ url_for('auth.logout') }}">{{ icon('esci') }} Esci</a>

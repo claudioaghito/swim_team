@@ -24,6 +24,7 @@
                 <th data-sort="text">Nome</th>
                 <th data-sort="text">Cognome</th>
                 <th data-sort="number">Età</th>
+                <th data-sort="text">Categoria</th>
                 <th data-sort="text">Utente</th>
                 <th data-sort="number">Saldo</th>
                 <th>Cartellino</th>
@@ -45,6 +46,7 @@
                 <td>{{ a.nome }}</td>
                 <td>{{ a.cognome }}</td>
                 <td>{{ a.eta if a.eta is not none else "-" }}</td>
+                <td>{{ a.categoria_master(anno_stagione) or "-" }}</td>
                 <td>{{ a.username }}</td>
                 <td class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</td>
                 <td>{{ "Sì" if a.cartellino_file else "-" }}</td>
@@ -55,7 +57,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="9">Nessun atleta trovato.</td></tr>
+            <tr><td colspan="10">Nessun atleta trovato.</td></tr>
             {% endfor %}
         </tbody>
     </table>

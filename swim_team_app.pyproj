@@ -77,6 +77,7 @@ FLASK_DEBUG=1</Environment>
     <Content Include="templates\login.html" />
     <Content Include="templates\admin\dashboard.html" />
     <Content Include="templates\admin\profilo.html" />
+    <Content Include="templates\admin\impostazioni.html" />
     <Content Include="templates\admin\lista_atleti.html" />
     <Content Include="templates\admin\dettaglio_atleta.html" />
     <Content Include="templates\admin\modifica_atleta.html" />

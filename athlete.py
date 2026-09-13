@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
+    Configurazione,
 )
 
 athlete_bp = Blueprint("athlete", __name__, url_prefix="/atleta")
@@ -35,6 +36,9 @@ def dashboard():
 
     messaggi = _messaggi_visibili_query().order_by(Messaggio.data.desc()).limit(10).all()
 
+    anno_stagione = Configurazione.ottieni().anno_stagione
+    categoria = current_user.categoria_master(anno_stagione)
+
     return render_template(
         "athlete/dashboard.html",
         prossimi_allenamenti=prossimi_allenamenti,
@@ -42,6 +46,7 @@ def dashboard():
         movimenti=movimenti,
         saldo=current_user.saldo_attuale(),
         messaggi=messaggi,
+        categoria=categoria,
     )
 
 

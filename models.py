@@ -59,6 +59,17 @@ class User(db.Model, UserMixin):
         ).scalar()
         return totale or 0
 
+    def categoria_master(self, anno_stagione):
+        """Categoria Master FIN: eta agonistica = anno di fine stagione - anno di nascita,
+        arrotondata per difetto al multiplo di 5 piu' vicino (minimo M25)."""
+        if not self.data_nascita:
+            return None
+        eta_agonistica = anno_stagione - self.data_nascita.year
+        if eta_agonistica < 25:
+            return None
+        fascia = (eta_agonistica // 5) * 5
+        return f"M{fascia}"
+
     def __repr__(self):
         return f"<User {self.username} ({self.ruolo})>"
 
@@ -227,3 +238,20 @@ class MessaggioNascosto(db.Model):
     __table_args__ = (
         db.UniqueConstraint("messaggio_id", "atleta_id", name="uq_messaggio_nascosto"),
     )
+
+
+class Configurazione(db.Model):
+    """Impostazioni globali dell'app (riga singola), gestite solo dall'amministratore."""
+    __tablename__ = "configurazione"
+
+    id = db.Column(db.Integer, primary_key=True)
+    anno_stagione = db.Column(db.Integer, nullable=False, default=lambda: datetime.utcnow().year)
+
+    @classmethod
+    def ottieni(cls):
+        config = cls.query.first()
+        if not config:
+            config = cls(anno_stagione=datetime.utcnow().year)
+            db.session.add(config)
+            db.session.commit()
+        return config

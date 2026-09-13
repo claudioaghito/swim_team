@@ -12,7 +12,9 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from extensions import db
-from models import User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo
+from models import (
+    User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
+)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -121,6 +123,27 @@ def profilo():
     return render_template("admin/profilo.html")
 
 
+@admin_bp.route("/impostazioni", methods=["GET", "POST"])
+@login_required
+@admin_required
+def impostazioni():
+    config = Configurazione.ottieni()
+
+    if request.method == "POST":
+        try:
+            anno = int(request.form["anno_stagione"])
+        except (KeyError, ValueError):
+            flash("Anno stagione non valido.", "danger")
+            return redirect(url_for("admin.impostazioni"))
+
+        config.anno_stagione = anno
+        db.session.commit()
+        flash("Impostazioni aggiornate.", "success")
+        return redirect(url_for("admin.impostazioni"))
+
+    return render_template("admin/impostazioni.html", config=config)
+
+
 @admin_bp.route("/atleti")
 @login_required
 @admin_required
@@ -133,7 +156,8 @@ def lista_atleti():
             (User.nome.ilike(like)) | (User.cognome.ilike(like)) | (User.username.ilike(like))
         )
     atleti = query.order_by(User.cognome, User.nome).all()
-    return render_template("admin/lista_atleti.html", atleti=atleti, q=q)
+    anno_stagione = Configurazione.ottieni().anno_stagione
+    return render_template("admin/lista_atleti.html", atleti=atleti, q=q, anno_stagione=anno_stagione)
 
 
 @admin_bp.route("/atleti/esporta")
@@ -141,10 +165,11 @@ def lista_atleti():
 @admin_required
 def esporta_atleti():
     atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome, User.nome).all()
+    anno_stagione = Configurazione.ottieni().anno_stagione
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter=";")
-    writer.writerow(["Nome", "Cognome", "Utente", "Email", "Data di nascita", "Saldo (€)"])
+    writer.writerow(["Nome", "Cognome", "Utente", "Email", "Data di nascita", "Categoria", "Saldo (€)"])
     for a in atleti:
         writer.writerow([
             a.nome,
@@ -152,6 +177,7 @@ def esporta_atleti():
             a.username,
             a.email or "",
             a.data_nascita.strftime("%d/%m/%Y") if a.data_nascita else "",
+            a.categoria_master(anno_stagione) or "",
             f"{a.saldo_attuale():.2f}",
         ])
 
@@ -211,7 +237,10 @@ def dettaglio_atleta(atleta_id):
     movimenti = MovimentoContabile.query.filter_by(atleta_id=atleta.id).order_by(
         MovimentoContabile.data
     ).all()
-    return render_template("admin/dettaglio_atleta.html", atleta=atleta, movimenti=movimenti)
+    anno_stagione = Configurazione.ottieni().anno_stagione
+    return render_template(
+        "admin/dettaglio_atleta.html", atleta=atleta, movimenti=movimenti, anno_stagione=anno_stagione
+    )
 
 
 @admin_bp.route("/atleti/<int:atleta_id>/modifica", methods=["GET", "POST"])
