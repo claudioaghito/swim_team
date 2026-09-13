@@ -1,10 +1,12 @@
+import csv
+import io
 import os
 from datetime import datetime
 from functools import wraps
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash, request, abort,
-    current_app, send_from_directory,
+    current_app, send_from_directory, Response,
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -132,6 +134,30 @@ def lista_atleti():
         )
     atleti = query.order_by(User.cognome, User.nome).all()
     return render_template("admin/lista_atleti.html", atleti=atleti, q=q)
+
+
+@admin_bp.route("/atleti/esporta")
+@login_required
+@admin_required
+def esporta_atleti():
+    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome, User.nome).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter=";")
+    writer.writerow(["Nome", "Cognome", "Utente", "Email", "Data di nascita", "Saldo (€)"])
+    for a in atleti:
+        writer.writerow([
+            a.nome,
+            a.cognome,
+            a.username,
+            a.email or "",
+            a.data_nascita.strftime("%d/%m/%Y") if a.data_nascita else "",
+            f"{a.saldo_attuale():.2f}",
+        ])
+
+    resp = Response("\N{ZERO WIDTH NO-BREAK SPACE}" + output.getvalue(), mimetype="text/csv")
+    resp.headers["Content-Disposition"] = "attachment; filename=atleti.csv"
+    return resp
 
 
 @admin_bp.route("/atleti/nuovo", methods=["GET", "POST"])
@@ -298,8 +324,13 @@ def nuovo_allenamento():
 @login_required
 @admin_required
 def lista_allenamenti():
-    allenamenti = Allenamento.query.order_by(Allenamento.data.desc()).all()
-    return render_template("admin/lista_allenamenti.html", allenamenti=allenamenti)
+    q = request.args.get("q", "").strip()
+    query = Allenamento.query
+    if q:
+        like = f"%{q}%"
+        query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
+    allenamenti = query.order_by(Allenamento.data.desc()).all()
+    return render_template("admin/lista_allenamenti.html", allenamenti=allenamenti, q=q)
 
 
 @admin_bp.route("/allenamenti/<int:allenamento_id>")
@@ -307,7 +338,39 @@ def lista_allenamenti():
 @admin_required
 def dettaglio_allenamento(allenamento_id):
     allenamento = Allenamento.query.get_or_404(allenamento_id)
-    return render_template("admin/dettaglio_allenamento.html", allenamento=allenamento)
+    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome, User.nome).all()
+    presenze_per_atleta = {
+        p.atleta_id: p for p in Presenza.query.filter_by(allenamento_id=allenamento.id).all()
+    }
+    return render_template(
+        "admin/dettaglio_allenamento.html",
+        allenamento=allenamento,
+        atleti=atleti,
+        presenze_per_atleta=presenze_per_atleta,
+    )
+
+
+@admin_bp.route("/allenamenti/<int:allenamento_id>/presenze", methods=["POST"])
+@login_required
+@admin_required
+def salva_presenze(allenamento_id):
+    allenamento = Allenamento.query.get_or_404(allenamento_id)
+    atleti = User.query.filter_by(ruolo="atleta").all()
+    presenti_ids = set(request.form.getlist("presenti"))
+
+    for atleta in atleti:
+        presenza = Presenza.query.filter_by(atleta_id=atleta.id, allenamento_id=allenamento.id).first()
+        presente = str(atleta.id) in presenti_ids
+        if not presenza:
+            if not presente:
+                continue
+            presenza = Presenza(atleta_id=atleta.id, allenamento_id=allenamento.id)
+            db.session.add(presenza)
+        presenza.presente = presente
+
+    db.session.commit()
+    flash("Presenze salvate.", "success")
+    return redirect(url_for("admin.dettaglio_allenamento", allenamento_id=allenamento.id))
 
 
 @admin_bp.route("/allenamenti/<int:allenamento_id>/modifica", methods=["GET", "POST"])
@@ -386,8 +449,13 @@ def nuova_gara():
 @login_required
 @admin_required
 def lista_gare():
-    gare = Gara.query.order_by(Gara.data.desc()).all()
-    return render_template("admin/lista_gare.html", gare=gare)
+    q = request.args.get("q", "").strip()
+    query = Gara.query
+    if q:
+        like = f"%{q}%"
+        query = query.filter((Gara.nome.ilike(like)) | (Gara.luogo.ilike(like)))
+    gare = query.order_by(Gara.data.desc()).all()
+    return render_template("admin/lista_gare.html", gare=gare, q=q)
 
 
 @admin_bp.route("/gare/<int:gara_id>")
@@ -472,6 +540,48 @@ def annulla_quota_gara(gara_id, atleta_id):
     return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
 
 
+@admin_bp.route("/gare/<int:gara_id>/quota/conferma-tutte", methods=["POST"])
+@login_required
+@admin_required
+def conferma_tutte_quote(gara_id):
+    gara = Gara.query.get_or_404(gara_id)
+    importo = float(gara.quota_gara or 0)
+
+    scelte_per_atleta = gara.iscrizioni_per_atleta()
+    quote_esistenti = {
+        q.atleta_id: q for q in QuotaTorneo.query.filter_by(gara_id=gara.id).all()
+    }
+
+    contatore = 0
+    for atleta in scelte_per_atleta:
+        quota = quote_esistenti.get(atleta.id)
+        if quota and quota.movimento_id:
+            continue  # già addebitata, non toccarla
+
+        if not quota:
+            quota = QuotaTorneo(atleta_id=atleta.id, gara_id=gara.id)
+            db.session.add(quota)
+
+        movimento = MovimentoContabile(
+            atleta_id=atleta.id,
+            importo=-importo,
+            causale=f"Quota gara: {gara.nome}",
+            registrato_da_id=current_user.id,
+        )
+        db.session.add(movimento)
+        db.session.flush()
+        quota.movimento_id = movimento.id
+        quota.importo = importo
+        contatore += 1
+
+    db.session.commit()
+    if contatore:
+        flash(f"{contatore} quota/e da {importo:.2f} € addebitata/e.", "success")
+    else:
+        flash("Nessuna quota da addebitare: tutti gli atleti hanno già una quota confermata.", "info")
+    return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
+
+
 @admin_bp.route("/gare/<int:gara_id>/modifica", methods=["GET", "POST"])
 @login_required
 @admin_required
@@ -532,8 +642,39 @@ def programma_gara(gara_id):
 @login_required
 @admin_required
 def lista_movimenti():
+    q = request.args.get("q", "").strip()
+    query = MovimentoContabile.query.join(User, MovimentoContabile.atleta_id == User.id)
+    if q:
+        like = f"%{q}%"
+        query = query.filter(
+            (MovimentoContabile.causale.ilike(like))
+            | (User.nome.ilike(like))
+            | (User.cognome.ilike(like))
+        )
+    movimenti = query.order_by(MovimentoContabile.data).all()
+    return render_template("admin/lista_movimenti.html", movimenti=movimenti, q=q)
+
+
+@admin_bp.route("/movimenti/esporta")
+@login_required
+@admin_required
+def esporta_movimenti():
     movimenti = MovimentoContabile.query.order_by(MovimentoContabile.data).all()
-    return render_template("admin/lista_movimenti.html", movimenti=movimenti)
+
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter=";")
+    writer.writerow(["Data", "Atleta", "Causale", "Importo (€)"])
+    for m in movimenti:
+        writer.writerow([
+            m.data.strftime("%d/%m/%Y"),
+            m.atleta.nome_completo,
+            m.causale,
+            f"{m.importo:.2f}",
+        ])
+
+    resp = Response("\N{ZERO WIDTH NO-BREAK SPACE}" + output.getvalue(), mimetype="text/csv")
+    resp.headers["Content-Disposition"] = "attachment; filename=movimenti.csv"
+    return resp
 
 
 @admin_bp.route("/movimenti/nuovo", methods=["GET", "POST"])
@@ -601,8 +742,13 @@ def nuovo_messaggio():
 @login_required
 @admin_required
 def lista_messaggi():
-    messaggi = Messaggio.query.order_by(Messaggio.data.desc()).all()
-    return render_template("admin/lista_messaggi.html", messaggi=messaggi)
+    q = request.args.get("q", "").strip()
+    query = Messaggio.query
+    if q:
+        like = f"%{q}%"
+        query = query.filter(Messaggio.testo.ilike(like))
+    messaggi = query.order_by(Messaggio.data.desc()).all()
+    return render_template("admin/lista_messaggi.html", messaggi=messaggi, q=q)
 
 
 @admin_bp.route("/messaggi/<int:messaggio_id>/elimina", methods=["POST"])

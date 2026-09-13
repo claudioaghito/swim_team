@@ -6,11 +6,19 @@
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
     <a class="btn" href="{{ url_for('admin.nuovo_movimento') }}">➕💶 Nuovo movimento</a>
+    <a class="btn" href="{{ url_for('admin.esporta_movimenti') }}">📥 Esporta CSV</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="search-form">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per atleta o causale...">
+        <button type="submit">🔍 Cerca</button>
+    </form>
 </div>
 
 <div class="card">
     <form method="POST" action="{{ url_for('admin.elimina_movimenti') }}"
-          onsubmit="return confirm('Eliminare i movimenti selezionati?');">
+          onsubmit="return confirmSubmit(this, 'Eliminare i movimenti selezionati?');">
         <input type="hidden" name="next" value="{{ url_for('admin.lista_movimenti') }}">
         <table class="table">
             <thead>

@@ -17,6 +17,16 @@
     {% if allenamento.descrizione %}
         <p><strong>Descrizione:</strong><br><span class="preserve-lines">{{ allenamento.descrizione }}</span></p>
     {% endif %}
+    <p>
+        <strong>Presenza:</strong>
+        {% if presenza and presenza.presente %}
+            <span class="status-dot green"></span>Presente
+        {% elif presenza %}
+            <span class="status-dot red"></span>Assente
+        {% else %}
+            non ancora registrata
+        {% endif %}
+    </p>
     <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella finestra di stampa del browser.</small></p>
 </div>
 

@@ -253,6 +253,8 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .search-form input { flex: 1; margin-top: 0; }
 
 .cartellino-img { max-width: 100%; max-height: 400px; border-radius: 8px; display: block; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+.avatar-thumb { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; display: inline-flex; align-items: center; justify-content: center; }
+.avatar-placeholder { background: var(--checkbox-bg); border: 1px solid var(--border); font-size: 1.1em; }
 .saldo-cell { font-weight: 700; }
 .saldo-cell.positivo { color: var(--green); }
 .saldo-cell.negativo { color: var(--red); }
@@ -272,6 +274,21 @@ ul { padding-left: 20px; margin: 8px 0; }
 li { margin-bottom: 4px; }
 
 .preserve-lines { white-space: pre-line; }
+
+.confirm-dialog {
+    border: none;
+    border-radius: var(--radius);
+    padding: 0;
+    background: var(--card-bg);
+    color: var(--ink);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    max-width: 400px;
+    width: 90%;
+}
+.confirm-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.confirm-dialog-body { padding: 20px; }
+.confirm-dialog-body p { margin: 0; }
+.confirm-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 0 20px 20px; }
 
 /* Mobile: la maggior parte degli accessi arriva da smartphone */
 @media (max-width: 640px) {

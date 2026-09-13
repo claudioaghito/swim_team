@@ -50,6 +50,52 @@
         {% block content %}{% endblock %}
     </main>
 
+    <dialog id="confirm-dialog" class="confirm-dialog">
+        <div class="confirm-dialog-body">
+            <p id="confirm-dialog-text"></p>
+        </div>
+        <div class="confirm-dialog-actions">
+            <button type="button" id="confirm-dialog-cancel">Annulla</button>
+            <button type="button" class="btn-danger" id="confirm-dialog-ok">Conferma</button>
+        </div>
+    </dialog>
+
+    <script>
+        function confirmSubmit(form, message) {
+            var dialog = document.getElementById("confirm-dialog");
+            if (!dialog || typeof dialog.showModal !== "function") {
+                return window.confirm(message);
+            }
+
+            document.getElementById("confirm-dialog-text").textContent = message;
+            dialog.showModal();
+
+            var okBtn = document.getElementById("confirm-dialog-ok");
+            var cancelBtn = document.getElementById("confirm-dialog-cancel");
+
+            function cleanup() {
+                okBtn.removeEventListener("click", onOk);
+                cancelBtn.removeEventListener("click", onCancel);
+                dialog.removeEventListener("cancel", onCancel);
+            }
+            function onOk() {
+                cleanup();
+                dialog.close();
+                form.submit();
+            }
+            function onCancel() {
+                cleanup();
+                dialog.close();
+            }
+
+            okBtn.addEventListener("click", onOk);
+            cancelBtn.addEventListener("click", onCancel);
+            dialog.addEventListener("cancel", onCancel);
+
+            return false;
+        }
+    </script>
+
     <script>
         function _isDarkActive() {
             var explicit = document.documentElement.getAttribute("data-theme");

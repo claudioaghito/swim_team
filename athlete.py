@@ -86,22 +86,37 @@ def lista_movimenti():
 @athlete_bp.route("/allenamenti")
 @login_required
 def lista_allenamenti():
-    allenamenti = Allenamento.query.order_by(Allenamento.data.desc()).all()
-    return render_template("athlete/lista_allenamenti.html", allenamenti=allenamenti)
+    q = request.args.get("q", "").strip()
+    query = Allenamento.query
+    if q:
+        like = f"%{q}%"
+        query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
+    allenamenti = query.order_by(Allenamento.data.desc()).all()
+    return render_template("athlete/lista_allenamenti.html", allenamenti=allenamenti, q=q)
 
 
 @athlete_bp.route("/allenamenti/<int:allenamento_id>")
 @login_required
 def dettaglio_allenamento(allenamento_id):
     allenamento = Allenamento.query.get_or_404(allenamento_id)
-    return render_template("athlete/dettaglio_allenamento.html", allenamento=allenamento)
+    presenza = Presenza.query.filter_by(
+        atleta_id=current_user.id, allenamento_id=allenamento.id
+    ).first()
+    return render_template(
+        "athlete/dettaglio_allenamento.html", allenamento=allenamento, presenza=presenza
+    )
 
 
 @athlete_bp.route("/gare")
 @login_required
 def lista_gare():
-    gare = Gara.query.order_by(Gara.data.desc()).all()
-    return render_template("athlete/lista_gare.html", gare=gare)
+    q = request.args.get("q", "").strip()
+    query = Gara.query
+    if q:
+        like = f"%{q}%"
+        query = query.filter((Gara.nome.ilike(like)) | (Gara.luogo.ilike(like)))
+    gare = query.order_by(Gara.data.desc()).all()
+    return render_template("athlete/lista_gare.html", gare=gare, q=q)
 
 
 @athlete_bp.route("/gare/<int:gara_id>/iscrizione", methods=["GET", "POST"])

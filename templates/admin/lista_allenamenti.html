@@ -9,6 +9,13 @@
 </div>
 
 <div class="card">
+    <form method="GET" class="search-form">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per gruppo o sede...">
+        <button type="submit">🔍 Cerca</button>
+    </form>
+</div>
+
+<div class="card">
     <table class="table">
         <thead>
             <tr>
@@ -30,7 +37,7 @@
                     <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">👁️ Apri</a>
                     <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=al.id) }}">✏️ Modifica</a>
                     <form method="POST" action="{{ url_for('admin.elimina_allenamento', allenamento_id=al.id) }}"
-                          onsubmit="return confirm('Eliminare questo allenamento?');" style="display:inline;">
+                          onsubmit="return confirmSubmit(this, 'Eliminare questo allenamento?');" style="display:inline;">
                         <button type="submit" class="btn-danger">🗑️ Elimina</button>
                     </form>
                 </td>

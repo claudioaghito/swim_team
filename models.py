@@ -120,6 +120,13 @@ class Gara(db.Model):
             return True
         return datetime.utcnow().date() <= self.scadenza_iscrizione
 
+    @property
+    def scadenza_vicina(self):
+        """True se le iscrizioni sono ancora aperte ma scadono entro 3 giorni."""
+        if not self.scadenza_iscrizione or not self.iscrizioni_aperte:
+            return False
+        return (self.scadenza_iscrizione - datetime.utcnow().date()).days <= 3
+
     def iscrizioni_per_atleta(self):
         raggruppate = {}
         for iscrizione in self.iscrizioni:

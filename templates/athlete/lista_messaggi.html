@@ -15,7 +15,7 @@
                 {% if m.is_comunicazione_generale %}<em>(a tutti)</em>{% endif %}
                 — <span class="preserve-lines">{{ m.testo }}</span>
                 <form method="POST" action="{{ url_for('athlete.elimina_messaggio', messaggio_id=m.id) }}"
-                      onsubmit="return confirm('Eliminare questo messaggio?');" style="display:inline;">
+                      onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');" style="display:inline;">
                     <input type="hidden" name="next" value="{{ url_for('athlete.lista_messaggi') }}">
                     <button type="submit" class="btn-danger">🗑️</button>
                 </form>

@@ -31,6 +31,12 @@
 
 <div class="card">
     <h3>Iscrizioni atleti ({{ scelte_per_atleta|length }})</h3>
+    {% if scelte_per_atleta %}
+    <form method="POST" action="{{ url_for('admin.conferma_tutte_quote', gara_id=gara.id) }}" class="no-print"
+          onsubmit="return confirmSubmit(this, 'Confermare la quota di {{ "%.2f"|format(gara.quota_gara or 0) }} € per tutti gli atleti che non hanno ancora una quota addebitata?');">
+        <button type="submit">✅ Conferma tutte le quote non addebitate ({{ "%.2f"|format(gara.quota_gara or 0) }} €)</button>
+    </form>
+    {% endif %}
     <div style="overflow-x:auto;">
     <table class="table">
         <thead>
@@ -65,7 +71,7 @@
                                 <div style="display:flex;gap:4px;align-items:center;">
                                     <button type="button" disabled style="opacity:0.5;cursor:not-allowed;">✅ Confermata</button>
                                     <form method="POST" action="{{ url_for('admin.annulla_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}"
-                                          onsubmit="return confirm('Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
+                                          onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
                                         <button type="submit" class="btn-danger">↩️ Annulla</button>
                                     </form>
                                 </div>

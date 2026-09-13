@@ -28,7 +28,7 @@
     </div>
 
     <div class="card">
-        <h3>🏊 Prossimi allenamenti</h3>
+        <h3>🏊 Prossimi allenamenti ({{ prossimi_allenamenti|length }})</h3>
         <ul>
             {% for al in prossimi_allenamenti %}
                 <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</a></li>
@@ -40,11 +40,12 @@
     </div>
 
     <div class="card">
-        <h3>Prossime gare</h3>
+        <h3>🏆 Prossime gare ({{ prossime_gare|length }})</h3>
         <ul>
             {% for g in prossime_gare %}
                 <li>
                     <a href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">{{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo }})</a>
+                    {% if g.scadenza_vicina %}<span class="status-dot red" title="Iscrizioni in scadenza"></span><small>iscrizioni in scadenza</small>{% endif %}
                     {% if g.lista_tipologie %}<br><small>{{ g.lista_tipologie|join(', ') }}</small>{% endif %}
                 </li>
             {% else %}
@@ -54,7 +55,7 @@
     </div>
 
     <div class="card warning">
-        <h3>Atleti con saldo negativo</h3>
+        <h3>⚠️ Atleti con saldo negativo ({{ atleti_in_debito|length }})</h3>
         <ul>
             {% for a in atleti_in_debito %}
                 <li>{{ a.nome_completo }}: <span class="saldo-cell negativo">{{ "%.2f"|format(a.saldo_attuale()) }} €</span></li>
