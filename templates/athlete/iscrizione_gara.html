@@ -16,19 +16,55 @@
     </p>
 </div>
 
+{% if gara.iscrizioni_aperte %}
 <div class="card">
     <h3>Seleziona le gare a cui vuoi partecipare</h3>
     <form method="POST">
-        <div class="checkbox-list">
-            {% for tipo in gara.lista_tipologie %}
-                <label class="checkbox-item">
-                    <input type="checkbox" name="tipologie" value="{{ tipo }}" {% if tipo in scelte_attuali %}checked{% endif %}> {{ tipo }}
-                </label>
-            {% else %}
-                <p>Nessuna tipologia di gara disponibile per questo torneo.</p>
-            {% endfor %}
-        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Partecipo</th>
+                    <th>Gara</th>
+                    <th>Tempo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tipo in gara.lista_tipologie %}
+                <tr>
+                    <td><input type="checkbox" name="tipologie" value="{{ tipo }}" style="width:auto;margin-top:0;" {% if tipo in iscrizioni_correnti %}checked{% endif %}></td>
+                    <td>{{ tipo }}</td>
+                    <td><input type="text" name="tempo_{{ tipo }}" placeholder="es. 01:02.35" value="{{ iscrizioni_correnti[tipo].tempo_ottenuto if tipo in iscrizioni_correnti else '' }}"></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3">Nessuna tipologia di gara disponibile per questo torneo.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <button type="submit">Salva le mie scelte</button>
     </form>
 </div>
+{% else %}
+<div class="card warning">
+    <h3>Iscrizioni chiuse</h3>
+    <p>Le iscrizioni a questo torneo sono scadute: non è più possibile scegliere o modificare le gare.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Gara</th>
+                <th>Tempo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tipo, iscrizione in iscrizioni_correnti.items() %}
+            <tr>
+                <td>{{ tipo }}</td>
+                <td>{{ iscrizione.tempo_ottenuto or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">Non ti eri iscritto a nessuna gara di questo torneo.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% endblock %}

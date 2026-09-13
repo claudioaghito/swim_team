@@ -14,6 +14,7 @@
         <strong>Quota gara:</strong> {{ "%.2f"|format(gara.quota_gara or 0) }} €<br>
         <strong>Quota staffetta:</strong> {{ "%.2f"|format(gara.quota_staffetta or 0) }} €<br>
         {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}<br>{% endif %}
+        <strong>Iscrizioni:</strong> {{ "aperte" if gara.iscrizioni_aperte else "chiuse" }}<br>
         <strong>Tipologie disponibili:</strong> {{ gara.lista_tipologie|join(', ') }}
     </p>
 </div>
@@ -28,10 +29,12 @@
             </tr>
         </thead>
         <tbody>
-            {% for atleta, scelte in scelte_per_atleta.items() %}
+            {% for atleta, iscrizioni in scelte_per_atleta.items() %}
             <tr>
                 <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
-                <td>{{ scelte|join(', ') }}</td>
+                <td>
+                    {% for iscrizione in iscrizioni %}{{ iscrizione.stile }}{% if iscrizione.tempo_ottenuto %} ({{ iscrizione.tempo_ottenuto }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+                </td>
             </tr>
             {% else %}
             <tr><td colspan="2">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>

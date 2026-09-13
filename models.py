@@ -113,6 +113,12 @@ class Gara(db.Model):
             return []
         return [t.strip() for t in self.tipologie_gara.split(",") if t.strip()]
 
+    @property
+    def iscrizioni_aperte(self):
+        if not self.scadenza_iscrizione:
+            return True
+        return datetime.utcnow().date() <= self.scadenza_iscrizione
+
     def __repr__(self):
         return f"<Gara {self.nome} {self.data}>"
 

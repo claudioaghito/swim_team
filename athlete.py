@@ -43,28 +43,35 @@ def dashboard():
 def iscrizione_gara(gara_id):
     gara = Gara.query.get_or_404(gara_id)
 
+    iscrizioni_correnti = {
+        i.stile: i
+        for i in IscrizioneGara.query.filter_by(atleta_id=current_user.id, gara_id=gara.id).all()
+    }
+
     if request.method == "POST":
+        if not gara.iscrizioni_aperte:
+            flash("Le iscrizioni a questo torneo sono chiuse.", "warning")
+            return redirect(url_for("athlete.iscrizione_gara", gara_id=gara.id))
+
         scelte = set(request.form.getlist("tipologie"))
-        esistenti = {
-            i.stile
-            for i in IscrizioneGara.query.filter_by(atleta_id=current_user.id, gara_id=gara.id).all()
-        }
 
-        da_rimuovere = esistenti - scelte
-        if da_rimuovere:
-            IscrizioneGara.query.filter_by(atleta_id=current_user.id, gara_id=gara.id).filter(
-                IscrizioneGara.stile.in_(da_rimuovere)
-            ).delete(synchronize_session=False)
+        for tipo, iscrizione in list(iscrizioni_correnti.items()):
+            if tipo not in scelte:
+                db.session.delete(iscrizione)
 
-        for tipo in scelte - esistenti:
-            db.session.add(IscrizioneGara(atleta_id=current_user.id, gara_id=gara.id, stile=tipo))
+        for tipo in scelte:
+            tempo = request.form.get(f"tempo_{tipo}", "").strip() or None
+            if tipo in iscrizioni_correnti:
+                iscrizioni_correnti[tipo].tempo_ottenuto = tempo
+            else:
+                db.session.add(IscrizioneGara(
+                    atleta_id=current_user.id, gara_id=gara.id, stile=tipo, tempo_ottenuto=tempo
+                ))
 
         db.session.commit()
         flash("Iscrizione aggiornata.", "success")
         return redirect(url_for("athlete.dashboard"))
 
-    scelte_attuali = {
-        i.stile
-        for i in IscrizioneGara.query.filter_by(atleta_id=current_user.id, gara_id=gara.id).all()
-    }
-    return render_template("athlete/iscrizione_gara.html", gara=gara, scelte_attuali=scelte_attuali)
+    return render_template(
+        "athlete/iscrizione_gara.html", gara=gara, iscrizioni_correnti=iscrizioni_correnti
+    )

@@ -33,7 +33,7 @@
             {% for g in prossime_gare %}
                 <li>
                     {{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo }})
-                    — <a href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">Seleziona le tue gare</a>
+                    — <a href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">{{ "Seleziona le tue gare" if g.iscrizioni_aperte else "Vedi le tue iscrizioni" }}</a>
                 </li>
             {% else %}
                 <li>Nessuna gara programmata.</li>
