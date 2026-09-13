@@ -20,6 +20,9 @@
             non ancora caricato
         {% endif %}
     </p>
+    {% if gara.note %}
+        <p><strong>Nota:</strong><br><span class="preserve-lines">{{ gara.note }}</span></p>
+    {% endif %}
 </div>
 
 {% if gara.iscrizioni_aperte %}

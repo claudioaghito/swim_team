@@ -10,7 +10,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from extensions import db
-from models import User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza
+from models import User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -360,6 +360,7 @@ def nuova_gara():
                 if request.form.get("scadenza_iscrizione") else None
             ),
             tipologie_gara=",".join(tipologie),
+            note=request.form.get("note", "").strip(),
         )
         db.session.add(gara)
         db.session.flush()
@@ -397,12 +398,62 @@ def dettaglio_gara(gara_id):
     scelte_per_atleta = gara.iscrizioni_per_atleta()
     max_gare = max((len(v) for v in scelte_per_atleta.values()), default=0)
 
+    quote_per_atleta = {
+        q.atleta_id: q
+        for q in QuotaTorneo.query.filter_by(gara_id=gara.id).all()
+    }
+
     return render_template(
         "admin/dettaglio_gara.html",
         gara=gara,
         scelte_per_atleta=scelte_per_atleta,
         max_gare=max_gare,
+        quote_per_atleta=quote_per_atleta,
     )
+
+
+@admin_bp.route("/gare/<int:gara_id>/quota/<int:atleta_id>", methods=["POST"])
+@login_required
+@admin_required
+def conferma_quota_gara(gara_id, atleta_id):
+    gara = Gara.query.get_or_404(gara_id)
+    atleta = User.query.filter_by(id=atleta_id, ruolo="atleta").first_or_404()
+
+    importo_str = request.form.get("importo", "").strip()
+    if not importo_str:
+        flash("Inserisci un importo per confermare la quota.", "warning")
+        return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
+
+    try:
+        importo = float(importo_str)
+    except ValueError:
+        flash("Importo non valido.", "danger")
+        return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
+
+    quota = QuotaTorneo.query.filter_by(atleta_id=atleta.id, gara_id=gara.id).first()
+    if not quota:
+        quota = QuotaTorneo(atleta_id=atleta.id, gara_id=gara.id)
+        db.session.add(quota)
+
+    if quota.movimento_id:
+        movimento = MovimentoContabile.query.get(quota.movimento_id)
+        movimento.importo = -importo
+        movimento.causale = f"Quota gara: {gara.nome}"
+    else:
+        movimento = MovimentoContabile(
+            atleta_id=atleta.id,
+            importo=-importo,
+            causale=f"Quota gara: {gara.nome}",
+            registrato_da_id=current_user.id,
+        )
+        db.session.add(movimento)
+        db.session.flush()
+        quota.movimento_id = movimento.id
+
+    quota.importo = importo
+    db.session.commit()
+    flash(f"Quota di {importo:.2f} € addebitata a {atleta.nome_completo}.", "success")
+    return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
 
 
 @admin_bp.route("/gare/<int:gara_id>/modifica", methods=["GET", "POST"])
@@ -427,6 +478,7 @@ def modifica_gara(gara_id):
             if request.form.get("scadenza_iscrizione") else None
         )
         gara.tipologie_gara = ",".join(tipologie)
+        gara.note = request.form.get("note", "").strip()
 
         try:
             nuovo_programma = _salva_upload(

@@ -157,6 +157,23 @@ class MovimentoContabile(db.Model):
         return f"<Movimento {self.atleta_id} {self.importo}>"
 
 
+class QuotaTorneo(db.Model):
+    """Quota gara addebitata a un singolo atleta per un torneo: crea/aggiorna un
+    MovimentoContabile in negativo quando l'admin la conferma."""
+    __tablename__ = "quote_torneo"
+
+    id = db.Column(db.Integer, primary_key=True)
+    atleta_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    gara_id = db.Column(db.Integer, db.ForeignKey("gare.id"), nullable=False)
+    importo = db.Column(db.Numeric(8, 2))
+    movimento_id = db.Column(db.Integer, db.ForeignKey("movimenti_contabili.id"))
+
+    atleta = db.relationship("User", foreign_keys=[atleta_id])
+    movimento = db.relationship("MovimentoContabile", foreign_keys=[movimento_id])
+
+    __table_args__ = (db.UniqueConstraint("atleta_id", "gara_id", name="uq_quota_torneo"),)
+
+
 class Messaggio(db.Model):
     __tablename__ = "messaggi"
 

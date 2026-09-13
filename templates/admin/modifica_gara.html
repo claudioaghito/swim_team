@@ -44,6 +44,9 @@
         {% endif %}
         <input type="file" name="programma_gare" accept="application/pdf">
 
+        <label>Nota per gli atleti (visibile solo in visualizzazione)</label>
+        <textarea name="note" rows="3" placeholder="es. Ritrovo alle 8:00, portare cartellino...">{{ gara.note or '' }}</textarea>
+
         <button type="submit">💾 Salva modifiche</button>
     </form>
 </div>
