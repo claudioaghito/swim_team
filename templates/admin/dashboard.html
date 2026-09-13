@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Pannello Admin{% endblock %}
 {% block content %}
-<h1>Pannello Amministratore</h1>
+<h1>🏠 Pannello Amministratore</h1>
 
 <div class="actions">
-    <a class="btn" href="{{ url_for('admin.lista_atleti') }}">Atleti</a>
-    <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">+ Nuovo allenamento</a>
-    <a class="btn" href="{{ url_for('admin.lista_gare') }}">Tornei</a>
-    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">+ Nuovo Torneo</a>
-    <a class="btn" href="{{ url_for('admin.lista_movimenti') }}">Movimenti contabili</a>
-    <a class="btn" href="{{ url_for('admin.nuovo_messaggio') }}">+ Nuovo messaggio</a>
+    <a class="btn" href="{{ url_for('admin.lista_atleti') }}">👥 Atleti</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">➕🏊 Nuovo allenamento</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">🏆 Tornei</a>
+    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">➕🏆 Nuovo Torneo</a>
+    <a class="btn" href="{{ url_for('admin.lista_movimenti') }}">💶 Movimenti contabili</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_messaggio') }}">➕✉️ Nuovo messaggio</a>
 </div>
 
 <div class="grid">

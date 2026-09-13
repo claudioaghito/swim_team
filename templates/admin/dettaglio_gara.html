@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.lista_gare') }}">&larr; Tornei</a>
-    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=gara.id) }}">Modifica torneo</a>
+    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=gara.id) }}">✏️ Modifica torneo</a>
 </div>
 
 <div class="card">
@@ -18,7 +18,7 @@
         <strong>Tipologie disponibili:</strong> {{ gara.lista_tipologie|join(', ') }}<br>
         <strong>Programma gare:</strong>
         {% if gara.programma_gare_file %}
-            <a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">Apri PDF</a>
+            <a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">📄 Apri PDF</a>
         {% else %}
             non caricato
         {% endif %}

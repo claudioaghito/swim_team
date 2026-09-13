@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Movimenti contabili{% endblock %}
 {% block content %}
-<h1>Movimenti contabili</h1>
+<h1>💶 Movimenti contabili</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
-    <a class="btn" href="{{ url_for('admin.nuovo_movimento') }}">+ Nuovo movimento</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_movimento') }}">➕💶 Nuovo movimento</a>
 </div>
 
 <div class="card">
@@ -37,7 +37,7 @@
             </tbody>
         </table>
         {% if movimenti %}
-            <button type="submit" class="btn-danger" style="margin-top:16px;">Elimina selezionati</button>
+            <button type="submit" class="btn-danger" style="margin-top:16px;">🗑️ Elimina selezionati</button>
         {% endif %}
     </form>
 </div>

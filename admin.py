@@ -105,6 +105,8 @@ def profilo():
             return redirect(url_for("admin.profilo"))
 
         current_user.username = username
+        current_user.nome = request.form["nome"].strip()
+        current_user.cognome = request.form["cognome"].strip()
 
         nuova_password = request.form.get("nuova_password", "").strip()
         if nuova_password:

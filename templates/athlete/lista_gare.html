@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Tornei{% endblock %}
 {% block content %}
-<h1>Tornei</h1>
+<h1>🏆 Tornei</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
@@ -33,14 +33,14 @@
                 </td>
                 <td>
                     {% if g.programma_gare_file %}
-                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">Apri PDF</a>
+                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">📄 Apri PDF</a>
                     {% else %}
                         -
                     {% endif %}
                 </td>
                 <td>
                     <a class="btn" href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">
-                        {{ "Seleziona le tue gare" if g.iscrizioni_aperte else "Vedi le tue iscrizioni" }}
+                        {{ "✅ Seleziona le tue gare" if g.iscrizioni_aperte else "👁️ Vedi le tue iscrizioni" }}
                     </a>
                 </td>
             </tr>

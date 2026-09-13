@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; Torneo</a>
-    <a class="btn" href="{{ url_for('admin.lista_gare') }}">Tutti i tornei</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">🏆 Tutti i tornei</a>
 </div>
 <div class="card">
     <h2>Modifica Torneo</h2>
@@ -40,11 +40,11 @@
 
         <label>Programma gare (PDF)</label>
         {% if gara.programma_gare_file %}
-            <p><a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">Apri programma attuale</a></p>
+            <p><a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">📄 Apri programma attuale</a></p>
         {% endif %}
         <input type="file" name="programma_gare" accept="application/pdf">
 
-        <button type="submit">Salva modifiche</button>
+        <button type="submit">💾 Salva modifiche</button>
     </form>
 </div>
 {% endblock %}

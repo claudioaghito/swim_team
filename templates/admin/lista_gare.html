@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Tornei{% endblock %}
 {% block content %}
-<h1>Tornei</h1>
+<h1>🏆 Tornei</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
-    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">+ Nuovo Torneo</a>
+    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">➕🏆 Nuovo Torneo</a>
 </div>
 
 <div class="card">
@@ -38,14 +38,14 @@
                 </td>
                 <td>
                     {% if g.programma_gare_file %}
-                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">Apri PDF</a>
+                        <a href="{{ url_for('admin.programma_gara', gara_id=g.id) }}" target="_blank">📄 Apri PDF</a>
                     {% else %}
                         -
                     {% endif %}
                 </td>
                 <td class="table-actions">
-                    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">Apri</a>
-                    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=g.id) }}">Modifica</a>
+                    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">👁️ Apri</a>
+                    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=g.id) }}">✏️ Modifica</a>
                 </td>
             </tr>
             {% else %}

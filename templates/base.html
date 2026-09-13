@@ -16,10 +16,10 @@
             <span class="user-info">
                 {{ current_user.nome_completo }}
                 {% if current_user.is_admin %}
-                    <a href="{{ url_for('admin.dashboard') }}">Home</a>
-                    <a href="{{ url_for('admin.profilo') }}">Modifica credenziali</a>
+                    <a href="{{ url_for('admin.dashboard') }}">🏠 Home</a>
+                    <a href="{{ url_for('admin.profilo') }}">🔑 Modifica credenziali</a>
                 {% endif %}
-                <a href="{{ url_for('auth.logout') }}">Esci</a>
+                <a href="{{ url_for('auth.logout') }}">🚪 Esci</a>
             </span>
         {% endif %}
     </nav>

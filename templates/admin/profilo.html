@@ -5,8 +5,14 @@
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
 </div>
 <div class="card">
-    <h2>Modifica credenziali di accesso</h2>
+    <h2>🔑 Modifica credenziali di accesso</h2>
     <form method="POST">
+        <label>Nome</label>
+        <input type="text" name="nome" value="{{ current_user.nome }}" required>
+
+        <label>Cognome</label>
+        <input type="text" name="cognome" value="{{ current_user.cognome }}" required>
+
         <label>Nome utente</label>
         <input type="text" name="username" value="{{ current_user.username }}" required>
 
@@ -16,7 +22,7 @@
         <label>Password attuale (obbligatoria per confermare le modifiche)</label>
         <input type="password" name="password_attuale" required>
 
-        <button type="submit">Salva modifiche</button>
+        <button type="submit">💾 Salva modifiche</button>
     </form>
 </div>
 {% endblock %}
