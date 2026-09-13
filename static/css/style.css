@@ -281,6 +281,10 @@ li { margin-bottom: 4px; }
 
 .preserve-lines { white-space: pre-line; }
 
+.icon { width: 20px; height: 20px; vertical-align: -5px; margin-right: 4px; flex-shrink: 0; }
+h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; }
+.theme-toggle .icon { margin-right: 0; width: 22px; height: 22px; vertical-align: -1px; }
+
 .confirm-dialog {
     border: none;
     border-radius: var(--radius);

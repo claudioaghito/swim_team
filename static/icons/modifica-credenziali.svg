@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-modifica-credenziali" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4338CA"/>
+    </linearGradient>
+    <radialGradient id="gloss-modifica-credenziali" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-modifica-credenziali" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#4338CA" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-modifica-credenziali" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-modifica-credenziali)" filter="url(#shadow-modifica-credenziali)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-modifica-credenziali)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-modifica-credenziali)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <circle cx="36" cy="36" r="16" fill="none" stroke="#fff" stroke-width="7.5"/>
+           <path d="M47 47 78 78" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+           <path d="M64 64l7-7M72 72l6-6" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

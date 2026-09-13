@@ -5,7 +5,7 @@
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
 </div>
 <div class="card">
-    <h2>🔑 Modifica credenziali di accesso</h2>
+    <h2>{{ icon('modifica-credenziali') }} Modifica credenziali di accesso</h2>
     <form method="POST">
         <label>Nome</label>
         <input type="text" name="nome" value="{{ current_user.nome }}" required>

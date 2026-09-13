@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-movimenti-contabili" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="100%" stop-color="#0891B2"/>
+    </linearGradient>
+    <radialGradient id="gloss-movimenti-contabili" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-movimenti-contabili" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0891B2" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-movimenti-contabili" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-movimenti-contabili)" filter="url(#shadow-movimenti-contabili)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-movimenti-contabili)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-movimenti-contabili)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <rect x="18" y="18" width="64" height="64" rx="14"/>
+           <path d="M34 56V36l10 10 10-10v20" fill="none" stroke="#0891B2" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+           <path d="M64 36v20" fill="none" stroke="#0891B2" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

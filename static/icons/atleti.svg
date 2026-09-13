@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-atleti" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5B8DEF"/>
+      <stop offset="100%" stop-color="#2E5BFF"/>
+    </linearGradient>
+    <radialGradient id="gloss-atleti" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-atleti" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#2E5BFF" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-atleti" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-atleti)" filter="url(#shadow-atleti)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-atleti)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-atleti)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <circle cx="38" cy="34" r="11"/><path d="M18 76c0-13 8.5-20 20-20s20 7 20 20" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round"/>
+           <circle cx="70" cy="38" r="8.5" fill="#ffffffaa"/><path d="M60 76c0.5-11 6.5-18 15.5-18 8 0 13.5 5.5 15 15" fill="none" stroke="#ffffffaa" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg>

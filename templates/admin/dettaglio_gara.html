@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.lista_gare') }}">&larr; Tornei</a>
-    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=gara.id) }}">✏️ Modifica torneo</a>
+    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=gara.id) }}">{{ icon('modifica') }} Modifica torneo</a>
     <button type="button" class="btn" onclick="window.print()">🖨️ Stampa / Esporta PDF iscritti</button>
 </div>
 

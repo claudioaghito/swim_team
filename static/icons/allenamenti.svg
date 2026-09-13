@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-allenamenti" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF9A56"/>
+      <stop offset="100%" stop-color="#FF5F6D"/>
+    </linearGradient>
+    <radialGradient id="gloss-allenamenti" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-allenamenti" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#FF5F6D" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-allenamenti" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-allenamenti)" filter="url(#shadow-allenamenti)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-allenamenti)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-allenamenti)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <rect x="16" y="40" width="12" height="24" rx="4"/><rect x="72" y="40" width="12" height="24" rx="4"/>
+           <rect x="28" y="44" width="10" height="16" rx="3"/><rect x="62" y="44" width="10" height="16" rx="3"/>
+           <rect x="36" y="48" width="28" height="8" rx="4"/>
+  </g>
+</svg>

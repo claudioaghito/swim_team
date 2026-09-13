@@ -27,14 +27,14 @@
                 <span class="user-info">
                     {{ current_user.nome_completo }}
                     {% if current_user.is_admin %}
-                        <a href="{{ url_for('admin.dashboard') }}">🏠 Home</a>
-                        <a href="{{ url_for('admin.profilo') }}">🔑 Modifica credenziali</a>
+                        <a href="{{ url_for('admin.dashboard') }}">{{ icon('home') }} Home</a>
+                        <a href="{{ url_for('admin.profilo') }}">{{ icon('modifica-credenziali') }} Modifica credenziali</a>
                     {% endif %}
-                    <a href="{{ url_for('auth.logout') }}">🚪 Esci</a>
+                    <a href="{{ url_for('auth.logout') }}">{{ icon('esci') }} Esci</a>
                 </span>
             {% endif %}
             <button type="button" id="theme-toggle" class="theme-toggle" onclick="toggleTheme()"
-                    aria-label="Cambia tema chiaro/scuro" title="Cambia tema chiaro/scuro">🌙</button>
+                    aria-label="Cambia tema chiaro/scuro" title="Cambia tema chiaro/scuro">{{ icon('tema') }}</button>
         </div>
     </nav>
 
@@ -103,17 +103,21 @@
             if (explicit === "light") return false;
             return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
         }
-        function _updateThemeIcon() {
+        function _updateThemeLabel() {
             var btn = document.getElementById("theme-toggle");
-            if (btn) btn.textContent = _isDarkActive() ? "☀️" : "🌙";
+            if (btn) {
+                var label = _isDarkActive() ? "Passa al tema chiaro" : "Passa al tema scuro";
+                btn.setAttribute("aria-label", label);
+                btn.setAttribute("title", label);
+            }
         }
         function toggleTheme() {
             var next = _isDarkActive() ? "light" : "dark";
             document.documentElement.setAttribute("data-theme", next);
             try { localStorage.setItem("theme", next); } catch (e) {}
-            _updateThemeIcon();
+            _updateThemeLabel();
         }
-        _updateThemeIcon();
+        _updateThemeLabel();
     </script>
 </body>
 </html>

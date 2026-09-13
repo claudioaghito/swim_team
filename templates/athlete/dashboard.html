@@ -4,12 +4,12 @@
 <h1>👋 Ciao, {{ current_user.nome }}!</h1>
 
 <div class="actions">
-    <a class="btn" href="{{ url_for('athlete.lista_gare') }}">🏆 Tornei &amp; iscrizioni gare</a>
+    <a class="btn" href="{{ url_for('athlete.lista_gare') }}">{{ icon('tornei') }} Tornei &amp; iscrizioni gare</a>
 </div>
 
 <div class="grid">
     <div class="card">
-        <h3>💶 Il tuo saldo</h3>
+        <h3>{{ icon('movimenti-contabili') }} Il tuo saldo</h3>
         <p class="saldo {{ 'negativo' if saldo < 0 else 'positivo' }}">{{ "%.2f"|format(saldo) }} €</p>
         <ul>
             {% for m in movimenti %}
@@ -22,7 +22,7 @@
     </div>
 
     <div class="card">
-        <h3>🏊 Prossimi allenamenti ({{ prossimi_allenamenti|length }})</h3>
+        <h3>{{ icon('allenamenti') }} Prossimi allenamenti ({{ prossimi_allenamenti|length }})</h3>
         <ul>
             {% for al in prossimi_allenamenti %}
                 <li><a href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</a></li>
@@ -34,13 +34,13 @@
     </div>
 
     <div class="card">
-        <h3>🏆 Prossime gare ({{ prossime_gare|length }})</h3>
+        <h3>{{ icon('tornei') }} Prossime gare ({{ prossime_gare|length }})</h3>
         <ul>
             {% for g in prossime_gare %}
                 <li>
                     {{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo }})
                     {% if g.scadenza_vicina %}<span class="status-dot red" title="Iscrizioni in scadenza"></span><small>iscrizioni in scadenza</small>{% endif %}
-                    — <a href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">{{ "✅ Seleziona le tue gare" if g.iscrizioni_aperte else "👁️ Vedi le tue iscrizioni" }}</a>
+                    — <a href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">{% if g.iscrizioni_aperte %}✅ Seleziona le tue gare{% else %}{{ icon('apri') }} Vedi le tue iscrizioni{% endif %}</a>
                 </li>
             {% else %}
                 <li>Nessuna gara programmata.</li>
@@ -50,7 +50,7 @@
     </div>
 
     <div class="card">
-        <h3>✉️ Comunicazioni ({{ messaggi|length }})</h3>
+        <h3>{{ icon('messaggio') }} Comunicazioni ({{ messaggi|length }})</h3>
         <ul>
             {% for m in messaggi %}
                 <li>
@@ -60,7 +60,7 @@
                     <form method="POST" action="{{ url_for('athlete.elimina_messaggio', messaggio_id=m.id) }}"
                           onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');" style="display:inline;">
                         <input type="hidden" name="next" value="{{ url_for('athlete.dashboard') }}">
-                        <button type="submit" class="btn-danger">🗑️</button>
+                        <button type="submit" class="btn-danger">{{ icon('elimina') }}</button>
                     </form>
                 </li>
             {% else %}

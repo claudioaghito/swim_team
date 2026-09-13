@@ -7,7 +7,7 @@
 </div>
 
 <div class="card">
-    <h2>🏊 Allenamento del {{ allenamento.data.strftime('%d/%m/%Y') }}</h2>
+    <h2>{{ icon('allenamenti') }} Allenamento del {{ allenamento.data.strftime('%d/%m/%Y') }}</h2>
     <p>
         <strong>Gruppo:</strong> {{ allenamento.gruppo or '-' }}<br>
         <strong>Sede:</strong> {{ allenamento.sede or '-' }}<br>

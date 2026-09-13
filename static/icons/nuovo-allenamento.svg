@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-nuovo-allenamento" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF9A56"/>
+      <stop offset="100%" stop-color="#FF5F6D"/>
+    </linearGradient>
+    <radialGradient id="gloss-nuovo-allenamento" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-nuovo-allenamento" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#FF5F6D" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-nuovo-allenamento" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-nuovo-allenamento)" filter="url(#shadow-nuovo-allenamento)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-nuovo-allenamento)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-nuovo-allenamento)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <rect x="14" y="42" width="12" height="22" rx="4"/><rect x="74" y="42" width="12" height="22" rx="4"/>
+           <rect x="26" y="46" width="10" height="14" rx="3"/><rect x="64" y="46" width="10" height="14" rx="3"/>
+           <rect x="34" y="50" width="32" height="6" rx="3"/>
+           <circle cx="76" cy="24" r="14" fill="#22C55E"/><path d="M76 18v12M70 24h12" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

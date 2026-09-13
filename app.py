@@ -2,6 +2,7 @@ import os
 import click
 from flask import Flask, redirect, url_for
 from flask_login import login_required, current_user
+from markupsafe import Markup
 
 from config import Config
 from extensions import db, login_manager
@@ -30,6 +31,13 @@ def create_app(config_class=Config):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+    @app.context_processor
+    def inject_icon_helper():
+        def icon(name, cls="icon"):
+            src = url_for("static", filename=f"icons/{name}.svg")
+            return Markup(f'<img src="{src}" class="{cls}" alt="">')
+        return dict(icon=icon)
 
     @app.route("/")
     def index():

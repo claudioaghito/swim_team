@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Tornei{% endblock %}
 {% block content %}
-<h1>🏆 Tornei</h1>
+<h1>{{ icon('tornei') }} Tornei</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
@@ -10,7 +10,7 @@
 <div class="card">
     <form method="GET" class="search-form">
         <input type="text" name="q" value="{{ q }}" placeholder="Cerca per nome o luogo...">
-        <button type="submit">🔍 Cerca</button>
+        <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
 </div>
 
@@ -47,7 +47,7 @@
                 </td>
                 <td>
                     <a class="btn" href="{{ url_for('athlete.iscrizione_gara', gara_id=g.id) }}">
-                        {{ "✅ Seleziona le tue gare" if g.iscrizioni_aperte else "👁️ Vedi le tue iscrizioni" }}
+                        {% if g.iscrizioni_aperte %}✅ Seleziona le tue gare{% else %}{{ icon('apri') }} Vedi le tue iscrizioni{% endif %}
                     </a>
                 </td>
             </tr>

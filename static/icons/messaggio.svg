@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-messaggio" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34D8C8"/>
+      <stop offset="100%" stop-color="#0EA5A0"/>
+    </linearGradient>
+    <radialGradient id="gloss-messaggio" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-messaggio" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0EA5A0" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-messaggio" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-messaggio)" filter="url(#shadow-messaggio)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-messaggio)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-messaggio)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <path d="M20 28h56a6 6 0 0 1 6 6v28a6 6 0 0 1-6 6H46l-14 12v-12h-12a6 6 0 0 1-6-6V34a6 6 0 0 1 6-6Z"/>
+           <circle cx="34" cy="48" r="4" fill="#0EA5A0"/><circle cx="50" cy="48" r="4" fill="#0EA5A0"/><circle cx="66" cy="48" r="4" fill="#0EA5A0"/>
+  </g>
+</svg>

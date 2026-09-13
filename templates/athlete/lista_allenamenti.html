@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Allenamenti{% endblock %}
 {% block content %}
-<h1>🏊 Allenamenti</h1>
+<h1>{{ icon('allenamenti') }} Allenamenti</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
@@ -10,7 +10,7 @@
 <div class="card">
     <form method="GET" class="search-form">
         <input type="text" name="q" value="{{ q }}" placeholder="Cerca per gruppo o sede...">
-        <button type="submit">🔍 Cerca</button>
+        <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
 </div>
 
@@ -31,7 +31,7 @@
                 <td>{{ al.gruppo or '-' }}</td>
                 <td>{{ al.sede or '-' }}</td>
                 <td>
-                    <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}">👁️ Apri</a>
+                    <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}">{{ icon('apri') }} Apri</a>
                 </td>
             </tr>
             {% else %}

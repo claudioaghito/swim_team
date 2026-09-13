@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; Torneo</a>
-    <a class="btn" href="{{ url_for('admin.lista_gare') }}">🏆 Tutti i tornei</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">{{ icon('tornei') }} Tutti i tornei</a>
 </div>
 <div class="card">
     <h2>Modifica Torneo</h2>

@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 {% block title %}Pannello Admin{% endblock %}
 {% block content %}
-<h1>🏠 Pannello Amministratore</h1>
+<h1>{{ icon('home') }} Pannello Amministratore</h1>
 
 <div class="actions">
-    <a class="btn" href="{{ url_for('admin.lista_atleti') }}">👥 Atleti</a>
-    <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">🏊 Allenamenti</a>
-    <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">➕🏊 Nuovo allenamento</a>
-    <a class="btn" href="{{ url_for('admin.lista_gare') }}">🏆 Tornei</a>
-    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">➕🏆 Nuovo Torneo</a>
-    <a class="btn" href="{{ url_for('admin.lista_movimenti') }}">💶 Movimenti contabili</a>
-    <a class="btn" href="{{ url_for('admin.lista_messaggi') }}">✉️ Messaggi</a>
-    <a class="btn" href="{{ url_for('admin.nuovo_messaggio') }}">➕✉️ Nuovo messaggio</a>
+    <a class="btn" href="{{ url_for('admin.lista_atleti') }}">{{ icon('atleti') }} Atleti</a>
+    <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">{{ icon('allenamenti') }} Allenamenti</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">{{ icon('nuovo-allenamento') }} Nuovo allenamento</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">{{ icon('tornei') }} Tornei</a>
+    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">{{ icon('nuovo-torneo') }} Nuovo Torneo</a>
+    <a class="btn" href="{{ url_for('admin.lista_movimenti') }}">{{ icon('movimenti-contabili') }} Movimenti contabili</a>
+    <a class="btn" href="{{ url_for('admin.lista_messaggi') }}">{{ icon('messaggio') }} Messaggi</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_messaggio') }}">{{ icon('nuovo-messaggio') }} Nuovo messaggio</a>
 </div>
 
 <div class="grid">
     <div class="card">
-        <h3>Atleti ({{ atleti|length }})</h3>
+        <h3>{{ icon('atleti') }} Atleti ({{ atleti|length }})</h3>
         <ul>
             {% for a in atleti %}
                 {% set saldo = a.saldo_attuale() %}
@@ -28,7 +28,7 @@
     </div>
 
     <div class="card">
-        <h3>🏊 Prossimi allenamenti ({{ prossimi_allenamenti|length }})</h3>
+        <h3>{{ icon('allenamenti') }} Prossimi allenamenti ({{ prossimi_allenamenti|length }})</h3>
         <ul>
             {% for al in prossimi_allenamenti %}
                 <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</a></li>
@@ -40,7 +40,7 @@
     </div>
 
     <div class="card">
-        <h3>🏆 Prossime gare ({{ prossime_gare|length }})</h3>
+        <h3>{{ icon('tornei') }} Prossime gare ({{ prossime_gare|length }})</h3>
         <ul>
             {% for g in prossime_gare %}
                 <li>

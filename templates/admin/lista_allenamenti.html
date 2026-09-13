@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Allenamenti{% endblock %}
 {% block content %}
-<h1>🏊 Allenamenti</h1>
+<h1>{{ icon('allenamenti') }} Allenamenti</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
-    <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">➕🏊 Nuovo allenamento</a>
+    <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">{{ icon('nuovo-allenamento') }} Nuovo allenamento</a>
 </div>
 
 <div class="card">
     <form method="GET" class="search-form">
         <input type="text" name="q" value="{{ q }}" placeholder="Cerca per gruppo o sede...">
-        <button type="submit">🔍 Cerca</button>
+        <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
 </div>
 
@@ -34,11 +34,11 @@
                 <td>{{ al.sede or '-' }}</td>
                 <td class="preserve-lines">{{ al.descrizione or '-' }}</td>
                 <td class="table-actions">
-                    <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">👁️ Apri</a>
-                    <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=al.id) }}">✏️ Modifica</a>
+                    <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ icon('apri') }} Apri</a>
+                    <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=al.id) }}">{{ icon('modifica') }} Modifica</a>
                     <form method="POST" action="{{ url_for('admin.elimina_allenamento', allenamento_id=al.id) }}"
                           onsubmit="return confirmSubmit(this, 'Eliminare questo allenamento?');" style="display:inline;">
-                        <button type="submit" class="btn-danger">🗑️ Elimina</button>
+                        <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina</button>
                     </form>
                 </td>
             </tr>
