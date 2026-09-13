@@ -33,9 +33,10 @@
     <h3>Iscrizioni atleti ({{ scelte_per_atleta|length }})</h3>
     {% if scelte_per_atleta %}
     <form method="POST" action="{{ url_for('admin.conferma_tutte_quote', gara_id=gara.id) }}" class="no-print"
-          onsubmit="return confirmSubmit(this, 'Confermare la quota di {{ "%.2f"|format(gara.quota_gara or 0) }} € per tutti gli atleti che non hanno ancora una quota addebitata?');">
-        <button type="submit">{{ icon('conferma') }} Conferma tutte le quote non addebitate ({{ "%.2f"|format(gara.quota_gara or 0) }} €)</button>
+          onsubmit="return confirmSubmit(this, 'Confermare la quota per tutti gli atleti che non hanno ancora una quota addebitata, calcolata in base al numero di gare scelte da ciascuno?');">
+        <button type="submit">{{ icon('conferma') }} Conferma tutte le quote non addebitate</button>
     </form>
+    <p class="no-print"><small>La quota di ogni atleta viene calcolata moltiplicando la quota gara ({{ "%.2f"|format(gara.quota_gara or 0) }} €) per il numero di gare scelte; le gare con "staffetta" nel nome usano invece la quota staffetta ({{ "%.2f"|format(gara.quota_staffetta or 0) }} €).</small></p>
     {% endif %}
     <div style="overflow-x:auto;">
     <table class="table">
@@ -78,7 +79,7 @@
                             {% else %}
                                 <form method="POST" action="{{ url_for('admin.conferma_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}" style="display:flex;gap:4px;">
                                     <input type="number" step="0.01" name="importo" placeholder="es. 20"
-                                           value="{{ gara.quota_gara }}" style="width:90px;margin-top:0;">
+                                           value="{{ '%.2f'|format(gara.calcola_quota(iscrizioni)) }}" style="width:90px;margin-top:0;">
                                     <button type="submit">{{ icon('conferma') }} Conferma</button>
                                 </form>
                             {% endif %}

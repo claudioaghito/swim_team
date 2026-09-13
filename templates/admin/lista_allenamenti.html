@@ -19,9 +19,9 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Data</th>
-                <th>Gruppo</th>
-                <th>Sede</th>
+                <th data-sort="date">Data</th>
+                <th data-sort="text">Gruppo</th>
+                <th data-sort="text">Sede</th>
                 <th>Descrizione</th>
                 <th></th>
             </tr>
@@ -29,7 +29,7 @@
         <tbody>
             {% for al in allenamenti %}
             <tr>
-                <td>{{ al.data.strftime('%d/%m/%Y') }}</td>
+                <td data-sort-value="{{ al.data.isoformat() }}">{{ al.data.strftime('%d/%m/%Y') }}</td>
                 <td>{{ al.gruppo or '-' }}</td>
                 <td>{{ al.sede or '-' }}</td>
                 <td class="preserve-lines">{{ al.descrizione or '-' }}</td>

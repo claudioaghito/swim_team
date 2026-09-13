@@ -254,6 +254,9 @@ form button, form input[type="submit"] { margin-top: 16px; }
 }
 .table tbody tr:hover { background: var(--table-hover-bg); }
 .table-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.table th[data-sort] { cursor: pointer; user-select: none; }
+.table th[data-sort]:hover { opacity: 0.8; }
+.sort-indicator { font-size: 0.9em; }
 
 .search-form { display: flex; gap: 8px; }
 .search-form input { flex: 1; margin-top: 0; }

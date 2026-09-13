@@ -133,6 +133,19 @@ class Gara(db.Model):
             raggruppate.setdefault(iscrizione.atleta, []).append(iscrizione)
         return dict(sorted(raggruppate.items(), key=lambda kv: (kv[0].cognome, kv[0].nome)))
 
+    def calcola_quota(self, iscrizioni):
+        """Quota gara moltiplicata per il numero di gare scelte; le gare la cui
+        descrizione contiene "staffetta" usano la quota_staffetta al posto della quota_gara."""
+        quota_gara = float(self.quota_gara or 0)
+        quota_staffetta = float(self.quota_staffetta or 0)
+        totale = 0.0
+        for iscrizione in iscrizioni:
+            if iscrizione.stile and "staffetta" in iscrizione.stile.lower():
+                totale += quota_staffetta
+            else:
+                totale += quota_gara
+        return totale
+
     def __repr__(self):
         return f"<Gara {self.nome} {self.data}>"
 

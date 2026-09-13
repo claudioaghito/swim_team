@@ -545,7 +545,6 @@ def annulla_quota_gara(gara_id, atleta_id):
 @admin_required
 def conferma_tutte_quote(gara_id):
     gara = Gara.query.get_or_404(gara_id)
-    importo = float(gara.quota_gara or 0)
 
     scelte_per_atleta = gara.iscrizioni_per_atleta()
     quote_esistenti = {
@@ -553,10 +552,12 @@ def conferma_tutte_quote(gara_id):
     }
 
     contatore = 0
-    for atleta in scelte_per_atleta:
+    for atleta, iscrizioni in scelte_per_atleta.items():
         quota = quote_esistenti.get(atleta.id)
         if quota and quota.movimento_id:
             continue  # già addebitata, non toccarla
+
+        importo = gara.calcola_quota(iscrizioni)
 
         if not quota:
             quota = QuotaTorneo(atleta_id=atleta.id, gara_id=gara.id)
@@ -576,7 +577,7 @@ def conferma_tutte_quote(gara_id):
 
     db.session.commit()
     if contatore:
-        flash(f"{contatore} quota/e da {importo:.2f} € addebitata/e.", "success")
+        flash(f"{contatore} quota/e addebitata/e in base alle gare scelte da ciascun atleta.", "success")
     else:
         flash("Nessuna quota da addebitare: tutti gli atleti hanno già una quota confermata.", "info")
     return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))

@@ -18,8 +18,8 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Data</th>
-                <th>Nome</th>
+                <th data-sort="date">Data</th>
+                <th data-sort="text">Nome</th>
                 <th>Luogo</th>
                 <th>Stato iscrizioni</th>
                 <th>Iscritti</th>
@@ -30,7 +30,7 @@
         <tbody>
             {% for g in gare %}
             <tr>
-                <td>{{ g.data.strftime('%d/%m/%Y') }}</td>
+                <td data-sort-value="{{ g.data.isoformat() }}">{{ g.data.strftime('%d/%m/%Y') }}</td>
                 <td>{{ g.nome }}</td>
                 <td>{{ g.luogo or '-' }}</td>
                 <td>{{ "aperte" if g.iscrizioni_aperte else "chiuse" }}</td>

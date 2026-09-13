@@ -119,5 +119,51 @@
         }
         _updateThemeLabel();
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("th[data-sort]").forEach(function (th) {
+                th.addEventListener("click", function () {
+                    var table = th.closest("table");
+                    var tbody = table.querySelector("tbody");
+                    var headerRow = th.parentNode;
+                    var index = Array.prototype.indexOf.call(headerRow.children, th);
+                    var type = th.getAttribute("data-sort");
+                    var asc = th.getAttribute("data-sort-dir") !== "asc";
+
+                    headerRow.querySelectorAll("th[data-sort]").forEach(function (h) {
+                        h.removeAttribute("data-sort-dir");
+                        var ind = h.querySelector(".sort-indicator");
+                        if (ind) ind.remove();
+                    });
+                    th.setAttribute("data-sort-dir", asc ? "asc" : "desc");
+                    var indicator = document.createElement("span");
+                    indicator.className = "sort-indicator";
+                    indicator.textContent = asc ? " ▲" : " ▼";
+                    th.appendChild(indicator);
+
+                    var rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
+                    rows.sort(function (r1, r2) {
+                        var c1 = r1.children[index];
+                        var c2 = r2.children[index];
+                        if (!c1 || !c2) return 0;
+                        var v1 = (c1.getAttribute("data-sort-value") || c1.textContent).trim();
+                        var v2 = (c2.getAttribute("data-sort-value") || c2.textContent).trim();
+                        if (type === "number") {
+                            v1 = parseFloat(v1.replace(",", ".")) || 0;
+                            v2 = parseFloat(v2.replace(",", ".")) || 0;
+                            return asc ? v1 - v2 : v2 - v1;
+                        }
+                        v1 = v1.toLowerCase();
+                        v2 = v2.toLowerCase();
+                        if (v1 < v2) return asc ? -1 : 1;
+                        if (v1 > v2) return asc ? 1 : -1;
+                        return 0;
+                    });
+                    rows.forEach(function (row) { tbody.appendChild(row); });
+                });
+            });
+        });
+    </script>
 </body>
 </html>
