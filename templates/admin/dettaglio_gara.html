@@ -69,7 +69,7 @@
                         <td class="no-print" rowspan="{{ iscrizioni|length }}">
                             {% if quota and quota.movimento_id %}
                                 <div style="display:flex;gap:4px;align-items:center;">
-                                    <button type="button" disabled style="opacity:0.5;cursor:not-allowed;">✅ Confermata</button>
+                                    <button type="button" disabled style="cursor:not-allowed;">✅ Confermata</button>
                                     <form method="POST" action="{{ url_for('admin.annulla_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}"
                                           onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
                                         <button type="submit" class="btn-danger">↩️ Annulla</button>
