@@ -29,6 +29,18 @@
     {% endif %}
 </div>
 
+{% if tipi_staffetta %}
+<div class="card no-print">
+    <h3>Formazione staffette</h3>
+    <p><small>Scegli la formazione migliore tra gli atleti iscritti a ciascuna staffetta.</small></p>
+    <div class="actions">
+        {% for tipo in tipi_staffetta %}
+            <a class="btn" href="{{ url_for('admin.formazione_staffetta', gara_id=gara.id, tipo=tipo) }}">{{ tipo }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 <div class="card">
     <h3>Iscrizioni atleti ({{ scelte_per_atleta|length }})</h3>
     {% if scelte_per_atleta %}

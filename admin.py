@@ -15,6 +15,7 @@ from extensions import db
 from models import (
     User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
 )
+from relay_master import Nuotatore, RELAY_BRACKETS, formazione_migliore_per_categoria_target
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -58,6 +59,33 @@ def _elimina_file(sottocartella, nome_file):
 
 def _parsa_data_nascita(valore):
     return datetime.strptime(valore, "%Y-%m-%d").date() if valore else None
+
+
+def _tempo_a_secondi(testo):
+    """Converte un tempo tipo '01:02.35' o '62.35' in secondi (float). None se vuoto/non valido."""
+    testo = (testo or "").strip().replace(",", ".")
+    if not testo:
+        return None
+    try:
+        if ":" in testo:
+            minuti, resto = testo.split(":", 1)
+            return int(minuti) * 60 + float(resto)
+        return float(testo)
+    except ValueError:
+        return None
+
+
+def _secondi_a_tempo(secondi):
+    minuti = int(secondi // 60)
+    resto = secondi - minuti * 60
+    return f"{minuti:02d}:{resto:05.2f}"
+
+
+def _prove_staffetta(tipo):
+    """Deduce le 4 prove/frazioni di una staffetta dal nome della tipologia."""
+    if "misti" in tipo.lower():
+        return ["DO", "RA", "FA", "SL"]
+    return ["SL", "SL", "SL", "SL"]
 
 
 TIPI_GARA_BASE = [
@@ -505,11 +533,97 @@ def dettaglio_gara(gara_id):
         for q in QuotaTorneo.query.filter_by(gara_id=gara.id).all()
     }
 
+    tipi_staffetta = [t for t in gara.lista_tipologie if "staffetta" in t.lower()]
+
     return render_template(
         "admin/dettaglio_gara.html",
         gara=gara,
         scelte_per_atleta=scelte_per_atleta,
         quote_per_atleta=quote_per_atleta,
+        tipi_staffetta=tipi_staffetta,
+    )
+
+
+@admin_bp.route("/gare/<int:gara_id>/staffetta/<path:tipo>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def formazione_staffetta(gara_id, tipo):
+    """Strumento admin per scegliere la formazione migliore di una staffetta,
+    a partire dagli atleti che si sono iscritti a quella tipologia di gara."""
+    gara = Gara.query.get_or_404(gara_id)
+    if tipo not in gara.lista_tipologie or "staffetta" not in tipo.lower():
+        abort(404)
+
+    iscritti = sorted(
+        {i.atleta for i in gara.iscrizioni if i.stile == tipo},
+        key=lambda a: (a.cognome, a.nome),
+    )
+    tempo_registrato = {
+        i.atleta_id: i.tempo_ottenuto
+        for i in gara.iscrizioni if i.stile == tipo
+    }
+    prove = _prove_staffetta(tipo)
+    prove_uniche = list(dict.fromkeys(prove))  # per la staffetta SL basta un campo tempo per atleta
+    anno_stagione = Configurazione.ottieni().anno_stagione
+
+    risultato = None
+    errore = None
+    valori_form = {}
+    categoria_target = None
+    strategia = "tempo_minimo"
+
+    if request.method == "POST":
+        categoria_target = request.form.get("categoria_target", "")
+        strategia = request.form.get("strategia", "tempo_minimo")
+        valori_form = request.form
+
+        candidati = []
+        for atleta in iscritti:
+            if not atleta.data_nascita:
+                continue
+            eta = anno_stagione - atleta.data_nascita.year
+            tempi = {}
+            for prova in prove_uniche:
+                secondi = _tempo_a_secondi(request.form.get(f"tempo_{atleta.id}_{prova}"))
+                if secondi is not None:
+                    tempi[prova] = secondi
+            if tempi:
+                candidati.append(Nuotatore(nome=atleta.nome_completo, eta=eta, tempi=tempi))
+
+        if categoria_target not in RELAY_BRACKETS:
+            errore = "Seleziona una categoria target valida."
+        elif len(candidati) < 4:
+            errore = "Servono almeno 4 atleti con eta' e tempo inseriti per calcolare una formazione."
+        else:
+            formazione = formazione_migliore_per_categoria_target(
+                candidati, categoria_target, prove, strategia=strategia
+            )
+            if formazione is None:
+                errore = "Nessuna combinazione di 4 atleti tra quelli inseriti rientra nella fascia d'eta' scelta."
+            else:
+                risultato = {
+                    "righe": [
+                        {"nome": n.nome, "prova": p, "tempo": _secondi_a_tempo(n.tempi[p])}
+                        for n, p in formazione.frazioni
+                    ],
+                    "tempo_totale": _secondi_a_tempo(formazione.tempo_totale),
+                    "somma_eta": formazione.somma_eta,
+                }
+
+    return render_template(
+        "admin/formazione_staffetta.html",
+        gara=gara,
+        tipo=tipo,
+        iscritti=iscritti,
+        tempo_registrato=tempo_registrato,
+        prove_uniche=prove_uniche,
+        categorie=list(RELAY_BRACKETS.keys()),
+        anno_stagione=anno_stagione,
+        categoria_target=categoria_target,
+        strategia=strategia,
+        valori_form=valori_form,
+        risultato=risultato,
+        errore=errore,
     )
 
 

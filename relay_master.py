@@ -38,7 +38,7 @@ STRATEGIE = ("tempo_minimo", "eta_minima_fascia")
 class Nuotatore:
     nome: str
     eta: int
-    sesso: str  # "M" o "F"
+    sesso: str = None  # "M" o "F", opzionale: serve solo se si usa tipo_squadra
     tempi: dict = field(default_factory=dict)  # tempo in secondi per prova, es. {"SL": 28.4}
 
 
@@ -54,6 +54,8 @@ class Formazione:
 
 
 def _composizione_valida(gruppo, tipo_squadra):
+    if tipo_squadra is None:
+        return True
     if tipo_squadra == "MISTA":
         maschi = sum(1 for n in gruppo if n.sesso == "M")
         femmine = sum(1 for n in gruppo if n.sesso == "F")
@@ -87,7 +89,7 @@ def formazione_migliore_per_categoria_target(
     candidati,
     categoria_target,
     prove,
-    tipo_squadra="MISTA",
+    tipo_squadra=None,
     strategia="tempo_minimo",
 ):
     """Trova la formazione di 4 nuotatori migliore per la categoria target.
@@ -97,8 +99,10 @@ def formazione_migliore_per_categoria_target(
     prove: le 4 prove della staffetta nell'ordine di frazione, es.
         ["SL", "SL", "SL", "SL"] per una 4x100 SL, oppure
         ["DO", "RA", "FA", "SL"] per una 4x100 misti.
-    tipo_squadra: "M", "F" o "MISTA" (vincolo di composizione: vedi nota
-        in cima al modulo sull'assunzione 2+2 per la mista).
+    tipo_squadra: None (nessun vincolo, il chiamante ha gia' selezionato un
+        gruppo di candidati coerente con il tipo di staffetta), oppure "M",
+        "F" o "MISTA" per far applicare qui il vincolo di composizione
+        (sulla mista si assume 2+2, vedi nota in cima al modulo).
     strategia:
         - "tempo_minimo": minimizza il tempo totale tra le formazioni che
           rientrano nella fascia d'eta' della categoria target.

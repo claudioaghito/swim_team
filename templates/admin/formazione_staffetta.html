@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Formazione staffetta{% endblock %}
+{% block content %}
+<div class="actions no-print">
+    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; {{ gara.nome }}</a>
+</div>
+
+<div class="card">
+    <h2>Formazione staffetta</h2>
+    <p><strong>Torneo:</strong> {{ gara.nome }}<br>
+       <strong>Tipologia:</strong> {{ tipo }}<br>
+       <strong>Anno stagione:</strong> {{ anno_stagione }} (usato per calcolare l'eta' agonistica)</p>
+    <p><small>Le soglie di categoria e la logica di calcolo sono un default plausibile: vanno confermate
+       con il regolamento ufficiale della manifestazione. L'eta' qui e' calcolata come per le gare
+       individuali (anno stagione - anno di nascita); le staffette potrebbero usare un riferimento
+       leggermente diverso.</small></p>
+</div>
+
+{% if not iscritti %}
+<div class="card warning">
+    <p>Nessun atleta si e' ancora iscritto a "{{ tipo }}" per questo torneo: non c'e' nessun candidato tra cui scegliere.</p>
+</div>
+{% else %}
+<div class="card">
+    <h3>{{ icon('atleti') }} Atleti iscritti a questa staffetta ({{ iscritti|length }})</h3>
+    <p><small>Inserisci il tempo di ciascun atleta sulle frazioni della staffetta: solo questi atleti
+       vengono considerati, non serve raccogliere i tempi di tutta la squadra.</small></p>
+    <form method="POST">
+        <div style="overflow-x:auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Atleta</th>
+                    {% if prove_uniche|length == 1 %}
+                        <th>Tempo {{ prove_uniche[0] }}</th>
+                    {% else %}
+                        {% for prova in prove_uniche %}<th>Tempo {{ prova }}</th>{% endfor %}
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for atleta in iscritti %}
+                <tr>
+                    <td>{{ atleta.nome_completo }}</td>
+                    {% for prova in prove_uniche %}
+                    <td>
+                        <input type="text" name="tempo_{{ atleta.id }}_{{ prova }}" placeholder="es. 01:02.35"
+                               value="{{ valori_form.get('tempo_' ~ atleta.id ~ '_' ~ prova, tempo_registrato.get(atleta.id, '') if prove_uniche|length == 1 else '') }}">
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+
+        <label>Categoria target</label>
+        <select name="categoria_target">
+            <option value="">-- seleziona --</option>
+            {% for cat in categorie %}
+                <option value="{{ cat }}" {% if cat == categoria_target %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Strategia</label>
+        <div class="checkbox-list">
+            <label class="checkbox-item">
+                <input type="radio" name="strategia" value="tempo_minimo" style="width:auto;"
+                       {% if strategia != "eta_minima_fascia" %}checked{% endif %}>
+                Tempo minimo (formazione piu' veloce nella fascia)
+            </label>
+            <label class="checkbox-item">
+                <input type="radio" name="strategia" value="eta_minima_fascia" style="width:auto;"
+                       {% if strategia == "eta_minima_fascia" %}checked{% endif %}>
+                Eta' minima nella fascia (resta "giovane" nella categoria)
+            </label>
+        </div>
+
+        <button type="submit">{{ icon('conferma') }} Calcola formazione migliore</button>
+    </form>
+</div>
+{% endif %}
+
+{% if errore %}
+<div class="card warning">
+    <p>{{ errore }}</p>
+</div>
+{% endif %}
+
+{% if risultato %}
+<div class="card">
+    <h3>{{ icon('conferma') }} Formazione proposta</h3>
+    <table class="table">
+        <thead>
+            <tr><th>Frazione</th><th>Atleta</th><th>Tempo</th></tr>
+        </thead>
+        <tbody>
+            {% for riga in risultato.righe %}
+            <tr>
+                <td>{{ riga.prova }}</td>
+                <td>{{ riga.nome }}</td>
+                <td>{{ riga.tempo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p><strong>Tempo totale stimato:</strong> {{ risultato.tempo_totale }}<br>
+       <strong>Somma eta':</strong> {{ risultato.somma_eta }}</p>
+</div>
+{% endif %}
+{% endblock %}
