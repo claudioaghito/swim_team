@@ -27,7 +27,10 @@
                     <th data-sort="date">Torneo</th>
                     <th data-sort="text">Tipologia</th>
                     <th data-sort="text">Categoria</th>
-                    <th>Formazione</th>
+                    <th>Frazione</th>
+                    <th>Atleta</th>
+                    <th>Sesso</th>
+                    <th>Tempo</th>
                     <th data-sort="text">Tempo totale</th>
                     <th data-sort="number">Somma età</th>
                     <th>Strategia</th>
@@ -35,22 +38,31 @@
             </thead>
             <tbody>
                 {% for f in formazioni %}
-                <tr>
-                    <td class="no-print"><input type="checkbox" class="staffetta-check" name="formazione_ids" value="{{ f.id }}"></td>
-                    <td data-sort-value="{{ f.gara.data.isoformat() }}">{{ f.gara.nome }} ({{ f.gara.data.strftime('%d/%m/%Y') }})</td>
-                    <td>{{ f.tipo }}</td>
-                    <td>{{ f.categoria }} <small>(fascia {{ f.fascia_eta }})</small></td>
-                    <td>
-                        {% for fr in f.frazioni %}
-                            {{ fr.prova }}: {{ fr.nome }}{% if fr.sesso %} ({{ fr.sesso }}){% endif %} — {{ fr.tempo }}<br>
-                        {% endfor %}
-                    </td>
-                    <td>{{ f.tempo_totale }}</td>
-                    <td>{{ f.somma_eta }}</td>
-                    <td>{{ "Tempo minimo" if f.strategia == "tempo_minimo" else "Età minima fascia" }}</td>
-                </tr>
+                    {% for fr in f.frazioni %}
+                    <tr class="{{ 'formazione-inizio' if loop.first else '' }}">
+                        {% if loop.first %}
+                            <td class="no-print" rowspan="{{ f.frazioni|length }}">
+                                <input type="checkbox" class="staffetta-check" name="formazione_ids" value="{{ f.id }}">
+                            </td>
+                            <td rowspan="{{ f.frazioni|length }}" data-sort-value="{{ f.gara.data.isoformat() }}">
+                                {{ f.gara.nome }} ({{ f.gara.data.strftime('%d/%m/%Y') }})
+                            </td>
+                            <td rowspan="{{ f.frazioni|length }}">{{ f.tipo }}</td>
+                            <td rowspan="{{ f.frazioni|length }}">{{ f.categoria }} <small>(fascia {{ f.fascia_eta }})</small></td>
+                        {% endif %}
+                        <td>{{ fr.prova }}</td>
+                        <td>{{ fr.nome }}</td>
+                        <td>{{ fr.sesso or "-" }}</td>
+                        <td>{{ fr.tempo }}</td>
+                        {% if loop.first %}
+                            <td rowspan="{{ f.frazioni|length }}">{{ f.tempo_totale }}</td>
+                            <td rowspan="{{ f.frazioni|length }}">{{ f.somma_eta }}</td>
+                            <td rowspan="{{ f.frazioni|length }}">{{ "Tempo minimo" if f.strategia == "tempo_minimo" else "Età minima fascia" }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
                 {% else %}
-                <tr><td colspan="8">Nessuna formazione salvata. Generane una dalla pagina di un torneo, sezione "Formazione staffette".</td></tr>
+                <tr><td colspan="11">Nessuna formazione salvata. Generane una dalla pagina di un torneo, sezione "Formazione staffette".</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -62,6 +74,7 @@
 </div>
 
 <style>
+.formazione-inizio > td { border-top: 2px solid var(--border); }
 @media print {
     .no-print, .navbar, .flash { display: none !important; }
     .card { box-shadow: none; border: none; }

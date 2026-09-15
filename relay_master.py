@@ -63,10 +63,17 @@ def _composizione_valida(gruppo, tipo_squadra):
     return all(n.sesso == tipo_squadra for n in gruppo)
 
 
-def _migliore_assegnazione(gruppo, prove):
-    """Tra le permutazioni dei 4 nuotatori sulle prove richieste, trova
-    quella con tempo totale minimo. Ritorna (frazioni, tempo_totale) o
-    None se nessuna assegnazione e' completa (tempi mancanti)."""
+def _migliore_assegnazione(gruppo, prove, richiedi_tempi=True):
+    """Tra le permutazioni dei 4 nuotatori sulle prove richieste, trova quella
+    con tempo totale minimo (tra quelle con tempi completi su tutte le frazioni).
+
+    Se richiedi_tempi e' True (strategia "tempo_minimo") e nessuna permutazione
+    ha tempi completi, ritorna None: senza tempi non si puo' minimizzare nulla.
+
+    Se richiedi_tempi e' False (strategia "eta_minima_fascia", dove il tempo e'
+    facoltativo), in assenza di tempi completi ritorna comunque un abbinamento
+    nell'ordine dato dei candidati, con tempo_totale a None se non tutte le
+    frazioni hanno un tempo inserito."""
     migliore = None
     for ordine in permutations(gruppo):
         tempo_totale = 0.0
@@ -82,7 +89,14 @@ def _migliore_assegnazione(gruppo, prove):
         if migliore is None or tempo_totale < migliore[1]:
             frazioni = list(zip(ordine, prove))
             migliore = (frazioni, tempo_totale)
-    return migliore
+
+    if migliore is not None or richiedi_tempi:
+        return migliore
+
+    frazioni = list(zip(gruppo, prove))
+    tempi_presenti = [n.tempi[p] for n, p in frazioni if p in n.tempi]
+    tempo_totale = sum(tempi_presenti) if len(tempi_presenti) == len(prove) else None
+    return frazioni, tempo_totale
 
 
 def _categoria_per_somma_eta(somma_eta):
@@ -110,6 +124,8 @@ def tutte_le_formazioni_possibili(candidati, prove, tipo_squadra=None, strategia
     if len(prove) != 4:
         raise ValueError("Una staffetta richiede esattamente 4 prove/frazioni")
 
+    richiedi_tempi = strategia == "tempo_minimo"
+
     migliori = {}
     for gruppo in combinations(candidati, 4):
         somma_eta = sum(n.eta for n in gruppo)
@@ -118,7 +134,7 @@ def tutte_le_formazioni_possibili(candidati, prove, tipo_squadra=None, strategia
             continue
         if not _composizione_valida(gruppo, tipo_squadra):
             continue
-        assegnazione = _migliore_assegnazione(gruppo, prove)
+        assegnazione = _migliore_assegnazione(gruppo, prove, richiedi_tempi=richiedi_tempi)
         if assegnazione is None:
             continue
         frazioni, tempo_totale = assegnazione
@@ -130,7 +146,7 @@ def tutte_le_formazioni_possibili(candidati, prove, tipo_squadra=None, strategia
         elif strategia == "tempo_minimo":
             if formazione.tempo_totale < attuale.tempo_totale:
                 migliori[categoria] = formazione
-        else:  # eta_minima_fascia
+        else:  # eta_minima_fascia: il tempo e' facoltativo, si sceglie solo per eta'
             eta_min = RELAY_BRACKETS[categoria][0]
             if (formazione.somma_eta - eta_min) < (attuale.somma_eta - eta_min):
                 migliori[categoria] = formazione
@@ -174,6 +190,7 @@ def formazione_migliore_per_categoria_target(
         raise ValueError("Una staffetta richiede esattamente 4 prove/frazioni")
 
     eta_min, eta_max = RELAY_BRACKETS[categoria_target]
+    richiedi_tempi = strategia == "tempo_minimo"
 
     formazioni_valide = []
     for gruppo in combinations(candidati, 4):
@@ -182,7 +199,7 @@ def formazione_migliore_per_categoria_target(
             continue
         if not _composizione_valida(gruppo, tipo_squadra):
             continue
-        assegnazione = _migliore_assegnazione(gruppo, prove)
+        assegnazione = _migliore_assegnazione(gruppo, prove, richiedi_tempi=richiedi_tempi)
         if assegnazione is None:
             continue
         frazioni, tempo_totale = assegnazione

@@ -32,7 +32,8 @@
 <div class="card">
     <h3>{{ icon('atleti') }} Atleti iscritti a questa staffetta ({{ iscritti|length }})</h3>
     <p><small>Inserisci il tempo di ciascun atleta sulle frazioni della staffetta: solo questi atleti
-       vengono considerati, non serve raccogliere i tempi di tutta la squadra.</small></p>
+       vengono considerati, non serve raccogliere i tempi di tutta la squadra. Con la strategia
+       "Eta' minima nella fascia" il tempo e' facoltativo: basta eta' (e sesso, se richiesto).</small></p>
     <form method="POST">
         <div style="overflow-x:auto;">
         <table class="table">
@@ -41,7 +42,7 @@
                     <th>Atleta</th>
                     <th>Sesso</th>
                     {% if prove_uniche|length == 1 %}
-                        <th>Tempo {{ prove_uniche[0] }}</th>
+                        <th>Tempo</th>
                     {% else %}
                         {% for prova in prove_uniche %}<th>Tempo {{ prova }}</th>{% endfor %}
                     {% endif %}

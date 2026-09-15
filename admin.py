@@ -607,11 +607,13 @@ def formazione_staffetta(gara_id, tipo):
                 secondi = _tempo_a_secondi(request.form.get(f"tempo_{atleta.id}_{prova}"))
                 if secondi is not None:
                     tempi[prova] = secondi
-            if tempi:
-                candidati.append(Nuotatore(nome=atleta.nome_completo, eta=eta, sesso=atleta.sesso, tempi=tempi))
+            candidati.append(Nuotatore(nome=atleta.nome_completo, eta=eta, sesso=atleta.sesso, tempi=tempi))
 
         if len(candidati) < 4:
-            errore = "Servono almeno 4 atleti con eta', sesso e tempo inseriti per calcolare una formazione."
+            errore = (
+                "Servono almeno 4 atleti con eta' inserita (e sesso, se richiesto dalla composizione) "
+                "per calcolare una formazione. Il tempo e' obbligatorio solo con la strategia 'tempo minimo'."
+            )
         else:
             formazioni_per_categoria = tutte_le_formazioni_possibili(
                 candidati, prove, tipo_squadra=tipo_squadra, strategia=strategia
@@ -620,15 +622,26 @@ def formazione_staffetta(gara_id, tipo):
             for categoria, (eta_min, eta_max) in RELAY_BRACKETS.items():
                 formazione = formazioni_per_categoria.get(categoria)
                 fascia = f"{eta_min}+" if eta_max is None else f"{eta_min}-{eta_max}"
-                righe = [
-                    {"nome": n.nome, "prova": p, "sesso": n.sesso, "tempo": _secondi_a_tempo(n.tempi[p])}
-                    for n, p in formazione.frazioni
-                ] if formazione else None
+                if formazione:
+                    righe = [
+                        {
+                            "nome": n.nome, "prova": p, "sesso": n.sesso,
+                            "tempo": _secondi_a_tempo(n.tempi[p]) if p in n.tempi else "n/d",
+                        }
+                        for n, p in formazione.frazioni
+                    ]
+                    tempo_totale_fmt = (
+                        _secondi_a_tempo(formazione.tempo_totale)
+                        if formazione.tempo_totale is not None else "n/d"
+                    )
+                else:
+                    righe = None
+                    tempo_totale_fmt = None
                 risultati.append({
                     "categoria": categoria,
                     "fascia": fascia,
                     "righe": righe,
-                    "tempo_totale": _secondi_a_tempo(formazione.tempo_totale) if formazione else None,
+                    "tempo_totale": tempo_totale_fmt,
                     "somma_eta": formazione.somma_eta if formazione else None,
                 })
 
@@ -642,7 +655,7 @@ def formazione_staffetta(gara_id, tipo):
                     salvata.fascia_eta = fascia
                     salvata.strategia = strategia
                     salvata.somma_eta = formazione.somma_eta
-                    salvata.tempo_totale = _secondi_a_tempo(formazione.tempo_totale)
+                    salvata.tempo_totale = tempo_totale_fmt
                     salvata.frazioni_json = json.dumps(righe)
                     salvata.creata_il = datetime.utcnow()
 
