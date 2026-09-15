@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -256,3 +257,29 @@ class Configurazione(db.Model):
             db.session.add(config)
             db.session.commit()
         return config
+
+
+class FormazioneStaffetta(db.Model):
+    """Formazione staffetta calcolata e salvata dall'admin per un torneo/tipologia/categoria."""
+    __tablename__ = "formazioni_staffetta"
+
+    id = db.Column(db.Integer, primary_key=True)
+    gara_id = db.Column(db.Integer, db.ForeignKey("gare.id"), nullable=False)
+    tipo = db.Column(db.String(120), nullable=False)  # es. "STAFFETTA 4X50 SL M/F"
+    categoria = db.Column(db.String(10), nullable=False)  # es. "160"
+    fascia_eta = db.Column(db.String(20))  # es. "160-199"
+    strategia = db.Column(db.String(30), nullable=False)
+    somma_eta = db.Column(db.Integer, nullable=False)
+    tempo_totale = db.Column(db.String(20), nullable=False)  # es. "01:53.20"
+    frazioni_json = db.Column(db.Text, nullable=False)  # lista di {"nome","sesso","prova","tempo"}
+    creata_il = db.Column(db.DateTime, default=datetime.utcnow)
+
+    gara = db.relationship("Gara", backref=db.backref("formazioni_staffetta", cascade="all, delete-orphan"))
+
+    __table_args__ = (
+        db.UniqueConstraint("gara_id", "tipo", "categoria", name="uq_formazione_staffetta"),
+    )
+
+    @property
+    def frazioni(self):
+        return json.loads(self.frazioni_json)

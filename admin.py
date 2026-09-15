@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 import os
 from datetime import datetime
 from functools import wraps
@@ -14,6 +15,7 @@ from werkzeug.utils import secure_filename
 from extensions import db
 from models import (
     User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
+    FormazioneStaffetta,
 )
 from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
 
@@ -617,20 +619,43 @@ def formazione_staffetta(gara_id, tipo):
             risultati = []
             for categoria, (eta_min, eta_max) in RELAY_BRACKETS.items():
                 formazione = formazioni_per_categoria.get(categoria)
+                fascia = f"{eta_min}+" if eta_max is None else f"{eta_min}-{eta_max}"
+                righe = [
+                    {"nome": n.nome, "prova": p, "sesso": n.sesso, "tempo": _secondi_a_tempo(n.tempi[p])}
+                    for n, p in formazione.frazioni
+                ] if formazione else None
                 risultati.append({
                     "categoria": categoria,
-                    "fascia": f"{eta_min}+" if eta_max is None else f"{eta_min}-{eta_max}",
-                    "righe": [
-                        {"nome": n.nome, "prova": p, "sesso": n.sesso, "tempo": _secondi_a_tempo(n.tempi[p])}
-                        for n, p in formazione.frazioni
-                    ] if formazione else None,
+                    "fascia": fascia,
+                    "righe": righe,
                     "tempo_totale": _secondi_a_tempo(formazione.tempo_totale) if formazione else None,
                     "somma_eta": formazione.somma_eta if formazione else None,
                 })
+
+                if formazione:
+                    salvata = FormazioneStaffetta.query.filter_by(
+                        gara_id=gara.id, tipo=tipo, categoria=categoria
+                    ).first()
+                    if not salvata:
+                        salvata = FormazioneStaffetta(gara_id=gara.id, tipo=tipo, categoria=categoria)
+                        db.session.add(salvata)
+                    salvata.fascia_eta = fascia
+                    salvata.strategia = strategia
+                    salvata.somma_eta = formazione.somma_eta
+                    salvata.tempo_totale = _secondi_a_tempo(formazione.tempo_totale)
+                    salvata.frazioni_json = json.dumps(righe)
+                    salvata.creata_il = datetime.utcnow()
+
             if not formazioni_per_categoria:
                 errore = (
                     "Nessuna combinazione di 4 atleti tra quelli inseriti rispetta la composizione "
                     "richiesta (" + (tipo_squadra or "libera") + ") in nessuna categoria."
+                )
+            else:
+                db.session.commit()
+                flash(
+                    f"{len(formazioni_per_categoria)} formazione/i salvata/e nell'elenco staffette.",
+                    "success",
                 )
 
     return render_template(
@@ -648,6 +673,45 @@ def formazione_staffetta(gara_id, tipo):
         risultati=risultati,
         errore=errore,
     )
+
+
+@admin_bp.route("/staffette")
+@login_required
+@admin_required
+def elenco_formazioni_staffetta():
+    formazioni = (
+        FormazioneStaffetta.query.join(Gara)
+        .order_by(Gara.data.desc(), FormazioneStaffetta.tipo, FormazioneStaffetta.categoria)
+        .all()
+    )
+    return render_template("admin/elenco_formazioni_staffetta.html", formazioni=formazioni)
+
+
+@admin_bp.route("/staffette/elimina", methods=["POST"])
+@login_required
+@admin_required
+def elimina_formazioni_staffetta():
+    ids = request.form.getlist("formazione_ids")
+    if not ids:
+        flash("Nessuna formazione selezionata.", "warning")
+        return redirect(url_for("admin.elenco_formazioni_staffetta"))
+
+    eliminate = FormazioneStaffetta.query.filter(FormazioneStaffetta.id.in_(ids)).delete(
+        synchronize_session=False
+    )
+    db.session.commit()
+    flash(f"{eliminate} formazione/i eliminata/e.", "success")
+    return redirect(url_for("admin.elenco_formazioni_staffetta"))
+
+
+@admin_bp.route("/staffette/elimina-tutte", methods=["POST"])
+@login_required
+@admin_required
+def elimina_tutte_formazioni_staffetta():
+    eliminate = FormazioneStaffetta.query.delete()
+    db.session.commit()
+    flash(f"{eliminate} formazione/i eliminata/e.", "success")
+    return redirect(url_for("admin.elenco_formazioni_staffetta"))
 
 
 @admin_bp.route("/gare/<int:gara_id>/quota/<int:atleta_id>", methods=["POST"])

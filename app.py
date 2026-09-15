@@ -11,16 +11,17 @@ from models import User
 
 
 def _migra_schema(app):
-    """Aggiunge alle tabelle gia' esistenti le colonne introdotte dopo la loro
-    creazione iniziale, senza perdere i dati gia' presenti (non c'e' Alembic)."""
+    """Aggiunge le tabelle nuove e le colonne introdotte dopo la creazione
+    iniziale del database, senza perdere i dati gia' presenti (non c'e' Alembic)."""
     with app.app_context():
         inspector = inspect(db.engine)
         if "users" not in inspector.get_table_names():
-            return  # db non ancora inizializzato: ci pensa create_all
+            return  # db non ancora inizializzato: ci pensa "flask init-db"
         colonne_users = {c["name"] for c in inspector.get_columns("users")}
         if "sesso" not in colonne_users:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN sesso VARCHAR(1)"))
+        db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
 
 def create_app(config_class=Config):

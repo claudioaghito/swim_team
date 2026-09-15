@@ -3,6 +3,7 @@
 {% block content %}
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; {{ gara.nome }}</a>
+    <a class="btn" href="{{ url_for('admin.elenco_formazioni_staffetta') }}">{{ icon('presenze') }} Elenco formazioni salvate</a>
 </div>
 
 <div class="card">
