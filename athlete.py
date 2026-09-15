@@ -8,6 +8,7 @@ from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
     Configurazione,
 )
+from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
 
 athlete_bp = Blueprint("athlete", __name__, url_prefix="/atleta")
 
@@ -146,7 +147,10 @@ def iscrizione_gara(gara_id):
                 db.session.delete(iscrizione)
 
         for tipo in scelte:
-            tempo = request.form.get(f"tempo_{tipo}", "").strip() or None
+            secondi = min_sec_a_secondi(
+                request.form.get(f"tempo_{tipo}_min"), request.form.get(f"tempo_{tipo}_sec")
+            )
+            tempo = secondi_a_tempo(secondi) if secondi is not None else None
             if tipo in iscrizioni_correnti:
                 iscrizioni_correnti[tipo].tempo_ottenuto = tempo
             else:
@@ -159,10 +163,15 @@ def iscrizione_gara(gara_id):
         return redirect(url_for("athlete.dashboard"))
 
     scelte_per_atleta = gara.iscrizioni_per_atleta()
+    tempi_min_sec = {
+        tipo: tempo_stringa_a_min_sec_str(iscrizione.tempo_ottenuto)
+        for tipo, iscrizione in iscrizioni_correnti.items()
+    }
 
     return render_template(
         "athlete/iscrizione_gara.html",
         gara=gara,
         iscrizioni_correnti=iscrizioni_correnti,
         scelte_per_atleta=scelte_per_atleta,
+        tempi_min_sec=tempi_min_sec,
     )

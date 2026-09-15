@@ -54,11 +54,17 @@
                     <td>{{ atleta.nome_completo }}</td>
                     <td>{{ atleta.sesso or "-" }}</td>
                     {% for prova in prove_uniche %}
+                    {% set default_min, default_sec = tempo_registrato_min_sec.get(atleta.id, ("", "")) if prove_uniche|length == 1 else ("", "") %}
                     <td>
-                        <input type="text" name="tempo_{{ atleta.id }}_{{ prova }}" placeholder="mm:ss (es. 01:02.35)"
-                               pattern="[0-9]{1,2}:[0-5][0-9]([.,][0-9]{1,2})?"
-                               title="Formato minuti:secondi, es. 1:02 oppure 01:02.35"
-                               value="{{ valori_form.get('tempo_' ~ atleta.id ~ '_' ~ prova, tempo_registrato.get(atleta.id, '') if prove_uniche|length == 1 else '') }}">
+                        <div style="display:flex;gap:4px;align-items:center;">
+                            <input type="number" min="0" max="59" step="1" style="width:60px;margin-top:0;"
+                                   name="tempo_{{ atleta.id }}_{{ prova }}_min" placeholder="min"
+                                   value="{{ valori_form.get('tempo_' ~ atleta.id ~ '_' ~ prova ~ '_min', default_min) }}">
+                            <span>:</span>
+                            <input type="number" min="0" max="59.99" step="0.01" style="width:80px;margin-top:0;"
+                                   name="tempo_{{ atleta.id }}_{{ prova }}_sec" placeholder="sec"
+                                   value="{{ valori_form.get('tempo_' ~ atleta.id ~ '_' ~ prova ~ '_sec', default_sec) }}">
+                        </div>
                     </td>
                     {% endfor %}
                 </tr>

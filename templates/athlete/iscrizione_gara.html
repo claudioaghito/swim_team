@@ -39,13 +39,19 @@
             </thead>
             <tbody>
                 {% for tipo in gara.lista_tipologie %}
+                {% set default_min, default_sec = tempi_min_sec.get(tipo, ("", "")) %}
                 <tr>
                     <td><input type="checkbox" name="tipologie" value="{{ tipo }}" style="width:auto;margin-top:0;" {% if tipo in iscrizioni_correnti %}checked{% endif %}></td>
                     <td>{{ tipo }}</td>
-                    <td><input type="text" name="tempo_{{ tipo }}" placeholder="mm:ss (es. 01:02.35)"
-                               pattern="[0-9]{1,2}:[0-5][0-9]([.,][0-9]{1,2})?"
-                               title="Formato minuti:secondi, es. 1:02 oppure 01:02.35"
-                               value="{{ iscrizioni_correnti[tipo].tempo_ottenuto if tipo in iscrizioni_correnti else '' }}"></td>
+                    <td>
+                        <div style="display:flex;gap:4px;align-items:center;">
+                            <input type="number" min="0" max="59" step="1" style="width:60px;margin-top:0;"
+                                   name="tempo_{{ tipo }}_min" placeholder="min" value="{{ default_min }}">
+                            <span>:</span>
+                            <input type="number" min="0" max="59.99" step="0.01" style="width:80px;margin-top:0;"
+                                   name="tempo_{{ tipo }}_sec" placeholder="sec" value="{{ default_sec }}">
+                        </div>
+                    </td>
                 </tr>
                 {% else %}
                 <tr><td colspan="3">Nessuna tipologia di gara disponibile per questo torneo.</td></tr>

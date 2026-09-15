@@ -18,6 +18,10 @@ from models import (
     FormazioneStaffetta,
 )
 from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
+from utils import (
+    tempo_a_secondi as _tempo_a_secondi, secondi_a_tempo as _secondi_a_tempo,
+    min_sec_a_secondi, tempo_stringa_a_min_sec_str,
+)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -61,26 +65,6 @@ def _elimina_file(sottocartella, nome_file):
 
 def _parsa_data_nascita(valore):
     return datetime.strptime(valore, "%Y-%m-%d").date() if valore else None
-
-
-def _tempo_a_secondi(testo):
-    """Converte un tempo tipo '01:02.35' o '62.35' in secondi (float). None se vuoto/non valido."""
-    testo = (testo or "").strip().replace(",", ".")
-    if not testo:
-        return None
-    try:
-        if ":" in testo:
-            minuti, resto = testo.split(":", 1)
-            return int(minuti) * 60 + float(resto)
-        return float(testo)
-    except ValueError:
-        return None
-
-
-def _secondi_a_tempo(secondi):
-    minuti = int(secondi // 60)
-    resto = secondi - minuti * 60
-    return f"{minuti:02d}:{resto:05.2f}"
 
 
 def _prove_staffetta(tipo):
@@ -589,6 +573,9 @@ def formazione_staffetta(gara_id, tipo):
         i.atleta_id: i.tempo_ottenuto
         for i in gara.iscrizioni if i.stile == tipo
     }
+    tempo_registrato_min_sec = {
+        atleta_id: tempo_stringa_a_min_sec_str(tempo) for atleta_id, tempo in tempo_registrato.items()
+    }
     prove = _prove_staffetta(tipo)
     prove_uniche = list(dict.fromkeys(prove))  # per la staffetta SL basta un campo tempo per atleta
     anno_stagione = Configurazione.ottieni().anno_stagione
@@ -613,7 +600,10 @@ def formazione_staffetta(gara_id, tipo):
             eta = anno_stagione - atleta.data_nascita.year
             tempi = {}
             for prova in prove_uniche:
-                secondi = _tempo_a_secondi(request.form.get(f"tempo_{atleta.id}_{prova}"))
+                secondi = min_sec_a_secondi(
+                    request.form.get(f"tempo_{atleta.id}_{prova}_min"),
+                    request.form.get(f"tempo_{atleta.id}_{prova}_sec"),
+                )
                 if secondi is not None:
                     tempi[prova] = secondi
             candidati.append(Nuotatore(nome=atleta.nome_completo, eta=eta, sesso=atleta.sesso, tempi=tempi))
@@ -685,7 +675,7 @@ def formazione_staffetta(gara_id, tipo):
         gara=gara,
         tipo=tipo,
         iscritti=iscritti,
-        tempo_registrato=tempo_registrato,
+        tempo_registrato_min_sec=tempo_registrato_min_sec,
         prove_uniche=prove_uniche,
         anno_stagione=anno_stagione,
         tipo_squadra=tipo_squadra,
