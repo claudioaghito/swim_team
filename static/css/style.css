@@ -322,8 +322,13 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
 
     .login-card { margin: 24px auto; }
 
-    .actions { gap: 6px; }
-    .actions .btn, .actions button { flex: 1 1 auto; justify-content: center; }
+    .actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 8px;
+    }
+    .actions .btn, .actions button, .actions form { justify-content: center; width: 100%; margin: 0; }
+    .actions form button { width: 100%; margin-top: 0; }
 
     .table th, .table td { padding: 8px 6px; font-size: 0.9em; }
 
