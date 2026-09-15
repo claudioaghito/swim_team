@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.lista_atleti') }}">&larr; Atleti</a>
-    <a class="btn" href="{{ url_for('admin.modifica_atleta', atleta_id=atleta.id) }}">{{ icon('modifica') }} Modifica</a>
+    <a class="btn" href="{{ url_for('admin.modifica_atleta', atleta_id=atleta.id) }}" title="Modifica">{{ icon('modifica') }}</a>
     <form method="POST" action="{{ url_for('admin.elimina_atleta', atleta_id=atleta.id) }}"
           onsubmit="return confirmSubmit(this, 'Eliminare definitivamente {{ atleta.nome_completo }}?');" style="display:inline;">
         <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina</button>

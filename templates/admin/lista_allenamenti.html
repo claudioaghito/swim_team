@@ -35,7 +35,7 @@
                 <td class="preserve-lines">{{ al.descrizione or '-' }}</td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ icon('apri') }} Apri</a>
-                    <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=al.id) }}">{{ icon('modifica') }} Modifica</a>
+                    <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=al.id) }}" title="Modifica">{{ icon('modifica') }}</a>
                     <form method="POST" action="{{ url_for('admin.elimina_allenamento', allenamento_id=al.id) }}"
                           onsubmit="return confirmSubmit(this, 'Eliminare questo allenamento?');" style="display:inline;">
                         <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina</button>

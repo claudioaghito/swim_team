@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.lista_gare') }}">&larr; Tornei</a>
-    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=gara.id) }}">{{ icon('modifica') }} Modifica torneo</a>
+    <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=gara.id) }}" title="Modifica torneo">{{ icon('modifica') }}</a>
     <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF iscritti</button>
     <form method="POST" action="{{ url_for('admin.elimina_gara', gara_id=gara.id) }}"
           onsubmit="return confirmSubmit(this, 'Eliminare definitivamente il torneo {{ gara.nome }}? Verranno eliminate anche tutte le iscrizioni degli atleti a questo torneo.');" style="display:inline;">
