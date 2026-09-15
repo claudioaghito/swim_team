@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; {{ gara.nome }}</a>
-    <a class="btn" href="{{ url_for('admin.elenco_formazioni_staffetta') }}">{{ icon('presenze') }} Elenco formazioni salvate</a>
+    <a class="btn" href="{{ url_for('admin.elenco_formazioni_staffetta', gara_id=gara.id) }}">{{ icon('presenze') }} Elenco formazioni salvate</a>
 </div>
 
 <div class="card">
@@ -110,7 +110,7 @@
             <tbody>
                 {% for riga in r.righe %}
                 <tr>
-                    <td>{{ riga.prova }}</td>
+                    <td>{{ loop.index }}</td>
                     <td>{{ riga.nome }}</td>
                     <td>{{ riga.sesso or "-" }}</td>
                     <td>{{ riga.tempo }}</td>

@@ -4,11 +4,16 @@
 <h1>{{ icon('presenze') }} Formazioni staffetta</h1>
 
 <div class="actions no-print">
-    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
+    {% if gara_provenienza %}
+        <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara_provenienza.id) }}">&larr; {{ gara_provenienza.nome }}</a>
+    {% else %}
+        <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
+    {% endif %}
     <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF</button>
     {% if formazioni %}
     <form method="POST" action="{{ url_for('admin.elimina_tutte_formazioni_staffetta') }}"
           onsubmit="return confirmSubmit(this, 'Eliminare TUTTE le formazioni salvate? Operazione non reversibile.');" style="display:inline;">
+        {% if gara_provenienza %}<input type="hidden" name="next" value="{{ url_for('admin.elenco_formazioni_staffetta', gara_id=gara_provenienza.id) }}">{% endif %}
         <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina tutte</button>
     </form>
     {% endif %}
@@ -17,6 +22,7 @@
 <div class="card">
     <form method="POST" action="{{ url_for('admin.elimina_formazioni_staffetta') }}"
           onsubmit="return confirmSubmit(this, 'Eliminare le formazioni selezionate?');">
+        {% if gara_provenienza %}<input type="hidden" name="next" value="{{ url_for('admin.elenco_formazioni_staffetta', gara_id=gara_provenienza.id) }}">{% endif %}
         <div style="overflow-x:auto;">
         <table class="table">
             <thead>
@@ -34,6 +40,7 @@
                     <th data-sort="text">Tempo totale</th>
                     <th data-sort="number">Somma età</th>
                     <th>Strategia</th>
+                    <th class="no-print">Azioni</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,7 +57,7 @@
                             <td rowspan="{{ f.frazioni|length }}">{{ f.tipo }}</td>
                             <td rowspan="{{ f.frazioni|length }}">{{ f.categoria }} <small>(fascia {{ f.fascia_eta }})</small></td>
                         {% endif %}
-                        <td>{{ fr.prova }}</td>
+                        <td>{{ loop.index }}</td>
                         <td>{{ fr.nome }}</td>
                         <td>{{ fr.sesso or "-" }}</td>
                         <td>{{ fr.tempo }}</td>
@@ -58,11 +65,14 @@
                             <td rowspan="{{ f.frazioni|length }}">{{ f.tempo_totale }}</td>
                             <td rowspan="{{ f.frazioni|length }}">{{ f.somma_eta }}</td>
                             <td rowspan="{{ f.frazioni|length }}">{{ "Tempo minimo" if f.strategia == "tempo_minimo" else "Età minima fascia" }}</td>
+                            <td class="no-print" rowspan="{{ f.frazioni|length }}">
+                                <a class="btn" href="{{ url_for('admin.ordina_formazione_staffetta', formazione_id=f.id) }}" title="Ordina">{{ icon('modifica') }} Ordina</a>
+                            </td>
                         {% endif %}
                     </tr>
                     {% endfor %}
                 {% else %}
-                <tr><td colspan="11">Nessuna formazione salvata. Generane una dalla pagina di un torneo, sezione "Formazione staffette".</td></tr>
+                <tr><td colspan="12">Nessuna formazione salvata. Generane una dalla pagina di un torneo, sezione "Formazione staffette".</td></tr>
                 {% endfor %}
             </tbody>
         </table>

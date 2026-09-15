@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Ordina staffetta{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.elenco_formazioni_staffetta', gara_id=formazione.gara_id) }}">&larr; Formazioni staffetta</a>
+</div>
+
+<div class="card">
+    <h2>Ordine di partenza</h2>
+    <p><strong>Torneo:</strong> {{ formazione.gara.nome }}<br>
+       <strong>Tipologia:</strong> {{ formazione.tipo }}<br>
+       <strong>Categoria:</strong> {{ formazione.categoria }} <small>(fascia {{ formazione.fascia_eta }})</small></p>
+    <p><small>Scegli in che posizione parte ciascun atleta (1° = parte per primo, 4° = ultima frazione).
+       Assegna una posizione diversa a ciascuno.</small></p>
+
+    <form method="POST">
+        <table class="table">
+            <thead>
+                <tr><th>Posizione</th><th>Atleta</th><th>Sesso</th><th>Tempo</th></tr>
+            </thead>
+            <tbody>
+                {% for fr in frazioni %}
+                {% set posizione_corrente = loop.index %}
+                <tr>
+                    <td>
+                        <select name="posizione_{{ loop.index0 }}">
+                            {% for n in range(1, frazioni|length + 1) %}
+                                <option value="{{ n }}" {% if n == posizione_corrente %}selected{% endif %}>{{ n }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>{{ fr.nome }}</td>
+                    <td>{{ fr.sesso or "-" }}</td>
+                    <td>{{ fr.tempo }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">{{ icon('salva') }} Salva ordine</button>
+    </form>
+</div>
+{% endblock %}

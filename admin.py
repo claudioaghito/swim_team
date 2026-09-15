@@ -697,7 +697,35 @@ def elenco_formazioni_staffetta():
         .order_by(Gara.data.desc(), FormazioneStaffetta.tipo, FormazioneStaffetta.categoria)
         .all()
     )
-    return render_template("admin/elenco_formazioni_staffetta.html", formazioni=formazioni)
+    gara_id_provenienza = request.args.get("gara_id", type=int)
+    gara_provenienza = Gara.query.get(gara_id_provenienza) if gara_id_provenienza else None
+    return render_template(
+        "admin/elenco_formazioni_staffetta.html", formazioni=formazioni, gara_provenienza=gara_provenienza
+    )
+
+
+@admin_bp.route("/staffette/<int:formazione_id>/ordine", methods=["GET", "POST"])
+@login_required
+@admin_required
+def ordina_formazione_staffetta(formazione_id):
+    formazione = FormazioneStaffetta.query.get_or_404(formazione_id)
+    frazioni = formazione.frazioni
+
+    if request.method == "POST":
+        posizioni = [request.form.get(f"posizione_{i}", type=int) for i in range(len(frazioni))]
+        if None in posizioni or sorted(posizioni) != list(range(1, len(frazioni) + 1)):
+            flash("Ordine non valido: assegna a ciascun atleta una posizione diversa da 1 a 4.", "danger")
+            return redirect(url_for("admin.ordina_formazione_staffetta", formazione_id=formazione.id))
+
+        riordinate = [fr for _, fr in sorted(zip(posizioni, frazioni), key=lambda x: x[0])]
+        formazione.frazioni_json = json.dumps(riordinate)
+        db.session.commit()
+        flash("Ordine di partenza aggiornato.", "success")
+        return redirect(url_for("admin.elenco_formazioni_staffetta", gara_id=formazione.gara_id))
+
+    return render_template(
+        "admin/ordina_formazione_staffetta.html", formazione=formazione, frazioni=frazioni
+    )
 
 
 @admin_bp.route("/staffette/elimina", methods=["POST"])
@@ -705,26 +733,28 @@ def elenco_formazioni_staffetta():
 @admin_required
 def elimina_formazioni_staffetta():
     ids = request.form.getlist("formazione_ids")
+    next_url = request.form.get("next") or url_for("admin.elenco_formazioni_staffetta")
     if not ids:
         flash("Nessuna formazione selezionata.", "warning")
-        return redirect(url_for("admin.elenco_formazioni_staffetta"))
+        return redirect(next_url)
 
     eliminate = FormazioneStaffetta.query.filter(FormazioneStaffetta.id.in_(ids)).delete(
         synchronize_session=False
     )
     db.session.commit()
     flash(f"{eliminate} formazione/i eliminata/e.", "success")
-    return redirect(url_for("admin.elenco_formazioni_staffetta"))
+    return redirect(next_url)
 
 
 @admin_bp.route("/staffette/elimina-tutte", methods=["POST"])
 @login_required
 @admin_required
 def elimina_tutte_formazioni_staffetta():
+    next_url = request.form.get("next") or url_for("admin.elenco_formazioni_staffetta")
     eliminate = FormazioneStaffetta.query.delete()
     db.session.commit()
     flash(f"{eliminate} formazione/i eliminata/e.", "success")
-    return redirect(url_for("admin.elenco_formazioni_staffetta"))
+    return redirect(next_url)
 
 
 @admin_bp.route("/gare/<int:gara_id>/quota/<int:atleta_id>", methods=["POST"])
