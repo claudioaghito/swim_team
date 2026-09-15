@@ -545,6 +545,8 @@ def dettaglio_gara(gara_id):
         for atleta, iscrizioni in scelte_per_atleta.items()
     }
 
+    anno_stagione = Configurazione.ottieni().anno_stagione
+
     return render_template(
         "admin/dettaglio_gara.html",
         gara=gara,
@@ -552,6 +554,7 @@ def dettaglio_gara(gara_id):
         scelte_gare_individuali=scelte_gare_individuali,
         quote_per_atleta=quote_per_atleta,
         tipi_staffetta=tipi_staffetta,
+        anno_stagione=anno_stagione,
     )
 
 

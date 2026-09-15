@@ -59,6 +59,7 @@
         <thead>
             <tr>
                 <th>Nome Cognome</th>
+                <th>Categoria</th>
                 <th>Gara</th>
                 <th>Tempo</th>
                 <th class="no-print">Quota gara</th>
@@ -74,6 +75,7 @@
                 <tr>
                     {% if loop.first %}
                         <td rowspan="{{ n_righe }}"><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
+                        <td rowspan="{{ n_righe }}">{{ atleta.categoria_master(anno_stagione) or "-" }}</td>
                     {% endif %}
                     <td>{{ iscrizione.stile }}</td>
                     <td>{{ iscrizione.tempo_ottenuto or '-' }}</td>
@@ -107,6 +109,7 @@
                 {% else %}
                 <tr>
                     <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
+                    <td>{{ atleta.categoria_master(anno_stagione) or "-" }}</td>
                     <td colspan="2"><em>Solo staffette (vedi sezione "Formazione staffette")</em></td>
                     <td class="no-print">
                         {% if quota and quota.movimento_id %}
@@ -135,7 +138,7 @@
                 </tr>
                 {% endfor %}
             {% else %}
-            <tr><td colspan="5">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
+            <tr><td colspan="6">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
             {% endfor %}
         </tbody>
     </table>
