@@ -9,6 +9,7 @@
     <h2>Formazione staffetta</h2>
     <p><strong>Torneo:</strong> {{ gara.nome }}<br>
        <strong>Tipologia:</strong> {{ tipo }}<br>
+       <strong>Composizione richiesta:</strong> {{ tipo_squadra or "libera (nessun vincolo di sesso rilevato dal nome)" }}<br>
        <strong>Anno stagione:</strong> {{ anno_stagione }} (usato per calcolare l'eta' agonistica)</p>
     <p><small>Le soglie di categoria e la logica di calcolo sono un default plausibile: vanno confermate
        con il regolamento ufficiale della manifestazione. L'eta' qui e' calcolata come per le gare
@@ -21,6 +22,12 @@
     <p>Nessun atleta si e' ancora iscritto a "{{ tipo }}" per questo torneo: non c'e' nessun candidato tra cui scegliere.</p>
 </div>
 {% else %}
+{% if senza_sesso %}
+<div class="card warning">
+    <p>Questi atleti iscritti non hanno il sesso impostato in anagrafica e non verranno considerati nel
+       calcolo (serve per rispettare la composizione "{{ tipo_squadra }}"): {{ senza_sesso|join(', ') }}.</p>
+</div>
+{% endif %}
 <div class="card">
     <h3>{{ icon('atleti') }} Atleti iscritti a questa staffetta ({{ iscritti|length }})</h3>
     <p><small>Inserisci il tempo di ciascun atleta sulle frazioni della staffetta: solo questi atleti
@@ -31,6 +38,7 @@
             <thead>
                 <tr>
                     <th>Atleta</th>
+                    <th>Sesso</th>
                     {% if prove_uniche|length == 1 %}
                         <th>Tempo {{ prove_uniche[0] }}</th>
                     {% else %}
@@ -42,6 +50,7 @@
                 {% for atleta in iscritti %}
                 <tr>
                     <td>{{ atleta.nome_completo }}</td>
+                    <td>{{ atleta.sesso or "-" }}</td>
                     {% for prova in prove_uniche %}
                     <td>
                         <input type="text" name="tempo_{{ atleta.id }}_{{ prova }}" placeholder="es. 01:02.35"
@@ -92,13 +101,14 @@
     <h3>{{ icon('conferma') }} Formazione proposta</h3>
     <table class="table">
         <thead>
-            <tr><th>Frazione</th><th>Atleta</th><th>Tempo</th></tr>
+            <tr><th>Frazione</th><th>Atleta</th><th>Sesso</th><th>Tempo</th></tr>
         </thead>
         <tbody>
             {% for riga in risultato.righe %}
             <tr>
                 <td>{{ riga.prova }}</td>
                 <td>{{ riga.nome }}</td>
+                <td>{{ riga.sesso or "-" }}</td>
                 <td>{{ riga.tempo }}</td>
             </tr>
             {% endfor %}

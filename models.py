@@ -19,6 +19,7 @@ class User(db.Model, UserMixin):
     creato_il = db.Column(db.DateTime, default=datetime.utcnow)
 
     data_nascita = db.Column(db.Date, nullable=True)
+    sesso = db.Column(db.String(1))  # "M" o "F", serve anche per comporre le staffette
     cartellino_file = db.Column(db.String(255))  # nome file immagine tesserino, in UPLOAD_FOLDER/cartellini
     certificato_medico_file = db.Column(db.String(255))  # nome file PDF, in UPLOAD_FOLDER/certificati
 

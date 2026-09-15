@@ -3,10 +3,24 @@ import click
 from flask import Flask, redirect, url_for
 from flask_login import login_required, current_user
 from markupsafe import Markup
+from sqlalchemy import inspect, text
 
 from config import Config
 from extensions import db, login_manager
 from models import User
+
+
+def _migra_schema(app):
+    """Aggiunge alle tabelle gia' esistenti le colonne introdotte dopo la loro
+    creazione iniziale, senza perdere i dati gia' presenti (non c'e' Alembic)."""
+    with app.app_context():
+        inspector = inspect(db.engine)
+        if "users" not in inspector.get_table_names():
+            return  # db non ancora inizializzato: ci pensa create_all
+        colonne_users = {c["name"] for c in inspector.get_columns("users")}
+        if "sesso" not in colonne_users:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN sesso VARCHAR(1)"))
 
 
 def create_app(config_class=Config):
@@ -15,6 +29,7 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     login_manager.init_app(app)
+    _migra_schema(app)
 
     os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "cartellini"), exist_ok=True)
     os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "certificati"), exist_ok=True)

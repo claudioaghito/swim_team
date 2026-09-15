@@ -15,6 +15,7 @@
         <h2>{{ atleta.nome_completo }}</h2>
         <p><strong>Utente:</strong> {{ atleta.username }}</p>
         <p><strong>Email:</strong> {{ atleta.email or "-" }}</p>
+        <p><strong>Sesso:</strong> {{ atleta.sesso or "-" }}</p>
         <p><strong>Data di nascita:</strong>
             {{ atleta.data_nascita.strftime('%d/%m/%Y') if atleta.data_nascita else "-" }}
             {% if atleta.eta is not none %}({{ atleta.eta }} anni){% endif %}

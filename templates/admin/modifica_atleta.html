@@ -16,6 +16,13 @@
         <label>Data di nascita</label>
         <input type="date" name="data_nascita" value="{{ atleta.data_nascita.isoformat() if atleta.data_nascita else '' }}">
 
+        <label>Sesso</label>
+        <select name="sesso" required>
+            <option value="" {% if not atleta.sesso %}selected{% endif %} disabled>-- seleziona --</option>
+            <option value="M" {% if atleta.sesso == "M" %}selected{% endif %}>Maschio</option>
+            <option value="F" {% if atleta.sesso == "F" %}selected{% endif %}>Femmina</option>
+        </select>
+
         <label>Nome utente</label>
         <input type="text" name="username" value="{{ atleta.username }}" required>
 

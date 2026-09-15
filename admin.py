@@ -88,6 +88,19 @@ def _prove_staffetta(tipo):
     return ["SL", "SL", "SL", "SL"]
 
 
+def _tipo_squadra_da_tipo(tipo):
+    """Deduce il vincolo di composizione (M / F / MISTA) dal nome della tipologia,
+    che termina con "M", "F" o "M/F" (es. "STAFFETTA 4X100 SL M/F")."""
+    t = tipo.strip().upper()
+    if t.endswith("M/F"):
+        return "MISTA"
+    if t.endswith(" M"):
+        return "M"
+    if t.endswith(" F"):
+        return "F"
+    return None
+
+
 TIPI_GARA_BASE = [
     "50 SL", "100 SL", "200 SL", "400 SL", "800 SL", "1500 SL",
     "50 DO", "100 DO", "200 DO",
@@ -203,12 +216,13 @@ def esporta_atleti():
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter=";")
-    writer.writerow(["Nome", "Cognome", "Utente", "Email", "Data di nascita", "Categoria", "Saldo (€)"])
+    writer.writerow(["Nome", "Cognome", "Utente", "Sesso", "Email", "Data di nascita", "Categoria", "Saldo (€)"])
     for a in atleti:
         writer.writerow([
             a.nome,
             a.cognome,
             a.username,
+            a.sesso or "",
             a.email or "",
             a.data_nascita.strftime("%d/%m/%Y") if a.data_nascita else "",
             a.categoria_master(anno_stagione) or "",
@@ -237,6 +251,7 @@ def nuovo_atleta():
             email=request.form.get("email", "").strip(),
             ruolo=request.form.get("ruolo", "atleta"),
             data_nascita=_parsa_data_nascita(request.form.get("data_nascita")),
+            sesso=request.form.get("sesso") or None,
         )
         nuovo.set_password(request.form["password"])
         db.session.add(nuovo)
@@ -295,6 +310,7 @@ def modifica_atleta(atleta_id):
         atleta.cognome = request.form["cognome"].strip()
         atleta.email = request.form.get("email", "").strip()
         atleta.data_nascita = _parsa_data_nascita(request.form.get("data_nascita"))
+        atleta.sesso = request.form.get("sesso") or None
 
         nuova_password = request.form.get("password", "").strip()
         if nuova_password:
@@ -565,6 +581,8 @@ def formazione_staffetta(gara_id, tipo):
     prove = _prove_staffetta(tipo)
     prove_uniche = list(dict.fromkeys(prove))  # per la staffetta SL basta un campo tempo per atleta
     anno_stagione = Configurazione.ottieni().anno_stagione
+    tipo_squadra = _tipo_squadra_da_tipo(tipo)
+    senza_sesso = [a.nome_completo for a in iscritti if not a.sesso] if tipo_squadra else []
 
     risultato = None
     errore = None
@@ -581,6 +599,8 @@ def formazione_staffetta(gara_id, tipo):
         for atleta in iscritti:
             if not atleta.data_nascita:
                 continue
+            if tipo_squadra and not atleta.sesso:
+                continue
             eta = anno_stagione - atleta.data_nascita.year
             tempi = {}
             for prova in prove_uniche:
@@ -588,22 +608,25 @@ def formazione_staffetta(gara_id, tipo):
                 if secondi is not None:
                     tempi[prova] = secondi
             if tempi:
-                candidati.append(Nuotatore(nome=atleta.nome_completo, eta=eta, tempi=tempi))
+                candidati.append(Nuotatore(nome=atleta.nome_completo, eta=eta, sesso=atleta.sesso, tempi=tempi))
 
         if categoria_target not in RELAY_BRACKETS:
             errore = "Seleziona una categoria target valida."
         elif len(candidati) < 4:
-            errore = "Servono almeno 4 atleti con eta' e tempo inseriti per calcolare una formazione."
+            errore = "Servono almeno 4 atleti con eta', sesso e tempo inseriti per calcolare una formazione."
         else:
             formazione = formazione_migliore_per_categoria_target(
-                candidati, categoria_target, prove, strategia=strategia
+                candidati, categoria_target, prove, tipo_squadra=tipo_squadra, strategia=strategia
             )
             if formazione is None:
-                errore = "Nessuna combinazione di 4 atleti tra quelli inseriti rientra nella fascia d'eta' scelta."
+                errore = (
+                    "Nessuna combinazione di 4 atleti tra quelli inseriti rientra nella fascia d'eta' "
+                    "scelta rispettando la composizione richiesta (" + (tipo_squadra or "libera") + ")."
+                )
             else:
                 risultato = {
                     "righe": [
-                        {"nome": n.nome, "prova": p, "tempo": _secondi_a_tempo(n.tempi[p])}
+                        {"nome": n.nome, "prova": p, "sesso": n.sesso, "tempo": _secondi_a_tempo(n.tempi[p])}
                         for n, p in formazione.frazioni
                     ],
                     "tempo_totale": _secondi_a_tempo(formazione.tempo_totale),
@@ -619,6 +642,8 @@ def formazione_staffetta(gara_id, tipo):
         prove_uniche=prove_uniche,
         categorie=list(RELAY_BRACKETS.keys()),
         anno_stagione=anno_stagione,
+        tipo_squadra=tipo_squadra,
+        senza_sesso=senza_sesso,
         categoria_target=categoria_target,
         strategia=strategia,
         valori_form=valori_form,
