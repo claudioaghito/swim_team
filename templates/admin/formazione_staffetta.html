@@ -55,7 +55,9 @@
                     <td>{{ atleta.sesso or "-" }}</td>
                     {% for prova in prove_uniche %}
                     <td>
-                        <input type="text" name="tempo_{{ atleta.id }}_{{ prova }}" placeholder="es. 01:02.35"
+                        <input type="text" name="tempo_{{ atleta.id }}_{{ prova }}" placeholder="mm:ss (es. 01:02.35)"
+                               pattern="[0-9]{1,2}:[0-5][0-9]([.,][0-9]{1,2})?"
+                               title="Formato minuti:secondi, es. 1:02 oppure 01:02.35"
                                value="{{ valori_form.get('tempo_' ~ atleta.id ~ '_' ~ prova, tempo_registrato.get(atleta.id, '') if prove_uniche|length == 1 else '') }}">
                     </td>
                     {% endfor %}

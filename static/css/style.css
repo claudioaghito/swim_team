@@ -184,6 +184,7 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
     transition: background-color 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
     box-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
@@ -340,7 +341,7 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
         --red: #cc4b37 !important;
         --ink: #1a1a1a !important;
         --muted: #5f6b76 !important;
-        --border: #d7dbe0 !important;
+        --border: #7d8894 !important;
         --bg: #ffffff !important;
         --card-bg: #ffffff !important;
         --input-bg: #ffffff !important;

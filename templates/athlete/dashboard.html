@@ -4,7 +4,7 @@
 <h1>{{ icon('saluto') }} Ciao, {{ current_user.nome }}!</h1>
 
 {% if categoria %}
-    <p>La tua categoria: <strong>{{ categoria }}</strong></p>
+    <p>La tua categoria: <strong>{{ categoria }}</strong>{% if current_user.sesso %} &mdash; Sesso: <strong>{{ current_user.sesso }}</strong>{% endif %}</p>
 {% endif %}
 
 <div class="actions">

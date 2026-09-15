@@ -553,10 +553,19 @@ def dettaglio_gara(gara_id):
 
     tipi_staffetta = [t for t in gara.lista_tipologie if "staffetta" in t.lower()]
 
+    # Le staffette hanno una sezione dedicata (formazioni salvate): non vanno duplicate
+    # nell'elenco/PDF delle gare individuali, che pero' continua a usare tutte le
+    # iscrizioni (staffette incluse) per il calcolo corretto della quota.
+    scelte_gare_individuali = {
+        atleta: [i for i in iscrizioni if "staffetta" not in (i.stile or "").lower()]
+        for atleta, iscrizioni in scelte_per_atleta.items()
+    }
+
     return render_template(
         "admin/dettaglio_gara.html",
         gara=gara,
         scelte_per_atleta=scelte_per_atleta,
+        scelte_gare_individuali=scelte_gare_individuali,
         quote_per_atleta=quote_per_atleta,
         tipi_staffetta=tipi_staffetta,
     )

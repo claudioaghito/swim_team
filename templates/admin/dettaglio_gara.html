@@ -68,22 +68,24 @@
         <tbody>
             {% for atleta, iscrizioni in scelte_per_atleta.items() %}
                 {% set quota = quote_per_atleta.get(atleta.id) %}
-                {% for iscrizione in iscrizioni %}
+                {% set individuali = scelte_gare_individuali[atleta] %}
+                {% set n_righe = individuali|length if individuali else 1 %}
+                {% for iscrizione in individuali %}
                 <tr>
                     {% if loop.first %}
-                        <td rowspan="{{ iscrizioni|length }}"><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
+                        <td rowspan="{{ n_righe }}"><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
                     {% endif %}
                     <td>{{ iscrizione.stile }}</td>
                     <td>{{ iscrizione.tempo_ottenuto or '-' }}</td>
                     {% if loop.first %}
-                        <td class="no-print" rowspan="{{ iscrizioni|length }}">
+                        <td class="no-print" rowspan="{{ n_righe }}">
                             {% if quota and quota.movimento_id %}
                                 {{ "%.2f"|format(quota.importo) }} € <span class="status-dot green" title="Addebitata"></span>
                             {% else %}
                                 non addebitata
                             {% endif %}
                         </td>
-                        <td class="no-print" rowspan="{{ iscrizioni|length }}">
+                        <td class="no-print" rowspan="{{ n_righe }}">
                             {% if quota and quota.movimento_id %}
                                 <div style="display:flex;gap:4px;align-items:center;">
                                     <button type="button" disabled style="cursor:not-allowed;">{{ icon('conferma') }} Confermata</button>
@@ -101,6 +103,35 @@
                             {% endif %}
                         </td>
                     {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
+                    <td colspan="2"><em>Solo staffette (vedi sezione "Formazione staffette")</em></td>
+                    <td class="no-print">
+                        {% if quota and quota.movimento_id %}
+                            {{ "%.2f"|format(quota.importo) }} € <span class="status-dot green" title="Addebitata"></span>
+                        {% else %}
+                            non addebitata
+                        {% endif %}
+                    </td>
+                    <td class="no-print">
+                        {% if quota and quota.movimento_id %}
+                            <div style="display:flex;gap:4px;align-items:center;">
+                                <button type="button" disabled style="cursor:not-allowed;">{{ icon('conferma') }} Confermata</button>
+                                <form method="POST" action="{{ url_for('admin.annulla_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}"
+                                      onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
+                                    <button type="submit" class="btn-danger">{{ icon('annulla') }} Annulla</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('admin.conferma_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}" style="display:flex;gap:4px;">
+                                <input type="number" step="0.01" name="importo" placeholder="es. 20"
+                                       value="{{ '%.2f'|format(gara.calcola_quota(iscrizioni)) }}" style="width:90px;margin-top:0;">
+                                <button type="submit">{{ icon('conferma') }} Conferma</button>
+                            </form>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             {% else %}
