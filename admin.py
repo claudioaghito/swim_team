@@ -778,6 +778,22 @@ def modifica_gara(gara_id):
     )
 
 
+@admin_bp.route("/gare/<int:gara_id>/elimina", methods=["POST"])
+@login_required
+@admin_required
+def elimina_gara(gara_id):
+    gara = Gara.query.get_or_404(gara_id)
+
+    _elimina_file("programmi_gare", gara.programma_gare_file)
+    QuotaTorneo.query.filter_by(gara_id=gara.id).delete()
+
+    nome = gara.nome
+    db.session.delete(gara)
+    db.session.commit()
+    flash(f"Torneo {nome} eliminato.", "success")
+    return redirect(url_for("admin.lista_gare"))
+
+
 @admin_bp.route("/gare/<int:gara_id>/programma")
 @login_required
 def programma_gara(gara_id):
