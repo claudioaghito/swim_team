@@ -63,13 +63,8 @@
         </table>
         </div>
 
-        <label>Categoria target</label>
-        <select name="categoria_target">
-            <option value="">-- seleziona --</option>
-            {% for cat in categorie %}
-                <option value="{{ cat }}" {% if cat == categoria_target %}selected{% endif %}>{{ cat }}</option>
-            {% endfor %}
-        </select>
+        <p><small>Non serve scegliere una categoria: il sistema calcola in automatico la formazione
+           migliore per ciascuna categoria raggiungibile con gli atleti e i tempi inseriti.</small></p>
 
         <label>Strategia</label>
         <div class="checkbox-list">
@@ -96,26 +91,35 @@
 </div>
 {% endif %}
 
-{% if risultato %}
+{% if risultati %}
 <div class="card">
-    <h3>{{ icon('conferma') }} Formazione proposta</h3>
-    <table class="table">
-        <thead>
-            <tr><th>Frazione</th><th>Atleta</th><th>Sesso</th><th>Tempo</th></tr>
-        </thead>
-        <tbody>
-            {% for riga in risultato.righe %}
-            <tr>
-                <td>{{ riga.prova }}</td>
-                <td>{{ riga.nome }}</td>
-                <td>{{ riga.sesso or "-" }}</td>
-                <td>{{ riga.tempo }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <p><strong>Tempo totale stimato:</strong> {{ risultato.tempo_totale }}<br>
-       <strong>Somma eta':</strong> {{ risultato.somma_eta }}</p>
+    <h3>{{ icon('conferma') }} Formazioni proposte per ciascuna categoria</h3>
+    <p><small>Categorie generate automaticamente in base alle combinazioni di eta' possibili con gli
+       atleti inseriti. Scegli tu quale usare per l'iscrizione effettiva.</small></p>
 </div>
+{% for r in risultati %}
+    {% if r.righe %}
+    <div class="card">
+        <h3>Categoria {{ r.categoria }} <small>(fascia eta' {{ r.fascia }})</small></h3>
+        <table class="table">
+            <thead>
+                <tr><th>Frazione</th><th>Atleta</th><th>Sesso</th><th>Tempo</th></tr>
+            </thead>
+            <tbody>
+                {% for riga in r.righe %}
+                <tr>
+                    <td>{{ riga.prova }}</td>
+                    <td>{{ riga.nome }}</td>
+                    <td>{{ riga.sesso or "-" }}</td>
+                    <td>{{ riga.tempo }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><strong>Tempo totale stimato:</strong> {{ r.tempo_totale }}<br>
+           <strong>Somma eta':</strong> {{ r.somma_eta }}</p>
+    </div>
+    {% endif %}
+{% endfor %}
 {% endif %}
 {% endblock %}

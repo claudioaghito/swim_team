@@ -15,7 +15,7 @@ from extensions import db
 from models import (
     User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
 )
-from relay_master import Nuotatore, RELAY_BRACKETS, formazione_migliore_per_categoria_target
+from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -584,14 +584,12 @@ def formazione_staffetta(gara_id, tipo):
     tipo_squadra = _tipo_squadra_da_tipo(tipo)
     senza_sesso = [a.nome_completo for a in iscritti if not a.sesso] if tipo_squadra else []
 
-    risultato = None
+    risultati = None
     errore = None
     valori_form = {}
-    categoria_target = None
     strategia = "tempo_minimo"
 
     if request.method == "POST":
-        categoria_target = request.form.get("categoria_target", "")
         strategia = request.form.get("strategia", "tempo_minimo")
         valori_form = request.form
 
@@ -610,28 +608,30 @@ def formazione_staffetta(gara_id, tipo):
             if tempi:
                 candidati.append(Nuotatore(nome=atleta.nome_completo, eta=eta, sesso=atleta.sesso, tempi=tempi))
 
-        if categoria_target not in RELAY_BRACKETS:
-            errore = "Seleziona una categoria target valida."
-        elif len(candidati) < 4:
+        if len(candidati) < 4:
             errore = "Servono almeno 4 atleti con eta', sesso e tempo inseriti per calcolare una formazione."
         else:
-            formazione = formazione_migliore_per_categoria_target(
-                candidati, categoria_target, prove, tipo_squadra=tipo_squadra, strategia=strategia
+            formazioni_per_categoria = tutte_le_formazioni_possibili(
+                candidati, prove, tipo_squadra=tipo_squadra, strategia=strategia
             )
-            if formazione is None:
-                errore = (
-                    "Nessuna combinazione di 4 atleti tra quelli inseriti rientra nella fascia d'eta' "
-                    "scelta rispettando la composizione richiesta (" + (tipo_squadra or "libera") + ")."
-                )
-            else:
-                risultato = {
+            risultati = []
+            for categoria, (eta_min, eta_max) in RELAY_BRACKETS.items():
+                formazione = formazioni_per_categoria.get(categoria)
+                risultati.append({
+                    "categoria": categoria,
+                    "fascia": f"{eta_min}+" if eta_max is None else f"{eta_min}-{eta_max}",
                     "righe": [
                         {"nome": n.nome, "prova": p, "sesso": n.sesso, "tempo": _secondi_a_tempo(n.tempi[p])}
                         for n, p in formazione.frazioni
-                    ],
-                    "tempo_totale": _secondi_a_tempo(formazione.tempo_totale),
-                    "somma_eta": formazione.somma_eta,
-                }
+                    ] if formazione else None,
+                    "tempo_totale": _secondi_a_tempo(formazione.tempo_totale) if formazione else None,
+                    "somma_eta": formazione.somma_eta if formazione else None,
+                })
+            if not formazioni_per_categoria:
+                errore = (
+                    "Nessuna combinazione di 4 atleti tra quelli inseriti rispetta la composizione "
+                    "richiesta (" + (tipo_squadra or "libera") + ") in nessuna categoria."
+                )
 
     return render_template(
         "admin/formazione_staffetta.html",
@@ -640,14 +640,12 @@ def formazione_staffetta(gara_id, tipo):
         iscritti=iscritti,
         tempo_registrato=tempo_registrato,
         prove_uniche=prove_uniche,
-        categorie=list(RELAY_BRACKETS.keys()),
         anno_stagione=anno_stagione,
         tipo_squadra=tipo_squadra,
         senza_sesso=senza_sesso,
-        categoria_target=categoria_target,
         strategia=strategia,
         valori_form=valori_form,
-        risultato=risultato,
+        risultati=risultati,
         errore=errore,
     )
 

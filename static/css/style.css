@@ -264,7 +264,7 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .cartellino-img { max-width: 100%; max-height: 400px; border-radius: 8px; display: block; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
 .avatar-thumb { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; display: inline-flex; align-items: center; justify-content: center; }
 .avatar-placeholder { background: var(--checkbox-bg); border: 1px solid var(--border); font-size: 1.1em; }
-.saldo-cell { font-weight: 700; }
+.saldo-cell { font-weight: 700; white-space: nowrap; }
 .saldo-cell.positivo { color: var(--green); }
 .saldo-cell.negativo { color: var(--red); }
 

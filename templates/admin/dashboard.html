@@ -21,7 +21,7 @@
         <ul>
             {% for a in atleti %}
                 {% set saldo = a.saldo_attuale() %}
-                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_completo }}</a> — saldo: <span class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</span></li>
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_completo }}</a> — <span class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">saldo: {{ "%.2f"|format(saldo) }} €</span></li>
             {% else %}
                 <li>Nessun atleta registrato.</li>
             {% endfor %}

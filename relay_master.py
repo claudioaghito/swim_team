@@ -85,6 +85,59 @@ def _migliore_assegnazione(gruppo, prove):
     return migliore
 
 
+def _categoria_per_somma_eta(somma_eta):
+    """Chiave di RELAY_BRACKETS in cui rientra la somma eta' indicata, o None
+    se sotto la soglia minima piu' bassa prevista."""
+    for categoria, (eta_min, eta_max) in RELAY_BRACKETS.items():
+        if somma_eta >= eta_min and (eta_max is None or somma_eta <= eta_max):
+            return categoria
+    return None
+
+
+def tutte_le_formazioni_possibili(candidati, prove, tipo_squadra=None, strategia="tempo_minimo"):
+    """Genera automaticamente tutte le categorie raggiungibili con i candidati a
+    disposizione (non serve indicare a priori una categoria target: le condizioni
+    possibili vengono derivate dalle combinazioni reali di eta' e composizione),
+    e per ciascuna calcola la formazione migliore secondo la strategia scelta.
+
+    candidati, prove, tipo_squadra, strategia: vedi formazione_migliore_per_categoria_target.
+
+    Ritorna un dict {categoria: Formazione} con solo le categorie per cui esiste
+    almeno una formazione valida tra i candidati.
+    """
+    if strategia not in STRATEGIE:
+        raise ValueError(f"Strategia sconosciuta: {strategia}")
+    if len(prove) != 4:
+        raise ValueError("Una staffetta richiede esattamente 4 prove/frazioni")
+
+    migliori = {}
+    for gruppo in combinations(candidati, 4):
+        somma_eta = sum(n.eta for n in gruppo)
+        categoria = _categoria_per_somma_eta(somma_eta)
+        if categoria is None:
+            continue
+        if not _composizione_valida(gruppo, tipo_squadra):
+            continue
+        assegnazione = _migliore_assegnazione(gruppo, prove)
+        if assegnazione is None:
+            continue
+        frazioni, tempo_totale = assegnazione
+        formazione = Formazione(frazioni, tempo_totale, somma_eta)
+
+        attuale = migliori.get(categoria)
+        if attuale is None:
+            migliori[categoria] = formazione
+        elif strategia == "tempo_minimo":
+            if formazione.tempo_totale < attuale.tempo_totale:
+                migliori[categoria] = formazione
+        else:  # eta_minima_fascia
+            eta_min = RELAY_BRACKETS[categoria][0]
+            if (formazione.somma_eta - eta_min) < (attuale.somma_eta - eta_min):
+                migliori[categoria] = formazione
+
+    return migliori
+
+
 def formazione_migliore_per_categoria_target(
     candidati,
     categoria_target,
