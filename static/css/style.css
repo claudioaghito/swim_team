@@ -135,7 +135,7 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
 .navbar a .icon { width: 24px; height: 24px; }
 .navbar-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.15em; letter-spacing: 0.3px; }
-.brand-logo { height: 40px; width: auto; background: white; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+.brand-logo { height: 80px; width: auto; background: white; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
 .user-info { display: flex; align-items: center; flex-wrap: wrap; font-weight: 700; font-size: 1.05em; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
 
 .navbar-toggle {
@@ -332,7 +332,7 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
 
     .navbar { padding: 10px 14px; gap: 8px; }
     .brand { font-size: 0.9em; gap: 8px; min-width: 0; }
-    .brand-logo { height: 30px; flex-shrink: 0; }
+    .brand-logo { height: 60px; flex-shrink: 0; }
     .navbar-toggle { display: inline-flex; align-items: center; justify-content: center; }
     .navbar-right {
         display: none;
