@@ -3,7 +3,7 @@
 {% block content %}
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('athlete.lista_allenamenti') }}">&larr; Allenamenti</a>
-    <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF</button>
+    <button type="button" class="btn" onclick="window.print()" title="Stampa / Esporta PDF">{{ icon('stampa') }}</button>
 </div>
 
 <div class="card">

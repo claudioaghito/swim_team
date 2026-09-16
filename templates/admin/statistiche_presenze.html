@@ -5,7 +5,7 @@
 
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">&larr; Allenamenti</a>
-    <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF</button>
+    <button type="button" class="btn" onclick="window.print()" title="Stampa / Esporta PDF">{{ icon('stampa') }}</button>
 </div>
 
 <p><small>Percentuale di presenza calcolata sugli allenamenti gia' svolti (totale: {{ totale_allenamenti }}).</small></p>

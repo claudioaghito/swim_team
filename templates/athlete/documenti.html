@@ -14,7 +14,7 @@
         {% if current_user.cartellino_file %}
             <img src="{{ url_for('athlete.cartellino') }}" alt="Cartellino" class="cartellino-img" id="cartellino-img">
             <div class="actions no-print">
-                <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa cartellino</button>
+                <button type="button" class="btn" onclick="window.print()" title="Stampa cartellino">{{ icon('stampa') }}</button>
             </div>
         {% else %}
             <p>Nessun cartellino caricato. Contatta l'amministratore.</p>

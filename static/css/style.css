@@ -178,7 +178,7 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     background: var(--btn-bg);
     color: white;
     border: none;
-    padding: 10px 18px;
+    padding: 7px 15px;
     border-radius: 8px;
     text-decoration: none;
     cursor: pointer;
@@ -191,6 +191,7 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     transition: background-color 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
     box-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
+.btn .icon, button .icon { width: 26px; height: 26px; margin-right: 0; }
 .btn:hover, button:hover { background: var(--btn-bg-hover); box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
 .btn:active, button:active { transform: translateY(1px); }
 .btn:focus-visible, button:focus-visible, input:focus-visible {
@@ -332,6 +333,7 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
     }
     .actions .btn, .actions button, .actions form { justify-content: center; width: 100%; margin: 0; }
     .actions form button { width: 100%; margin-top: 0; }
+    .actions .btn, .actions button { white-space: normal; text-align: center; }
 
     .table th, .table td { padding: 8px 6px; font-size: 0.9em; }
 

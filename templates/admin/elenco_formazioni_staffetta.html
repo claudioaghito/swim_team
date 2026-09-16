@@ -9,7 +9,7 @@
     {% else %}
         <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
     {% endif %}
-    <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF</button>
+    <button type="button" class="btn" onclick="window.print()" title="Stampa / Esporta PDF">{{ icon('stampa') }}</button>
     {% if formazioni %}
     <form method="POST" action="{{ url_for('admin.elimina_tutte_formazioni_staffetta') }}"
           onsubmit="return confirmSubmit(this, 'Eliminare TUTTE le formazioni salvate? Operazione non reversibile.');" style="display:inline;">
