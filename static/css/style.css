@@ -125,15 +125,18 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     color: white;
     margin-left: 16px;
     text-decoration: none;
-    font-weight: 600;
-    opacity: 0.9;
+    font-weight: 700;
+    font-size: 1.05em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    opacity: 1;
     transition: opacity 0.15s ease;
 }
-.navbar a:hover { opacity: 1; text-decoration: underline; }
+.navbar a:hover { opacity: 0.8; text-decoration: underline; }
+.navbar a .icon { width: 24px; height: 24px; }
 .navbar-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.15em; letter-spacing: 0.3px; }
 .brand-logo { height: 40px; width: auto; background: white; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
-.user-info { display: flex; align-items: center; flex-wrap: wrap; }
+.user-info { display: flex; align-items: center; flex-wrap: wrap; font-weight: 700; font-size: 1.05em; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
 .navbar-search { display: flex; gap: 4px; }
 .navbar-search input { width: 170px; margin-top: 0; padding: 7px 10px; font-size: 0.85em; }
 .navbar-search button { padding: 7px 10px; }
