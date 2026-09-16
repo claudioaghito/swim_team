@@ -110,6 +110,13 @@ class Allenamento(db.Model):
     descrizione = db.Column(db.Text)
 
     presenze = db.relationship("Presenza", backref="allenamento", lazy=True, cascade="all, delete-orphan")
+    nascosto_da = db.relationship(
+        "AllenamentoNascosto", backref="allenamento", lazy=True, cascade="all, delete-orphan"
+    )
+
+    @property
+    def passato(self):
+        return self.data < datetime.utcnow().date()
 
     def __repr__(self):
         return f"<Allenamento {self.data} {self.gruppo}>"
@@ -252,7 +259,9 @@ class Messaggio(db.Model):
 
 
 class MessaggioNascosto(db.Model):
-    """Traccia quali comunicazioni generali un atleta ha eliminato dalla propria vista."""
+    """Traccia quali messaggi un atleta ha eliminato dalla propria vista (comunicazioni
+    generali o messaggi diretti): non tocca la riga condivisa, quindi non ha effetto
+    sul mittente ne' sugli altri destinatari."""
     __tablename__ = "messaggi_nascosti"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -261,6 +270,20 @@ class MessaggioNascosto(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("messaggio_id", "atleta_id", name="uq_messaggio_nascosto"),
+    )
+
+
+class AllenamentoNascosto(db.Model):
+    """Traccia quali allenamenti passati un atleta ha rimosso dal proprio archivio
+    personale: non elimina l'allenamento (resta visibile agli altri e all'admin)."""
+    __tablename__ = "allenamenti_nascosti"
+
+    id = db.Column(db.Integer, primary_key=True)
+    allenamento_id = db.Column(db.Integer, db.ForeignKey("allenamenti.id"), nullable=False)
+    atleta_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint("allenamento_id", "atleta_id", name="uq_allenamento_nascosto"),
     )
 
 

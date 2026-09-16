@@ -464,12 +464,21 @@ def nuovo_allenamento():
 @admin_required
 def lista_allenamenti():
     q = request.args.get("q", "").strip()
+    vista = request.args.get("vista", "prossimi")
+    oggi = datetime.utcnow().date()
+
     query = Allenamento.query
+    if vista == "archivio":
+        query = query.filter(Allenamento.data < oggi)
+    elif vista == "prossimi":
+        query = query.filter(Allenamento.data >= oggi)
+    # vista == "tutti": nessun filtro sulla data
+
     if q:
         like = f"%{q}%"
         query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
     allenamenti = query.order_by(Allenamento.data.desc()).all()
-    return render_template("admin/lista_allenamenti.html", allenamenti=allenamenti, q=q)
+    return render_template("admin/lista_allenamenti.html", allenamenti=allenamenti, q=q, vista=vista)
 
 
 @admin_bp.route("/allenamenti/statistiche")

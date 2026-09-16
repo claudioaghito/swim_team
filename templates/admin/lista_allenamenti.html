@@ -9,15 +9,22 @@
     <a class="btn" href="{{ url_for('admin.statistiche_presenze') }}">{{ icon('presenze') }} Statistiche presenze</a>
 </div>
 
+<div class="actions">
+    {% if vista == 'prossimi' %}<button type="button" disabled>Prossimi</button>{% else %}<a class="btn" href="{{ url_for('admin.lista_allenamenti', vista='prossimi', q=q) }}">Prossimi</a>{% endif %}
+    {% if vista == 'archivio' %}<button type="button" disabled>Archivio (passati)</button>{% else %}<a class="btn" href="{{ url_for('admin.lista_allenamenti', vista='archivio', q=q) }}">Archivio (passati)</a>{% endif %}
+    {% if vista == 'tutti' %}<button type="button" disabled>Tutti</button>{% else %}<a class="btn" href="{{ url_for('admin.lista_allenamenti', vista='tutti', q=q) }}">Tutti</a>{% endif %}
+</div>
+
 <div class="card">
     <form method="GET" class="search-form">
+        <input type="hidden" name="vista" value="{{ vista }}">
         <input type="text" name="q" value="{{ q }}" placeholder="Cerca per gruppo o sede...">
         <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
 </div>
 
 <div class="card">
-    <table class="table">
+    <table class="table responsive-cards">
         <thead>
             <tr>
                 <th data-sort="date">Data</th>
@@ -30,10 +37,10 @@
         <tbody>
             {% for al in allenamenti %}
             <tr>
-                <td data-sort-value="{{ al.data.isoformat() }}">{{ al.data.strftime('%d/%m/%Y') }}</td>
-                <td>{{ al.gruppo or '-' }}</td>
-                <td>{{ al.sede or '-' }}</td>
-                <td class="preserve-lines">{{ al.descrizione or '-' }}</td>
+                <td data-label="Data" data-sort-value="{{ al.data.isoformat() }}">{{ al.data.strftime('%d/%m/%Y') }}</td>
+                <td data-label="Gruppo">{{ al.gruppo or '-' }}</td>
+                <td data-label="Sede">{{ al.sede or '-' }}</td>
+                <td data-label="Descrizione" class="preserve-lines">{{ al.descrizione or '-' }}</td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}" title="Apri">{{ icon('apri') }}</a>
                     <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=al.id) }}" title="Modifica">{{ icon('modifica') }}</a>

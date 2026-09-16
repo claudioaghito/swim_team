@@ -17,7 +17,7 @@
 </div>
 
 <div class="card">
-    <table class="table">
+    <table class="table responsive-cards">
         <thead>
             <tr>
                 <th data-sort="text">Nome</th>
@@ -36,15 +36,15 @@
             {% for a in atleti %}
             {% set saldo = a.saldo_attuale() %}
             <tr>
-                <td>{{ a.nome }}</td>
-                <td>{{ a.cognome }}</td>
-                <td>{{ a.sesso or "-" }}</td>
-                <td>{{ a.eta if a.eta is not none else "-" }}</td>
-                <td>{{ a.categoria_master(anno_stagione) or "-" }}</td>
-                <td>{{ a.username }}</td>
-                <td class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</td>
-                <td>{{ "Sì" if a.cartellino_file else "-" }}</td>
-                <td>
+                <td data-label="Nome">{{ a.nome }}</td>
+                <td data-label="Cognome">{{ a.cognome }}</td>
+                <td data-label="Sesso">{{ a.sesso or "-" }}</td>
+                <td data-label="Età">{{ a.eta if a.eta is not none else "-" }}</td>
+                <td data-label="Categoria">{{ a.categoria_master(anno_stagione) or "-" }}</td>
+                <td data-label="Utente">{{ a.username }}</td>
+                <td data-label="Saldo" class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</td>
+                <td data-label="Cartellino">{{ "Sì" if a.cartellino_file else "-" }}</td>
+                <td data-label="Certificato medico">
                     {% if a.certificato_medico_valido is not none %}
                         <span class="status-dot {{ 'green' if a.certificato_medico_valido else 'red' }}"
                               title="{{ ('Valido fino al ' if a.certificato_medico_valido else 'Scaduto il ') ~ a.certificato_medico_scadenza.strftime('%d/%m/%Y') }}"></span>{{ "Valido" if a.certificato_medico_valido else "Scaduto" }}

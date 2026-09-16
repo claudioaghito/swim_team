@@ -10,7 +10,7 @@ from flask_login import login_required, current_user
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
-    Configurazione,
+    Configurazione, AllenamentoNascosto,
 )
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
 
@@ -65,13 +65,14 @@ def lista_messaggi():
 @athlete_bp.route("/messaggi/<int:messaggio_id>/elimina", methods=["POST"])
 @login_required
 def elimina_messaggio(messaggio_id):
+    """L'atleta elimina un messaggio solo dalla propria vista: non tocca mai la riga
+    condivisa, ne' per i messaggi diretti ne' per le comunicazioni a tutta la squadra,
+    cosi' la cancellazione non ha effetto per il mittente o per gli altri destinatari."""
     messaggio = Messaggio.query.get_or_404(messaggio_id)
     if messaggio.destinatario_id not in (None, current_user.id):
         abort(403)
 
-    if messaggio.destinatario_id == current_user.id:
-        db.session.delete(messaggio)
-    elif not MessaggioNascosto.query.filter_by(
+    if not MessaggioNascosto.query.filter_by(
         messaggio_id=messaggio.id, atleta_id=current_user.id
     ).first():
         db.session.add(MessaggioNascosto(messaggio_id=messaggio.id, atleta_id=current_user.id))
@@ -97,12 +98,68 @@ def lista_movimenti():
 @login_required
 def lista_allenamenti():
     q = request.args.get("q", "").strip()
-    query = Allenamento.query
+    oggi = datetime.utcnow().date()
+    query = Allenamento.query.filter(Allenamento.data >= oggi)
     if q:
         like = f"%{q}%"
         query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
     allenamenti = query.order_by(Allenamento.data.desc()).all()
     return render_template("athlete/lista_allenamenti.html", allenamenti=allenamenti, q=q)
+
+
+@athlete_bp.route("/allenamenti/archivio")
+@login_required
+def archivio_allenamenti():
+    """Allenamenti passati, esclusi quelli che l'atleta ha rimosso dal proprio archivio."""
+    q = request.args.get("q", "").strip()
+    oggi = datetime.utcnow().date()
+    nascosti = db.session.query(AllenamentoNascosto.allenamento_id).filter_by(atleta_id=current_user.id)
+    query = Allenamento.query.filter(
+        Allenamento.data < oggi, ~Allenamento.id.in_(nascosti)
+    )
+    if q:
+        like = f"%{q}%"
+        query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
+    allenamenti = query.order_by(Allenamento.data.desc()).all()
+    return render_template("athlete/archivio_allenamenti.html", allenamenti=allenamenti, q=q)
+
+
+@athlete_bp.route("/allenamenti/<int:allenamento_id>/nascondi", methods=["POST"])
+@login_required
+def nascondi_allenamento(allenamento_id):
+    """Rimuove un allenamento passato dal proprio archivio personale (non lo elimina:
+    resta visibile agli altri atleti e all'amministratore)."""
+    allenamento = Allenamento.query.get_or_404(allenamento_id)
+    if not allenamento.passato:
+        abort(400)
+    if not AllenamentoNascosto.query.filter_by(
+        allenamento_id=allenamento.id, atleta_id=current_user.id
+    ).first():
+        db.session.add(AllenamentoNascosto(allenamento_id=allenamento.id, atleta_id=current_user.id))
+        db.session.commit()
+    flash("Allenamento rimosso dal tuo archivio.", "success")
+    return redirect(url_for("athlete.archivio_allenamenti"))
+
+
+@athlete_bp.route("/allenamenti/archivio/svuota", methods=["POST"])
+@login_required
+def svuota_archivio_allenamenti():
+    """Rimuove dal proprio archivio tutti gli allenamenti passati non ancora nascosti."""
+    oggi = datetime.utcnow().date()
+    gia_nascosti = {
+        r[0] for r in db.session.query(AllenamentoNascosto.allenamento_id).filter_by(
+            atleta_id=current_user.id
+        ).all()
+    }
+    passati = Allenamento.query.filter(Allenamento.data < oggi).all()
+    aggiunti = 0
+    for al in passati:
+        if al.id not in gia_nascosti:
+            db.session.add(AllenamentoNascosto(allenamento_id=al.id, atleta_id=current_user.id))
+            aggiunti += 1
+    db.session.commit()
+    flash(f"Archivio svuotato ({aggiunti} allenamento/i rimosso/i dalla tua vista).", "success")
+    return redirect(url_for("athlete.archivio_allenamenti"))
 
 
 @athlete_bp.route("/allenamenti/<int:allenamento_id>")

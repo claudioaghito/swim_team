@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Archivio allenamenti{% endblock %}
+{% block content %}
+<h1>{{ icon('allenamenti') }} Archivio allenamenti</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.lista_allenamenti') }}">&larr; Prossimi allenamenti</a>
+    {% if allenamenti %}
+    <form method="POST" action="{{ url_for('athlete.svuota_archivio_allenamenti') }}"
+          onsubmit="return confirmSubmit(this, 'Svuotare tutto il tuo archivio? Gli allenamenti restano visibili agli altri, spariscono solo dalla tua vista.');" style="display:inline;">
+        <button type="submit" class="btn-danger">{{ icon('elimina') }} Svuota archivio</button>
+    </form>
+    {% endif %}
+</div>
+
+<p><small>Qui trovi i tuoi allenamenti passati. Rimuoverli dall'archivio li nasconde solo dalla tua
+   vista: restano visibili agli altri atleti e all'amministratore.</small></p>
+
+<div class="card">
+    <form method="GET" class="search-form">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per gruppo o sede...">
+        <button type="submit">{{ icon('cerca') }} Cerca</button>
+    </form>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th data-sort="date">Data</th>
+                <th data-sort="text">Gruppo</th>
+                <th data-sort="text">Sede</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for al in allenamenti %}
+            <tr>
+                <td data-sort-value="{{ al.data.isoformat() }}">{{ al.data.strftime('%d/%m/%Y') }}</td>
+                <td>{{ al.gruppo or '-' }}</td>
+                <td>{{ al.sede or '-' }}</td>
+                <td class="table-actions">
+                    <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}" title="Apri">{{ icon('apri') }}</a>
+                    <form method="POST" action="{{ url_for('athlete.nascondi_allenamento', allenamento_id=al.id) }}" style="display:inline;">
+                        <button type="submit" class="btn-danger" title="Rimuovi dal mio archivio">{{ icon('elimina') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Il tuo archivio e' vuoto.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Allenamenti{% endblock %}
 {% block content %}
-<h1>{{ icon('allenamenti') }} Allenamenti</h1>
+<h1>{{ icon('allenamenti') }} Prossimi allenamenti</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+    <a class="btn" href="{{ url_for('athlete.archivio_allenamenti') }}">{{ icon('presenze') }} Archivio allenamenti passati</a>
 </div>
 
 <div class="card">
@@ -35,7 +36,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="4">Nessun allenamento registrato.</td></tr>
+            <tr><td colspan="4">Nessun allenamento in programma.</td></tr>
             {% endfor %}
         </tbody>
     </table>

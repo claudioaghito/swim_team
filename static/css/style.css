@@ -336,6 +336,28 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
     .table th, .table td { padding: 8px 6px; font-size: 0.9em; }
 
     .checkbox-list { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+
+    /* Tabelle "a card": ogni riga diventa un blocco con etichetta:valore,
+       invece di una tabella larga da scorrere in orizzontale. Le tabelle che
+       usano rowspan (piu' righe collegate, es. iscrizioni) restano con lo
+       scroll orizzontale perche' rowspan non e' compatibile con questo trucco. */
+    .table.responsive-cards { border: none; }
+    .table.responsive-cards thead { display: none; }
+    .table.responsive-cards, .table.responsive-cards tbody,
+    .table.responsive-cards tr, .table.responsive-cards td { display: block; width: 100%; }
+    .table.responsive-cards tr {
+        margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px;
+        padding: 6px 10px; background: var(--card-bg);
+    }
+    .table.responsive-cards td {
+        border-bottom: 1px dashed var(--border); padding: 8px 0; text-align: right;
+    }
+    .table.responsive-cards td:last-child { border-bottom: none; }
+    .table.responsive-cards td[data-label]::before {
+        content: attr(data-label); float: left; font-weight: 600; color: var(--label-color);
+        margin-right: 8px;
+    }
+    .table.responsive-cards td:not([data-label]) { text-align: center; }
 }
 
 /* Stampa/PDF: sempre chiara e leggibile su carta bianca, a prescindere dal tema attivo a schermo */
