@@ -36,7 +36,7 @@
                 <td>
                     <form method="POST" action="{{ url_for('admin.elimina_messaggio', messaggio_id=m.id) }}"
                           onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');">
-                        <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina</button>
+                        <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
                     </form>
                 </td>
             </tr>

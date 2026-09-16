@@ -51,11 +51,11 @@
                     {% endif %}
                 </td>
                 <td class="table-actions">
-                    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">{{ icon('apri') }} Apri</a>
+                    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}" title="Apri">{{ icon('apri') }}</a>
                     <a class="btn" href="{{ url_for('admin.modifica_gara', gara_id=g.id) }}" title="Modifica">{{ icon('modifica') }}</a>
                     <form method="POST" action="{{ url_for('admin.elimina_gara', gara_id=g.id) }}"
                           onsubmit="return confirmSubmit(this, 'Eliminare definitivamente il torneo {{ g.nome }}? Verranno eliminate anche tutte le iscrizioni degli atleti a questo torneo.');" style="display:inline;">
-                        <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina</button>
+                        <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
                     </form>
                 </td>
             </tr>

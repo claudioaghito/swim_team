@@ -14,7 +14,7 @@
     <form method="POST" action="{{ url_for('admin.elimina_tutte_formazioni_staffetta') }}"
           onsubmit="return confirmSubmit(this, 'Eliminare TUTTE le formazioni salvate? Operazione non reversibile.');" style="display:inline;">
         {% if gara_provenienza %}<input type="hidden" name="next" value="{{ url_for('admin.elenco_formazioni_staffetta', gara_id=gara_provenienza.id) }}">{% endif %}
-        <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina tutte</button>
+        <button type="submit" class="btn-danger" title="Elimina tutte">{{ icon('elimina') }}</button>
     </form>
     {% endif %}
 </div>
@@ -78,7 +78,7 @@
         </table>
         </div>
         {% if formazioni %}
-        <button type="submit" class="btn-danger no-print" style="margin-top:16px;">{{ icon('elimina') }} Elimina selezionate</button>
+        <button type="submit" class="btn-danger no-print" style="margin-top:16px;" title="Elimina selezionate">{{ icon('elimina') }}</button>
         {% endif %}
     </form>
 </div>

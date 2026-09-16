@@ -7,7 +7,7 @@
     <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF iscritti</button>
     <form method="POST" action="{{ url_for('admin.elimina_gara', gara_id=gara.id) }}"
           onsubmit="return confirmSubmit(this, 'Eliminare definitivamente il torneo {{ gara.nome }}? Verranno eliminate anche tutte le iscrizioni degli atleti a questo torneo.');" style="display:inline;">
-        <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina torneo</button>
+        <button type="submit" class="btn-danger" title="Elimina torneo">{{ icon('elimina') }}</button>
     </form>
 </div>
 

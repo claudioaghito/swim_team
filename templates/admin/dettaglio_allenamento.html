@@ -7,7 +7,7 @@
     <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF</button>
     <form method="POST" action="{{ url_for('admin.elimina_allenamento', allenamento_id=allenamento.id) }}"
           onsubmit="return confirmSubmit(this, 'Eliminare questo allenamento?');" style="display:inline;">
-        <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina</button>
+        <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
     </form>
 </div>
 

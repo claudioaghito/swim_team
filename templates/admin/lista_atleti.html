@@ -54,7 +54,7 @@
                 <td>{{ "Sì" if a.cartellino_file else "-" }}</td>
                 <td>{{ "Sì" if a.certificato_medico_file else "-" }}</td>
                 <td class="table-actions">
-                    <a class="btn" href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ icon('apri') }} Apri</a>
+                    <a class="btn" href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}" title="Apri">{{ icon('apri') }}</a>
                     <a class="btn" href="{{ url_for('admin.modifica_atleta', atleta_id=a.id) }}" title="Modifica">{{ icon('modifica') }}</a>
                 </td>
             </tr>

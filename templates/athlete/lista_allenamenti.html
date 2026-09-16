@@ -31,7 +31,7 @@
                 <td>{{ al.gruppo or '-' }}</td>
                 <td>{{ al.sede or '-' }}</td>
                 <td>
-                    <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}">{{ icon('apri') }} Apri</a>
+                    <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}" title="Apri">{{ icon('apri') }}</a>
                 </td>
             </tr>
             {% else %}
