@@ -22,8 +22,10 @@
 
 {% if modalita_pagamento %}
     <div class="card">
-        <h3>{{ icon('movimenti-contabili') }} Modalità di pagamento</h3>
-        <p class="preserve-lines">{{ modalita_pagamento }}</p>
+        <details class="info-toggle">
+            <summary title="Mostra/nascondi modalità di pagamento">{{ icon('movimenti-contabili') }} Modalità di pagamento</summary>
+            <p class="preserve-lines">{{ modalita_pagamento }}</p>
+        </details>
     </div>
 {% endif %}
 

@@ -107,6 +107,19 @@ h1 { font-size: 1.6em; margin: 0 0 16px; }
 h2 { font-size: 1.25em; margin-top: 0; }
 h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
 
+.info-toggle summary {
+    font-size: 1.05em;
+    font-weight: 700;
+    color: var(--blue-dark);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+.info-toggle summary::-webkit-details-marker { display: none; }
+.info-toggle summary:hover { opacity: 0.8; }
+.info-toggle[open] summary { margin-bottom: 10px; }
+.info-toggle p { margin: 0; }
+
 .navbar {
     background: linear-gradient(135deg, var(--btn-bg), var(--btn-bg-hover));
     color: white;
