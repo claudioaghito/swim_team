@@ -18,9 +18,26 @@
        leggermente diverso.</small></p>
 </div>
 
+{% if atleti_convocabili %}
+<div class="card no-print">
+    <h3>{{ icon('crea-atleta') }} Convoca altri atleti</h3>
+    <p><small>Aggiungi al gruppo di candidati anche atleti che non si sono auto-iscritti a questa staffetta.</small></p>
+    <form method="POST" action="{{ url_for('admin.convoca_atleti_staffetta', gara_id=gara.id, tipo=tipo) }}">
+        <div class="checkbox-list">
+            {% for a in atleti_convocabili %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="atleta_ids" value="{{ a.id }}"> {{ a.nome_completo }}
+                </label>
+            {% endfor %}
+        </div>
+        <button type="submit">{{ icon('conferma') }} Convoca selezionati</button>
+    </form>
+</div>
+{% endif %}
+
 {% if not iscritti %}
 <div class="card warning">
-    <p>Nessun atleta si e' ancora iscritto a "{{ tipo }}" per questo torneo: non c'e' nessun candidato tra cui scegliere.</p>
+    <p>Nessun atleta si e' ancora iscritto a "{{ tipo }}" per questo torneo: non c'e' nessun candidato tra cui scegliere. Puoi comunque convocarne manualmente qui sopra.</p>
 </div>
 {% else %}
 {% if senza_sesso %}

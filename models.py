@@ -64,6 +64,19 @@ class User(db.Model, UserMixin):
             return None
         return self.certificato_medico_scadenza >= datetime.utcnow().date()
 
+    @property
+    def certificato_medico_giorni_alla_scadenza(self):
+        """Giorni mancanti alla scadenza (negativo se gia' scaduto); None se non impostata."""
+        if not self.certificato_medico_scadenza:
+            return None
+        return (self.certificato_medico_scadenza - datetime.utcnow().date()).days
+
+    @property
+    def certificato_medico_in_scadenza(self):
+        """True se il certificato e' ancora valido ma scade entro 30 giorni."""
+        giorni = self.certificato_medico_giorni_alla_scadenza
+        return giorni is not None and 0 <= giorni <= 30
+
     def saldo_attuale(self):
         totale = db.session.query(db.func.sum(MovimentoContabile.importo)).filter_by(
             atleta_id=self.id

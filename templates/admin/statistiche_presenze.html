@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Statistiche presenze{% endblock %}
+{% block content %}
+<h1>{{ icon('presenze') }} Statistiche presenze</h1>
+
+<div class="actions no-print">
+    <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">&larr; Allenamenti</a>
+    <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa / Esporta PDF</button>
+</div>
+
+<p><small>Percentuale di presenza calcolata sugli allenamenti gia' svolti (totale: {{ totale_allenamenti }}).</small></p>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th data-sort="text">Atleta</th>
+                <th data-sort="number">Presenze</th>
+                <th data-sort="number">Percentuale</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in statistiche %}
+            <tr>
+                <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=s.atleta.id) }}">{{ s.atleta.nome_completo }}</a></td>
+                <td>{{ s.presenze }} / {{ totale_allenamenti }}</td>
+                <td data-sort-value="{{ s.percentuale }}">{{ "%.0f"|format(s.percentuale) }}%</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">Nessun atleta registrato.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

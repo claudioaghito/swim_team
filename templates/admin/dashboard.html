@@ -66,5 +66,22 @@
             {% endfor %}
         </ul>
     </div>
+
+    <div class="card warning">
+        <h3>{{ icon('warning') }} Certificati medici ({{ atleti_certificato_scaduto|length + atleti_certificato_in_scadenza|length }})</h3>
+        <ul>
+            {% for a in atleti_certificato_scaduto %}
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_completo }}</a>:
+                    <span class="status-dot red"></span>scaduto il {{ a.certificato_medico_scadenza.strftime('%d/%m/%Y') }}</li>
+            {% endfor %}
+            {% for a in atleti_certificato_in_scadenza %}
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_completo }}</a>:
+                    <span class="status-dot green"></span>scade tra {{ a.certificato_medico_giorni_alla_scadenza }} giorni ({{ a.certificato_medico_scadenza.strftime('%d/%m/%Y') }})</li>
+            {% endfor %}
+            {% if not atleti_certificato_scaduto and not atleti_certificato_in_scadenza %}
+                <li>Nessun certificato scaduto o in scadenza {{ icon('tromba-festa') }}</li>
+            {% endif %}
+        </ul>
+    </div>
 </div>
 {% endblock %}

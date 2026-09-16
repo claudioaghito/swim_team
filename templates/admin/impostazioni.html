@@ -21,4 +21,11 @@
         <button type="submit" title="Salva">{{ icon('salva') }}</button>
     </form>
 </div>
+
+<div class="card">
+    <h2>{{ icon('download') }} Backup dati</h2>
+    <p><small>Scarica una copia completa del database (atleti, tornei, movimenti, messaggi, staffette, ecc.).
+       Conservala in un posto sicuro: contiene dati personali.</small></p>
+    <a class="btn" href="{{ url_for('admin.backup') }}">{{ icon('download') }} Scarica backup</a>
+</div>
 {% endblock %}

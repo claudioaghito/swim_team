@@ -14,6 +14,8 @@
         <strong>{{ current_user.certificato_medico_scadenza.strftime('%d/%m/%Y') }}</strong>
         {% if not current_user.certificato_medico_valido %}
             — <a href="{{ url_for('athlete.documenti') }}">contatta l'amministratore per rinnovarlo</a>
+        {% elif current_user.certificato_medico_in_scadenza %}
+            — <small>scade tra {{ current_user.certificato_medico_giorni_alla_scadenza }} giorni, pensa al rinnovo</small>
         {% endif %}
     </p>
 {% endif %}

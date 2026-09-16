@@ -7,7 +7,7 @@ from functools import wraps
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash, request, abort,
-    current_app, send_from_directory, Response,
+    current_app, send_from_directory, send_file, Response,
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 from extensions import db
 from models import (
     User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
-    FormazioneStaffetta,
+    FormazioneStaffetta, IscrizioneGara,
 )
 from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
 from utils import (
@@ -116,12 +116,18 @@ def dashboard():
     # Atleti con saldo negativo, utile a colpo d'occhio
     atleti_in_debito = [a for a in atleti if a.saldo_attuale() < 0]
 
+    # Certificati medici scaduti o in scadenza entro 30 giorni
+    atleti_certificato_scaduto = [a for a in atleti if a.certificato_medico_valido is False]
+    atleti_certificato_in_scadenza = [a for a in atleti if a.certificato_medico_in_scadenza]
+
     return render_template(
         "admin/dashboard.html",
         atleti=atleti,
         prossimi_allenamenti=prossimi_allenamenti,
         prossime_gare=prossime_gare,
         atleti_in_debito=atleti_in_debito,
+        atleti_certificato_scaduto=atleti_certificato_scaduto,
+        atleti_certificato_in_scadenza=atleti_certificato_in_scadenza,
     )
 
 
@@ -175,6 +181,23 @@ def impostazioni():
         return redirect(url_for("admin.impostazioni"))
 
     return render_template("admin/impostazioni.html", config=config)
+
+
+@admin_bp.route("/backup")
+@login_required
+@admin_required
+def backup():
+    """Scarica una copia completa del database SQLite (tutte le tabelle)."""
+    uri = current_app.config["SQLALCHEMY_DATABASE_URI"]
+    prefisso = "sqlite:///"
+    if not uri.startswith(prefisso):
+        abort(404)  # backup diretto disponibile solo per SQLite
+    percorso_db = uri[len(prefisso):]
+    if not os.path.isabs(percorso_db):
+        percorso_db = os.path.join(current_app.root_path, percorso_db)
+
+    nome_file = f"backup_squadra_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.db"
+    return send_file(percorso_db, as_attachment=True, download_name=nome_file)
 
 
 @admin_bp.route("/atleti")
@@ -405,6 +428,31 @@ def lista_allenamenti():
     return render_template("admin/lista_allenamenti.html", allenamenti=allenamenti, q=q)
 
 
+@admin_bp.route("/allenamenti/statistiche")
+@login_required
+@admin_required
+def statistiche_presenze():
+    oggi = datetime.utcnow().date()
+    totale_allenamenti = Allenamento.query.filter(Allenamento.data <= oggi).count()
+
+    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome, User.nome).all()
+    statistiche = []
+    for atleta in atleti:
+        presenze = Presenza.query.filter_by(atleta_id=atleta.id, presente=True).join(
+            Allenamento, Presenza.allenamento_id == Allenamento.id
+        ).filter(Allenamento.data <= oggi).count()
+        percentuale = (presenze / totale_allenamenti * 100) if totale_allenamenti else 0
+        statistiche.append({"atleta": atleta, "presenze": presenze, "percentuale": percentuale})
+
+    statistiche.sort(key=lambda s: s["percentuale"], reverse=True)
+
+    return render_template(
+        "admin/statistiche_presenze.html",
+        statistiche=statistiche,
+        totale_allenamenti=totale_allenamenti,
+    )
+
+
 @admin_bp.route("/allenamenti/<int:allenamento_id>")
 @login_required
 @admin_required
@@ -605,6 +653,12 @@ def formazione_staffetta(gara_id, tipo):
     tipo_squadra = _tipo_squadra_da_tipo(tipo)
     senza_sesso = [a.nome_completo for a in iscritti if not a.sesso] if tipo_squadra else []
 
+    id_iscritti = {a.id for a in iscritti}
+    atleti_convocabili = sorted(
+        (a for a in User.query.filter_by(ruolo="atleta").all() if a.id not in id_iscritti),
+        key=lambda a: (a.cognome, a.nome),
+    )
+
     risultati = None
     errore = None
     valori_form = {}
@@ -698,6 +752,7 @@ def formazione_staffetta(gara_id, tipo):
         gara=gara,
         tipo=tipo,
         iscritti=iscritti,
+        atleti_convocabili=atleti_convocabili,
         tempo_registrato_min_sec=tempo_registrato_min_sec,
         prove_uniche=prove_uniche,
         anno_stagione=anno_stagione,
@@ -708,6 +763,37 @@ def formazione_staffetta(gara_id, tipo):
         risultati=risultati,
         errore=errore,
     )
+
+
+@admin_bp.route("/gare/<int:gara_id>/staffetta/<path:tipo>/convoca", methods=["POST"])
+@login_required
+@admin_required
+def convoca_atleti_staffetta(gara_id, tipo):
+    """Convoca manualmente altri atleti per una staffetta, anche se non si sono
+    auto-iscritti: crea l'iscrizione (senza tempo) cosi' compaiono tra i candidati."""
+    gara = Gara.query.get_or_404(gara_id)
+    if tipo not in gara.lista_tipologie or "staffetta" not in tipo.lower():
+        abort(404)
+
+    atleta_ids = request.form.getlist("atleta_ids")
+    if not atleta_ids:
+        flash("Seleziona almeno un atleta da convocare.", "warning")
+        return redirect(url_for("admin.formazione_staffetta", gara_id=gara.id, tipo=tipo))
+
+    gia_iscritti = {
+        i.atleta_id for i in gara.iscrizioni if i.stile == tipo
+    }
+    convocati = 0
+    for atleta_id in atleta_ids:
+        atleta_id = int(atleta_id)
+        if atleta_id in gia_iscritti:
+            continue
+        db.session.add(IscrizioneGara(atleta_id=atleta_id, gara_id=gara.id, stile=tipo))
+        convocati += 1
+
+    db.session.commit()
+    flash(f"{convocati} atleta/i convocato/i per \"{tipo}\".", "success")
+    return redirect(url_for("admin.formazione_staffetta", gara_id=gara.id, tipo=tipo))
 
 
 @admin_bp.route("/staffette")
