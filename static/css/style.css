@@ -137,6 +137,21 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.15em; letter-spacing: 0.3px; }
 .brand-logo { height: 40px; width: auto; background: white; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
 .user-info { display: flex; align-items: center; flex-wrap: wrap; font-weight: 700; font-size: 1.05em; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+
+.navbar-toggle {
+    display: none;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 1.4em;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.navbar-toggle:hover { background: rgba(255,255,255,0.3); }
 .navbar-search { display: flex; gap: 4px; }
 .navbar-search input { width: 170px; margin-top: 0; padding: 7px 10px; font-size: 0.85em; }
 .navbar-search button { padding: 7px 10px; }
@@ -316,9 +331,24 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
     .container { margin: 12px auto; padding: 0 10px; }
 
     .navbar { padding: 10px 14px; gap: 8px; }
-    .brand { font-size: 0.9em; gap: 8px; }
-    .brand-logo { height: 30px; }
-    .user-info { width: 100%; justify-content: flex-start; gap: 4px 0; }
+    .brand { font-size: 0.9em; gap: 8px; min-width: 0; }
+    .brand-logo { height: 30px; flex-shrink: 0; }
+    .navbar-toggle { display: inline-flex; align-items: center; justify-content: center; }
+    .navbar-right {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        order: 3;
+        margin-top: 4px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    .navbar-right.open { display: flex; }
+    .navbar-search { width: 100%; }
+    .navbar-search input { flex: 1; width: auto; }
+    .user-info { width: 100%; flex-direction: column; align-items: flex-start; gap: 10px; }
     .navbar a { margin-left: 0; margin-right: 14px; }
 
     h1 { font-size: 1.3em; }

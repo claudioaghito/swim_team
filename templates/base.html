@@ -22,7 +22,10 @@
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Derthona Nuoto Master" class="brand-logo">
             DERTHONA NUOTO MASTER
         </span>
-        <div class="navbar-right">
+        <button type="button" id="navbar-toggle" class="navbar-toggle" aria-label="Apri menu" aria-expanded="false" aria-controls="navbar-right">
+            &#9776;
+        </button>
+        <div class="navbar-right" id="navbar-right">
             {% if current_user.is_authenticated %}
                 {% if current_user.is_admin %}
                     <form method="GET" action="{{ url_for('admin.ricerca') }}" class="navbar-search">
@@ -125,6 +128,19 @@
             _updateThemeLabel();
         }
         _updateThemeLabel();
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var navToggle = document.getElementById("navbar-toggle");
+            var navMenu = document.getElementById("navbar-right");
+            if (navToggle && navMenu) {
+                navToggle.addEventListener("click", function () {
+                    var aperto = navMenu.classList.toggle("open");
+                    navToggle.setAttribute("aria-expanded", aperto ? "true" : "false");
+                });
+            }
+        });
     </script>
 
     <script>
