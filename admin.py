@@ -373,11 +373,16 @@ def certificato_atleta(atleta_id):
 @admin_required
 def nuovo_allenamento():
     if request.method == "POST":
+        descrizione = request.form.get("descrizione", "").strip()
+        if not descrizione:
+            flash("Inserisci una descrizione per poter salvare l'allenamento.", "danger")
+            return redirect(url_for("admin.nuovo_allenamento"))
+
         allenamento = Allenamento(
             data=datetime.strptime(request.form["data"], "%Y-%m-%d").date(),
             gruppo=request.form.get("gruppo", ""),
             sede=request.form.get("sede", ""),
-            descrizione=request.form.get("descrizione", ""),
+            descrizione=descrizione,
         )
         db.session.add(allenamento)
         db.session.commit()
@@ -447,10 +452,19 @@ def modifica_allenamento(allenamento_id):
     allenamento = Allenamento.query.get_or_404(allenamento_id)
 
     if request.method == "POST":
+        descrizione = request.form.get("descrizione", "").strip()
+        if not descrizione:
+            flash(
+                "Inserisci una descrizione per poter salvare le modifiche: puoi solo "
+                "eliminare l'allenamento o annullare senza salvare.",
+                "danger",
+            )
+            return redirect(url_for("admin.modifica_allenamento", allenamento_id=allenamento.id))
+
         allenamento.data = datetime.strptime(request.form["data"], "%Y-%m-%d").date()
         allenamento.gruppo = request.form.get("gruppo", "")
         allenamento.sede = request.form.get("sede", "")
-        allenamento.descrizione = request.form.get("descrizione", "")
+        allenamento.descrizione = descrizione
         db.session.commit()
         flash("Allenamento aggiornato.", "success")
         return redirect(url_for("admin.dettaglio_allenamento", allenamento_id=allenamento.id))
@@ -478,6 +492,10 @@ def nuova_gara():
         altre = request.form.get("altre_tipologie", "").strip()
         if altre:
             tipologie += [t.strip() for t in altre.split(",") if t.strip()]
+
+        if not tipologie:
+            flash("Seleziona almeno una tipologia di gara per poter salvare il torneo.", "danger")
+            return redirect(url_for("admin.nuova_gara"))
 
         gara = Gara(
             nome=request.form["nome"].strip(),
@@ -877,6 +895,10 @@ def modifica_gara(gara_id):
         altre = request.form.get("altre_tipologie", "").strip()
         if altre:
             tipologie += [t.strip() for t in altre.split(",") if t.strip()]
+
+        if not tipologie:
+            flash("Seleziona almeno una tipologia di gara per poter salvare il torneo.", "danger")
+            return redirect(url_for("admin.modifica_gara", gara_id=gara.id))
 
         gara.nome = request.form["nome"].strip()
         gara.data = datetime.strptime(request.form["data"], "%Y-%m-%d").date()
