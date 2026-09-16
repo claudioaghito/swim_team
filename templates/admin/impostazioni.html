@@ -18,6 +18,9 @@
             gareggia in categoria M40 per tutta la stagione (2026 &minus; 1986 = 40).
         </small></p>
 
+        <label>Modalità di pagamento (uguale per tutti i tornei, visibile agli atleti)</label>
+        <textarea name="modalita_pagamento" rows="3" placeholder="es. Bonifico a... oppure contanti in segreteria entro...">{{ config.modalita_pagamento or '' }}</textarea>
+
         <button type="submit" title="Salva">{{ icon('salva') }}</button>
     </form>
 </div>

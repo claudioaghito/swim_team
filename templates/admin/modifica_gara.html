@@ -47,8 +47,8 @@
         <label>Nota per gli atleti (visibile solo in visualizzazione)</label>
         <textarea name="note" rows="3" placeholder="es. Ritrovo alle 8:00, portare cartellino...">{{ gara.note or '' }}</textarea>
 
-        <label>Modalità di pagamento (visibile agli atleti)</label>
-        <textarea name="modalita_pagamento" rows="3" placeholder="es. Bonifico a... oppure contanti in segreteria entro...">{{ gara.modalita_pagamento or '' }}</textarea>
+        <p><small>La modalità di pagamento è unica per tutti i tornei: si imposta in
+           <a href="{{ url_for('admin.impostazioni') }}">Impostazioni</a>.</small></p>
 
         <button type="submit" title="Salva modifiche">{{ icon('salva') }}</button>
     </form>

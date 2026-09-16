@@ -232,6 +232,7 @@ def iscrizione_gara(gara_id):
     return render_template(
         "athlete/iscrizione_gara.html",
         gara=gara,
+        modalita_pagamento=Configurazione.ottieni().modalita_pagamento,
         iscrizioni_correnti=iscrizioni_correnti,
         scelte_per_atleta=scelte_per_atleta,
         tempi_min_sec=tempi_min_sec,

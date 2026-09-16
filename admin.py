@@ -220,6 +220,7 @@ def impostazioni():
             return redirect(url_for("admin.impostazioni"))
 
         config.anno_stagione = anno
+        config.modalita_pagamento = request.form.get("modalita_pagamento", "").strip()
         db.session.commit()
         flash("Impostazioni aggiornate.", "success")
         return redirect(url_for("admin.impostazioni"))
@@ -610,7 +611,6 @@ def nuova_gara():
             ),
             tipologie_gara=",".join(tipologie),
             note=request.form.get("note", "").strip(),
-            modalita_pagamento=request.form.get("modalita_pagamento", "").strip(),
         )
         db.session.add(gara)
         db.session.flush()
@@ -667,7 +667,8 @@ def dettaglio_gara(gara_id):
         for atleta, iscrizioni in scelte_per_atleta.items()
     }
 
-    anno_stagione = Configurazione.ottieni().anno_stagione
+    config = Configurazione.ottieni()
+    anno_stagione = config.anno_stagione
 
     # Totale costo torneo: somma delle quote calcolate per ciascun atleta iscritto
     # (gara + staffetta secondo il tipo di iscrizione), e quanto gia' addebitato.
@@ -679,6 +680,7 @@ def dettaglio_gara(gara_id):
     return render_template(
         "admin/dettaglio_gara.html",
         gara=gara,
+        modalita_pagamento=config.modalita_pagamento,
         scelte_per_atleta=scelte_per_atleta,
         scelte_gare_individuali=scelte_gare_individuali,
         quote_per_atleta=quote_per_atleta,
@@ -1060,7 +1062,6 @@ def modifica_gara(gara_id):
         )
         gara.tipologie_gara = ",".join(tipologie)
         gara.note = request.form.get("note", "").strip()
-        gara.modalita_pagamento = request.form.get("modalita_pagamento", "").strip()
 
         try:
             nuovo_programma = _salva_upload(
