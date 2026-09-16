@@ -24,6 +24,11 @@ def _migra_schema(app):
         if "certificato_medico_scadenza" not in colonne_users:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN certificato_medico_scadenza DATE"))
+        if "gare" in inspector.get_table_names():
+            colonne_gare = {c["name"] for c in inspector.get_columns("gare")}
+            if "modalita_pagamento" not in colonne_gare:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE gare ADD COLUMN modalita_pagamento TEXT"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
 

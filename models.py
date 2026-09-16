@@ -147,6 +147,7 @@ class Gara(db.Model):
     note = db.Column(db.Text)
     tipologie_gara = db.Column(db.Text)  # tipi di gara offerti, separati da virgola (es. "50 SL,100 DO")
     programma_gare_file = db.Column(db.String(255))  # nome file PDF, in UPLOAD_FOLDER/programmi_gare
+    modalita_pagamento = db.Column(db.Text)  # testo libero, visibile anche agli atleti
 
     iscrizioni = db.relationship("IscrizioneGara", backref="gara", lazy=True, cascade="all, delete-orphan")
 
