@@ -42,6 +42,16 @@
     </div>
 
     <div class="card">
+        <h3>{{ icon('presenze') }} Presenze agli ultimi allenamenti</h3>
+        {% if grafico_presenze.etichette %}
+            <canvas id="grafico-presenze" height="180"></canvas>
+        {% else %}
+            <p>Nessun allenamento svolto finora.</p>
+        {% endif %}
+        <a class="btn" style="margin-top:8px;" href="{{ url_for('admin.statistiche_presenze') }}">Statistiche complete &rarr;</a>
+    </div>
+
+    <div class="card">
         <h3>{{ icon('tornei') }} Prossime gare ({{ prossime_gare|length }})</h3>
         <ul>
             {% for g in prossime_gare %}
@@ -84,4 +94,31 @@
         </ul>
     </div>
 </div>
+
+{% if grafico_presenze.etichette %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+    (function () {
+        var ctx = document.getElementById('grafico-presenze');
+        if (!ctx || typeof Chart === 'undefined') return;
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ grafico_presenze.etichette|tojson }},
+                datasets: [{
+                    label: 'Atleti presenti',
+                    data: {{ grafico_presenze.valori|tojson }},
+                    backgroundColor: '#1565c0',
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+    })();
+</script>
+{% endif %}
 {% endblock %}

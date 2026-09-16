@@ -120,11 +120,25 @@ def dashboard():
     atleti_certificato_scaduto = [a for a in atleti if a.certificato_medico_valido is False]
     atleti_certificato_in_scadenza = [a for a in atleti if a.certificato_medico_in_scadenza]
 
+    # Presenze agli ultimi allenamenti svolti, per il grafico in dashboard
+    ultimi_allenamenti = Allenamento.query.filter(
+        Allenamento.data <= datetime.utcnow().date()
+    ).order_by(Allenamento.data.desc()).limit(8).all()
+    ultimi_allenamenti.reverse()
+    grafico_presenze = {
+        "etichette": [al.data.strftime("%d/%m") for al in ultimi_allenamenti],
+        "valori": [
+            Presenza.query.filter_by(allenamento_id=al.id, presente=True).count()
+            for al in ultimi_allenamenti
+        ],
+    }
+
     return render_template(
         "admin/dashboard.html",
         atleti=atleti,
         prossimi_allenamenti=prossimi_allenamenti,
         prossime_gare=prossime_gare,
+        grafico_presenze=grafico_presenze,
         atleti_in_debito=atleti_in_debito,
         atleti_certificato_scaduto=atleti_certificato_scaduto,
         atleti_certificato_in_scadenza=atleti_certificato_in_scadenza,
