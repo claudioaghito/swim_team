@@ -131,6 +131,36 @@ def dashboard():
     )
 
 
+@admin_bp.route("/cerca")
+@login_required
+@admin_required
+def ricerca():
+    q = request.args.get("q", "").strip()
+    risultati = {"atleti": [], "tornei": [], "allenamenti": [], "movimenti": []}
+
+    if q:
+        like = f"%{q}%"
+        risultati["atleti"] = User.query.filter_by(ruolo="atleta").filter(
+            (User.nome.ilike(like)) | (User.cognome.ilike(like)) | (User.username.ilike(like))
+        ).order_by(User.cognome, User.nome).all()
+
+        risultati["tornei"] = Gara.query.filter(
+            (Gara.nome.ilike(like)) | (Gara.luogo.ilike(like))
+        ).order_by(Gara.data.desc()).all()
+
+        risultati["allenamenti"] = Allenamento.query.filter(
+            (Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like))
+            | (Allenamento.descrizione.ilike(like))
+        ).order_by(Allenamento.data.desc()).all()
+
+        risultati["movimenti"] = MovimentoContabile.query.join(User, MovimentoContabile.atleta_id == User.id).filter(
+            (MovimentoContabile.causale.ilike(like)) | (User.nome.ilike(like)) | (User.cognome.ilike(like))
+        ).order_by(MovimentoContabile.data.desc()).all()
+
+    totale = sum(len(v) for v in risultati.values())
+    return render_template("admin/ricerca.html", q=q, risultati=risultati, totale=totale)
+
+
 @admin_bp.route("/profilo", methods=["GET", "POST"])
 @login_required
 @admin_required

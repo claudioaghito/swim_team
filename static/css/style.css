@@ -134,6 +134,9 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.15em; letter-spacing: 0.3px; }
 .brand-logo { height: 40px; width: auto; background: white; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
 .user-info { display: flex; align-items: center; flex-wrap: wrap; }
+.navbar-search { display: flex; gap: 4px; }
+.navbar-search input { width: 170px; margin-top: 0; padding: 7px 10px; font-size: 0.85em; }
+.navbar-search button { padding: 7px 10px; }
 
 .theme-toggle {
     background: rgba(255,255,255,0.15);

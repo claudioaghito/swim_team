@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Ricerca{% endblock %}
+{% block content %}
+<h1>{{ icon('cerca') }} Ricerca</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
+</div>
+
+<div class="card">
+    <form method="GET" class="search-form">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca atleti, tornei, allenamenti, movimenti...">
+        <button type="submit">{{ icon('cerca') }} Cerca</button>
+    </form>
+</div>
+
+{% if q %}
+    <p><small>{{ totale }} risultato/i per "{{ q }}".</small></p>
+
+    {% if risultati.atleti %}
+    <div class="card">
+        <h3>{{ icon('atleti') }} Atleti ({{ risultati.atleti|length }})</h3>
+        <ul>
+            {% for a in risultati.atleti %}
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_completo }}</a> ({{ a.username }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if risultati.tornei %}
+    <div class="card">
+        <h3>{{ icon('tornei') }} Tornei ({{ risultati.tornei|length }})</h3>
+        <ul>
+            {% for g in risultati.tornei %}
+                <li><a href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">{{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo or '-' }})</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if risultati.allenamenti %}
+    <div class="card">
+        <h3>{{ icon('allenamenti') }} Allenamenti ({{ risultati.allenamenti|length }})</h3>
+        <ul>
+            {% for al in risultati.allenamenti %}
+                <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo or '-' }} ({{ al.sede or '-' }})</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if risultati.movimenti %}
+    <div class="card">
+        <h3>{{ icon('movimenti-contabili') }} Movimenti contabili ({{ risultati.movimenti|length }})</h3>
+        <ul>
+            {% for m in risultati.movimenti %}
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=m.atleta.id) }}">{{ m.atleta.nome_completo }}</a> — {{ m.causale }}
+                    (<span class="saldo-cell {{ 'positivo' if m.importo >= 0 else 'negativo' }}">{{ "%.2f"|format(m.importo) }} €</span>, {{ m.data.strftime('%d/%m/%Y') }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if totale == 0 %}
+    <div class="card warning">
+        <p>Nessun risultato per "{{ q }}".</p>
+    </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

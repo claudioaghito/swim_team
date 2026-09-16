@@ -24,6 +24,12 @@
         </span>
         <div class="navbar-right">
             {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                    <form method="GET" action="{{ url_for('admin.ricerca') }}" class="navbar-search">
+                        <input type="text" name="q" placeholder="Cerca ovunque..." value="{{ request.args.get('q', '') if request.endpoint == 'admin.ricerca' else '' }}">
+                        <button type="submit" title="Cerca">{{ icon('cerca') }}</button>
+                    </form>
+                {% endif %}
                 <span class="user-info">
                     {{ current_user.nome_completo }}
                     {% if current_user.is_admin %}
