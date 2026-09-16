@@ -46,6 +46,15 @@
                 </a>
             </p>
             <p><small>Il certificato si apre in una nuova scheda: usa il comando di stampa del visualizzatore PDF del browser.</small></p>
+            {% if atleta.certificato_medico_scadenza %}
+                <p>
+                    <span class="status-dot {{ 'green' if atleta.certificato_medico_valido else 'red' }}"></span>
+                    {{ "Valido fino al" if atleta.certificato_medico_valido else "Scaduto il" }}
+                    <strong>{{ atleta.certificato_medico_scadenza.strftime('%d/%m/%Y') }}</strong>
+                </p>
+            {% else %}
+                <p><small>Nessuna scadenza impostata.</small></p>
+            {% endif %}
         {% else %}
             <p>Nessun certificato medico caricato.</p>
         {% endif %}

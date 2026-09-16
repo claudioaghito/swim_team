@@ -44,6 +44,10 @@
         {% endif %}
         <input type="file" name="certificato_medico" accept=".pdf">
 
+        <label>Scadenza certificato medico</label>
+        <input type="date" name="certificato_medico_scadenza"
+               value="{{ atleta.certificato_medico_scadenza.isoformat() if atleta.certificato_medico_scadenza else '' }}">
+
         <button type="submit" title="Salva modifiche">{{ icon('salva') }}</button>
     </form>
 </div>

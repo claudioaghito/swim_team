@@ -21,6 +21,9 @@ def _migra_schema(app):
         if "sesso" not in colonne_users:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN sesso VARCHAR(1)"))
+        if "certificato_medico_scadenza" not in colonne_users:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN certificato_medico_scadenza DATE"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
 

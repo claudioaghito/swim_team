@@ -63,7 +63,7 @@ def _elimina_file(sottocartella, nome_file):
         os.remove(percorso)
 
 
-def _parsa_data_nascita(valore):
+def _parsa_data(valore):
     return datetime.strptime(valore, "%Y-%m-%d").date() if valore else None
 
 
@@ -236,8 +236,9 @@ def nuovo_atleta():
             cognome=request.form["cognome"].strip(),
             email=request.form.get("email", "").strip(),
             ruolo=request.form.get("ruolo", "atleta"),
-            data_nascita=_parsa_data_nascita(request.form.get("data_nascita")),
+            data_nascita=_parsa_data(request.form.get("data_nascita")),
             sesso=request.form.get("sesso") or None,
+            certificato_medico_scadenza=_parsa_data(request.form.get("certificato_medico_scadenza")),
         )
         nuovo.set_password(request.form["password"])
         db.session.add(nuovo)
@@ -295,8 +296,9 @@ def modifica_atleta(atleta_id):
         atleta.nome = request.form["nome"].strip()
         atleta.cognome = request.form["cognome"].strip()
         atleta.email = request.form.get("email", "").strip()
-        atleta.data_nascita = _parsa_data_nascita(request.form.get("data_nascita"))
+        atleta.data_nascita = _parsa_data(request.form.get("data_nascita"))
         atleta.sesso = request.form.get("sesso") or None
+        atleta.certificato_medico_scadenza = _parsa_data(request.form.get("certificato_medico_scadenza"))
 
         nuova_password = request.form.get("password", "").strip()
         if nuova_password:

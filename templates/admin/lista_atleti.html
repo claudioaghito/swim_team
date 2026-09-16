@@ -20,7 +20,6 @@
     <table class="table">
         <thead>
             <tr>
-                <th></th>
                 <th data-sort="text">Nome</th>
                 <th data-sort="text">Cognome</th>
                 <th data-sort="text">Sesso</th>
@@ -37,13 +36,6 @@
             {% for a in atleti %}
             {% set saldo = a.saldo_attuale() %}
             <tr>
-                <td>
-                    {% if a.cartellino_file %}
-                        <img src="{{ url_for('admin.cartellino_atleta', atleta_id=a.id) }}" alt="" class="avatar-thumb">
-                    {% else %}
-                        <span class="avatar-thumb avatar-placeholder">👤</span>
-                    {% endif %}
-                </td>
                 <td>{{ a.nome }}</td>
                 <td>{{ a.cognome }}</td>
                 <td>{{ a.sesso or "-" }}</td>
@@ -52,14 +44,23 @@
                 <td>{{ a.username }}</td>
                 <td class="saldo-cell {{ 'positivo' if saldo >= 0 else 'negativo' }}">{{ "%.2f"|format(saldo) }} €</td>
                 <td>{{ "Sì" if a.cartellino_file else "-" }}</td>
-                <td>{{ "Sì" if a.certificato_medico_file else "-" }}</td>
+                <td>
+                    {% if a.certificato_medico_valido is not none %}
+                        <span class="status-dot {{ 'green' if a.certificato_medico_valido else 'red' }}"
+                              title="{{ ('Valido fino al ' if a.certificato_medico_valido else 'Scaduto il ') ~ a.certificato_medico_scadenza.strftime('%d/%m/%Y') }}"></span>{{ "Valido" if a.certificato_medico_valido else "Scaduto" }}
+                    {% elif a.certificato_medico_file %}
+                        Sì
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}" title="Apri">{{ icon('apri') }}</a>
                     <a class="btn" href="{{ url_for('admin.modifica_atleta', atleta_id=a.id) }}" title="Modifica">{{ icon('modifica') }}</a>
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="11">Nessun atleta trovato.</td></tr>
+            <tr><td colspan="10">Nessun atleta trovato.</td></tr>
             {% endfor %}
         </tbody>
     </table>

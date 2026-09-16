@@ -23,6 +23,7 @@ class User(db.Model, UserMixin):
     sesso = db.Column(db.String(1))  # "M" o "F", serve anche per comporre le staffette
     cartellino_file = db.Column(db.String(255))  # nome file immagine tesserino, in UPLOAD_FOLDER/cartellini
     certificato_medico_file = db.Column(db.String(255))  # nome file PDF, in UPLOAD_FOLDER/certificati
+    certificato_medico_scadenza = db.Column(db.Date)
 
     # Relazioni
     presenze = db.relationship("Presenza", backref="atleta", lazy=True, cascade="all, delete-orphan")
@@ -54,6 +55,14 @@ class User(db.Model, UserMixin):
         return oggi.year - self.data_nascita.year - (
             (oggi.month, oggi.day) < (self.data_nascita.month, self.data_nascita.day)
         )
+
+    @property
+    def certificato_medico_valido(self):
+        """True/False in base alla scadenza impostata dall'admin; None se non impostata
+        (nessuna scadenza registrata, es. certificato non ancora caricato)."""
+        if not self.certificato_medico_scadenza:
+            return None
+        return self.certificato_medico_scadenza >= datetime.utcnow().date()
 
     def saldo_attuale(self):
         totale = db.session.query(db.func.sum(MovimentoContabile.importo)).filter_by(

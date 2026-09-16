@@ -7,8 +7,20 @@
     <p>La tua categoria: <strong>{{ categoria }}</strong>{% if current_user.sesso %} &mdash; Sesso: <strong>{{ current_user.sesso }}</strong>{% endif %}</p>
 {% endif %}
 
+{% if current_user.certificato_medico_scadenza %}
+    <p>
+        <span class="status-dot {{ 'green' if current_user.certificato_medico_valido else 'red' }}"></span>
+        Certificato medico: {{ "valido fino al" if current_user.certificato_medico_valido else "scaduto il" }}
+        <strong>{{ current_user.certificato_medico_scadenza.strftime('%d/%m/%Y') }}</strong>
+        {% if not current_user.certificato_medico_valido %}
+            — <a href="{{ url_for('athlete.documenti') }}">contatta l'amministratore per rinnovarlo</a>
+        {% endif %}
+    </p>
+{% endif %}
+
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.lista_gare') }}">{{ icon('tornei') }} Tornei &amp; iscrizioni gare</a>
+    <a class="btn" href="{{ url_for('athlete.documenti') }}">{{ icon('cartellino') }} I miei documenti</a>
 </div>
 
 <div class="grid">

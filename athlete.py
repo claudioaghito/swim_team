@@ -1,6 +1,10 @@
+import os
 from datetime import datetime
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+from flask import (
+    Blueprint, render_template, request, redirect, url_for, flash, abort,
+    current_app, send_from_directory,
+)
 from flask_login import login_required, current_user
 
 from extensions import db
@@ -175,3 +179,29 @@ def iscrizione_gara(gara_id):
         scelte_per_atleta=scelte_per_atleta,
         tempi_min_sec=tempi_min_sec,
     )
+
+
+@athlete_bp.route("/documenti")
+@login_required
+def documenti():
+    """Cartellino e certificato medico dell'atleta loggato: solo visualizzazione/stampa,
+    il caricamento e la modifica restano riservati all'amministratore."""
+    return render_template("athlete/documenti.html")
+
+
+@athlete_bp.route("/documenti/cartellino")
+@login_required
+def cartellino():
+    if not current_user.cartellino_file:
+        abort(404)
+    cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "cartellini")
+    return send_from_directory(cartella, current_user.cartellino_file)
+
+
+@athlete_bp.route("/documenti/certificato")
+@login_required
+def certificato():
+    if not current_user.certificato_medico_file:
+        abort(404)
+    cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "certificati")
+    return send_from_directory(cartella, current_user.certificato_medico_file)

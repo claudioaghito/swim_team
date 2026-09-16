@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}I miei documenti{% endblock %}
+{% block content %}
+<div class="actions no-print">
+    <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+</div>
+
+<p><small>Cartellino e certificato medico sono caricati e aggiornati solo dall'amministratore:
+   da qui puoi solo visualizzarli e stamparli.</small></p>
+
+<div class="grid">
+    <div class="card">
+        <h3>{{ icon('cartellino') }} Cartellino</h3>
+        {% if current_user.cartellino_file %}
+            <img src="{{ url_for('athlete.cartellino') }}" alt="Cartellino" class="cartellino-img" id="cartellino-img">
+            <div class="actions no-print">
+                <button type="button" class="btn" onclick="window.print()">{{ icon('stampa') }} Stampa cartellino</button>
+            </div>
+        {% else %}
+            <p>Nessun cartellino caricato. Contatta l'amministratore.</p>
+        {% endif %}
+    </div>
+
+    <div class="card no-print">
+        <h3>{{ icon('crea-pdf') }} Certificato medico</h3>
+        {% if current_user.certificato_medico_file %}
+            <p>
+                <a class="btn" href="{{ url_for('athlete.certificato') }}" target="_blank">
+                    {{ icon('crea-pdf') }} Apri / Stampa certificato
+                </a>
+            </p>
+            <p><small>Il certificato si apre in una nuova scheda: usa il comando di stampa del visualizzatore PDF del browser.</small></p>
+            {% if current_user.certificato_medico_scadenza %}
+                <p>
+                    <span class="status-dot {{ 'green' if current_user.certificato_medico_valido else 'red' }}"></span>
+                    {{ "Valido fino al" if current_user.certificato_medico_valido else "Scaduto il" }}
+                    <strong>{{ current_user.certificato_medico_scadenza.strftime('%d/%m/%Y') }}</strong>
+                    {% if not current_user.certificato_medico_valido %}
+                        <br><small>Il certificato e' scaduto: contatta l'amministratore per rinnovarlo.</small>
+                    {% endif %}
+                </p>
+            {% else %}
+                <p><small>Nessuna scadenza impostata dall'amministratore.</small></p>
+            {% endif %}
+        {% else %}
+            <p>Nessun certificato medico caricato. Contatta l'amministratore.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+@media print {
+    .no-print, .navbar, .flash { display: none !important; }
+    .grid { display: block; }
+    .card { box-shadow: none; }
+}
+</style>
+{% endblock %}
