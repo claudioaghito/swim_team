@@ -90,10 +90,10 @@
                         <td class="no-print" rowspan="{{ n_righe }}">
                             {% if quota and quota.movimento_id %}
                                 <div style="display:flex;gap:4px;align-items:center;">
-                                    <button type="button" disabled style="cursor:not-allowed;">{{ icon('conferma') }} Confermata</button>
+                                    <button type="button" disabled style="cursor:not-allowed;" title="Confermata">{{ icon('conferma') }}</button>
                                     <form method="POST" action="{{ url_for('admin.annulla_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}"
                                           onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
-                                        <button type="submit" class="btn-danger">{{ icon('annulla') }} Annulla</button>
+                                        <button type="submit" class="btn-danger" title="Annulla">{{ icon('annulla') }}</button>
                                     </form>
                                 </div>
                             {% else %}
@@ -121,10 +121,10 @@
                     <td class="no-print">
                         {% if quota and quota.movimento_id %}
                             <div style="display:flex;gap:4px;align-items:center;">
-                                <button type="button" disabled style="cursor:not-allowed;">{{ icon('conferma') }} Confermata</button>
+                                <button type="button" disabled style="cursor:not-allowed;" title="Confermata">{{ icon('conferma') }}</button>
                                 <form method="POST" action="{{ url_for('admin.annulla_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}"
                                       onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
-                                    <button type="submit" class="btn-danger">{{ icon('annulla') }} Annulla</button>
+                                    <button type="submit" class="btn-danger" title="Annulla">{{ icon('annulla') }}</button>
                                 </form>
                             </div>
                         {% else %}
