@@ -41,8 +41,8 @@ def dashboard():
 
     messaggi = _messaggi_visibili_query().order_by(Messaggio.data.desc()).limit(10).all()
 
-    anno_stagione = Configurazione.ottieni().anno_stagione
-    categoria = current_user.categoria_master(anno_stagione)
+    config = Configurazione.ottieni()
+    categoria = current_user.categoria_master(config.anno_stagione)
 
     return render_template(
         "athlete/dashboard.html",
@@ -52,6 +52,7 @@ def dashboard():
         saldo=current_user.saldo_attuale(),
         messaggi=messaggi,
         categoria=categoria,
+        modalita_pagamento=config.modalita_pagamento,
     )
 
 
@@ -232,7 +233,6 @@ def iscrizione_gara(gara_id):
     return render_template(
         "athlete/iscrizione_gara.html",
         gara=gara,
-        modalita_pagamento=Configurazione.ottieni().modalita_pagamento,
         iscrizioni_correnti=iscrizioni_correnti,
         scelte_per_atleta=scelte_per_atleta,
         tempi_min_sec=tempi_min_sec,

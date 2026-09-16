@@ -20,6 +20,13 @@
     </p>
 {% endif %}
 
+{% if modalita_pagamento %}
+    <div class="card">
+        <h3>{{ icon('movimenti-contabili') }} Modalità di pagamento</h3>
+        <p class="preserve-lines">{{ modalita_pagamento }}</p>
+    </div>
+{% endif %}
+
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.lista_gare') }}">{{ icon('tornei') }} Tornei &amp; iscrizioni gare</a>
     <a class="btn" href="{{ url_for('athlete.documenti') }}">{{ icon('cartellino') }} I miei documenti</a>
