@@ -7,7 +7,7 @@
 </div>
 <div class="card">
     <h2>{{ icon('modifica') }} Modifica allenamento</h2>
-    <form method="POST">
+    <form method="POST" id="form-allenamento">
         <label>Data</label>
         <input type="date" name="data" value="{{ allenamento.data.isoformat() }}" required>
 
@@ -20,9 +20,22 @@
         <label>Descrizione</label>
         <textarea name="descrizione" rows="3" required>{{ allenamento.descrizione or '' }}</textarea>
 
-        <button type="submit" title="Salva modifiche">{{ icon('salva') }}</button>
+        <h3 style="margin-top:24px;">{{ icon('crea-pdf') }} Piano di allenamento a fasi (facoltativo)</h3>
+        <p><small>Aggiungi le fasi della seduta (riscaldamento, tecnica, lavoro principale, ecc.) con le relative
+           serie: verranno mostrate a atleti/admin e sono esportabili in PDF con la struttura dell'esempio.</small></p>
+        <div id="piano-builder"></div>
+        <button type="button" class="btn" id="piano-aggiungi-fase" style="margin-top:8px;">{{ icon('nuovo-allenamento') }} Aggiungi fase</button>
+        <input type="hidden" name="piano_json" id="piano-json-input">
+
+        <button type="submit" title="Salva modifiche" style="margin-top:24px;">{{ icon('salva') }}</button>
     </form>
 </div>
+
+<script>
+    window.FASI_TIPI = {{ fasi_tipi|map('list')|list|tojson }};
+    window.PIANO_INIZIALE = {{ allenamento.piano|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/piano_allenamento.js') }}"></script>
 
 <div class="actions">
     <form method="POST" action="{{ url_for('admin.elimina_allenamento', allenamento_id=allenamento.id) }}"

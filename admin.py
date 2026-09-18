@@ -17,6 +17,7 @@ from models import (
     User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
     FormazioneStaffetta, IscrizioneGara, RecordSocietario,
 )
+from piani_allenamento import FASI_TIPI, FASI_TIPI_CODICI
 from records import STILI_RECORD, STILI_CODICI, STILI_NOMI, CATEGORIE_RECORD, griglia_record
 from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
 from utils import (
@@ -66,6 +67,59 @@ def _elimina_file(sottocartella, nome_file):
 
 def _parsa_data(valore):
     return datetime.strptime(valore, "%Y-%m-%d").date() if valore else None
+
+
+def _intero_o_none(valore):
+    try:
+        return int(valore)
+    except (TypeError, ValueError):
+        return None
+
+
+def _pulisci_piano(raw_json):
+    """Valida e normalizza il piano JSON inviato dal form del builder; scarta le fasi
+    vuote (senza nome ne' righe) e ignora l'input se non e' JSON valido. Ritorna None
+    se non c'e' alcun piano da salvare."""
+    if not raw_json:
+        return None
+    try:
+        fasi = json.loads(raw_json)
+    except ValueError:
+        return None
+    if not isinstance(fasi, list):
+        return None
+
+    pulite = []
+    for fase in fasi:
+        if not isinstance(fase, dict):
+            continue
+
+        righe_pulite = []
+        for riga in fase.get("righe") or []:
+            if not isinstance(riga, dict):
+                continue
+            riga_pulita = {
+                campo: (riga.get(campo) or "").strip()
+                for campo in ("rip_blocco", "serie", "esercizio", "recupero", "ripartenza")
+            }
+            if any(riga_pulita.values()):
+                righe_pulite.append(riga_pulita)
+
+        nome = (fase.get("nome") or "").strip()
+        if not nome and not righe_pulite:
+            continue
+
+        pulite.append({
+            "tipo": fase.get("tipo") if fase.get("tipo") in FASI_TIPI_CODICI else "altro",
+            "nome": nome,
+            "durata_min": _intero_o_none(fase.get("durata_min")),
+            "metri": _intero_o_none(fase.get("metri")),
+            "sottotitolo": (fase.get("sottotitolo") or "").strip(),
+            "nota": (fase.get("nota") or "").strip(),
+            "righe": righe_pulite,
+        })
+
+    return json.dumps(pulite) if pulite else None
 
 
 def _prove_staffetta(tipo):
@@ -452,13 +506,14 @@ def nuovo_allenamento():
             gruppo=request.form.get("gruppo", ""),
             sede=request.form.get("sede", ""),
             descrizione=descrizione,
+            piano_json=_pulisci_piano(request.form.get("piano_json")),
         )
         db.session.add(allenamento)
         db.session.commit()
         flash("Allenamento creato.", "success")
         return redirect(url_for("admin.dashboard"))
 
-    return render_template("admin/nuovo_allenamento.html")
+    return render_template("admin/nuovo_allenamento.html", fasi_tipi=FASI_TIPI)
 
 
 @admin_bp.route("/allenamenti")
@@ -568,11 +623,12 @@ def modifica_allenamento(allenamento_id):
         allenamento.gruppo = request.form.get("gruppo", "")
         allenamento.sede = request.form.get("sede", "")
         allenamento.descrizione = descrizione
+        allenamento.piano_json = _pulisci_piano(request.form.get("piano_json"))
         db.session.commit()
         flash("Allenamento aggiornato.", "success")
         return redirect(url_for("admin.dettaglio_allenamento", allenamento_id=allenamento.id))
 
-    return render_template("admin/modifica_allenamento.html", allenamento=allenamento)
+    return render_template("admin/modifica_allenamento.html", allenamento=allenamento, fasi_tipi=FASI_TIPI)
 
 
 @admin_bp.route("/allenamenti/<int:allenamento_id>/elimina", methods=["POST"])

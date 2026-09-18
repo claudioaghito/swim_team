@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-fase-altro" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7C8896"/>
+      <stop offset="100%" stop-color="#5F6B76"/>
+    </linearGradient>
+    <radialGradient id="gloss-fase-altro" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-fase-altro" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#404952" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-fase-altro" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-fase-altro)" filter="url(#shadow-fase-altro)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-fase-altro)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-fase-altro)" fill="#ffffff">
+    <rect x="20" y="16" width="60" height="68" rx="9"/>
+    <rect x="38" y="10" width="24" height="12" rx="4" fill="#404952"/>
+    <rect x="30" y="38" width="40" height="7" rx="3.5" fill="#5F6B76"/>
+    <rect x="30" y="54" width="40" height="7" rx="3.5" fill="#5F6B76"/>
+    <rect x="30" y="70" width="26" height="7" rx="3.5" fill="#5F6B76"/>
+  </g>
+</svg>

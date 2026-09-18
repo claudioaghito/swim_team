@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "macros/piano_allenamento.html" as pianomacro with context %}
 {% block title %}Allenamento {{ allenamento.data.strftime('%d/%m/%Y') }}{% endblock %}
 {% block content %}
 <div class="actions no-print">
@@ -27,8 +28,13 @@
             non ancora registrata
         {% endif %}
     </p>
-    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella finestra di stampa del browser.</small></p>
+    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella
+       finestra di stampa del browser (abilita anche "Grafica di sfondo" per mantenere i colori delle fasi).</small></p>
 </div>
+
+{% if allenamento.piano %}
+    {{ pianomacro.render_piano(allenamento.piano) }}
+{% endif %}
 
 <style>
 @media print {

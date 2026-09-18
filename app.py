@@ -8,6 +8,7 @@ from sqlalchemy import inspect, text
 from config import Config
 from extensions import db, login_manager
 from models import User
+from piani_allenamento import fase_colore, fase_icona
 
 
 def _migra_schema(app):
@@ -24,6 +25,11 @@ def _migra_schema(app):
         if "certificato_medico_scadenza" not in colonne_users:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN certificato_medico_scadenza DATE"))
+        if "allenamenti" in inspector.get_table_names():
+            colonne_allenamenti = {c["name"] for c in inspector.get_columns("allenamenti")}
+            if "piano_json" not in colonne_allenamenti:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE allenamenti ADD COLUMN piano_json TEXT"))
         if "configurazione" in inspector.get_table_names():
             colonne_config = {c["name"] for c in inspector.get_columns("configurazione")}
             if "modalita_pagamento" not in colonne_config:
@@ -61,7 +67,7 @@ def create_app(config_class=Config):
         def icon(name, cls="icon"):
             src = url_for("static", filename=f"icons/{name}.svg")
             return Markup(f'<img src="{src}" class="{cls}" alt="">')
-        return dict(icon=icon)
+        return dict(icon=icon, fase_colore=fase_colore, fase_icona=fase_icona)
 
     @app.route("/")
     def index():

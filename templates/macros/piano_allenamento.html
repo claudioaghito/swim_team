@@ -1,0 +1,43 @@
+{% macro render_piano(fasi) %}
+{% for fase in fasi %}
+<div class="card fase-card">
+    <div class="fase-header" style="background:{{ fase_colore(fase.tipo) }};">
+        {{ icon(fase_icona(fase.tipo), 'icon fase-header-icon') }}
+        <h3 class="fase-header-titolo">{{ loop.index }}. {{ fase.nome or '' }}</h3>
+        <div class="fase-header-meta">
+            {%- if fase.durata_min %}{{ fase.durata_min }} min{% endif -%}
+            {%- if fase.durata_min and fase.metri %} &bull; {% endif -%}
+            {%- if fase.metri %}{{ fase.metri }} m{% endif -%}
+        </div>
+    </div>
+    <div class="fase-body">
+        {% if fase.sottotitolo %}<p class="fase-sottotitolo">{{ fase.sottotitolo }}</p>{% endif %}
+        {% if fase.righe %}
+        <table class="table fase-table">
+            <thead>
+                <tr>
+                    <th>Rip. blocco</th>
+                    <th>Serie</th>
+                    <th>Esercizio</th>
+                    <th>Recupero</th>
+                    <th>Tempo di ripartenza</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for riga in fase.righe %}
+                <tr>
+                    <td>{{ riga.rip_blocco or '—' }}</td>
+                    <td>{{ riga.serie or '' }}</td>
+                    <td>{{ riga.esercizio or '' }}</td>
+                    <td>{{ riga.recupero or '—' }}</td>
+                    <td>{{ riga.ripartenza or '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if fase.nota %}<p class="fase-nota"><strong>Nota</strong> &mdash; {{ fase.nota }}</p>{% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endmacro %}

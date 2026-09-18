@@ -326,6 +326,33 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .record-table .record-edit-btn { padding: 3px 6px; margin-top: 6px; }
 .record-table .record-edit-btn .icon { width: 16px; height: 16px; margin-right: 0; }
 
+/* Piano di allenamento a fasi (creazione/modifica e visualizzazione) */
+.fase-card {
+    padding: 0;
+    overflow: hidden;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;
+}
+.fase-header {
+    display: flex; align-items: center; gap: 12px; padding: 14px 18px; color: #ffffff;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;
+}
+.fase-header-icon { width: 40px; height: 40px; margin-right: 0; flex-shrink: 0; }
+.fase-header-titolo { color: #ffffff; margin: 0; flex: 1; font-size: 1.1em; }
+.fase-header-meta { font-size: 0.85em; font-weight: 700; white-space: nowrap; }
+.fase-body { padding: 16px 18px; }
+.fase-sottotitolo { font-style: italic; color: var(--muted); margin-top: 0; }
+.fase-table th, .fase-table td { font-size: 0.9em; }
+.fase-nota { font-style: italic; font-size: 0.9em; color: var(--muted); margin-bottom: 0; }
+
+.fase-builder-card { border-left: 6px solid var(--border); }
+.fase-builder-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.fase-builder-head > div { flex: 1; min-width: 140px; }
+.fase-builder-head label { margin-top: 0; }
+.fase-builder-righe-table input { margin-top: 0; }
+.fase-builder-righe-table td { padding: 4px; vertical-align: top; }
+.fase-riga-rimuovi, .fase-rimuovi { background: var(--red); }
+.fase-riga-rimuovi:hover, .fase-rimuovi:hover { background: #a83b2b; }
+
 ul { padding-left: 20px; margin: 8px 0; }
 li { margin-bottom: 4px; }
 

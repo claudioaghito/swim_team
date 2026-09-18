@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-fase-attivazione" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC93C"/>
+      <stop offset="100%" stop-color="#E8A400"/>
+    </linearGradient>
+    <radialGradient id="gloss-fase-attivazione" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-fase-attivazione" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#B67D00" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-fase-attivazione" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-fase-attivazione)" filter="url(#shadow-fase-attivazione)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-fase-attivazione)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-fase-attivazione)" fill="#ffffff">
+    <path d="M56 12 L28 52 H46 L40 88 L74 44 H54 Z"/>
+  </g>
+</svg>

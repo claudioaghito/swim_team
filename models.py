@@ -108,6 +108,7 @@ class Allenamento(db.Model):
     gruppo = db.Column(db.String(64))  # es. "Esordienti", "Agonisti"
     sede = db.Column(db.String(120))
     descrizione = db.Column(db.Text)
+    piano_json = db.Column(db.Text)  # piano strutturato a fasi (vedi piani_allenamento.py), facoltativo
 
     presenze = db.relationship("Presenza", backref="allenamento", lazy=True, cascade="all, delete-orphan")
     nascosto_da = db.relationship(
@@ -117,6 +118,17 @@ class Allenamento(db.Model):
     @property
     def passato(self):
         return self.data < datetime.utcnow().date()
+
+    @property
+    def piano(self):
+        """Lista di fasi del piano strutturato (lista vuota se non impostato o non valido)."""
+        if not self.piano_json:
+            return []
+        try:
+            fasi = json.loads(self.piano_json)
+        except ValueError:
+            return []
+        return fasi if isinstance(fasi, list) else []
 
     def __repr__(self):
         return f"<Allenamento {self.data} {self.gruppo}>"

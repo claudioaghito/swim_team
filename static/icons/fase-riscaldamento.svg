@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-fase-riscaldamento" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4FC3DB"/>
+      <stop offset="100%" stop-color="#2AACC8"/>
+    </linearGradient>
+    <radialGradient id="gloss-fase-riscaldamento" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-fase-riscaldamento" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#187E96" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-fase-riscaldamento" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-fase-riscaldamento)" filter="url(#shadow-fase-riscaldamento)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-fase-riscaldamento)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-fase-riscaldamento)" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round">
+    <path d="M18 38 Q26 28 34 38 T50 38 T66 38 T82 38"/>
+    <path d="M18 56 Q26 46 34 56 T50 56 T66 56 T82 56"/>
+    <path d="M18 74 Q26 64 34 74 T50 74 T66 74 T82 74"/>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-fase-principale" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F0703F"/>
+      <stop offset="100%" stop-color="#D9481E"/>
+    </linearGradient>
+    <radialGradient id="gloss-fase-principale" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-fase-principale" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#A62F0F" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-fase-principale" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-fase-principale)" filter="url(#shadow-fase-principale)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-fase-principale)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-fase-principale)" fill="#ffffff">
+    <path d="M50 12c14 18 18 30 11 42 7-3 12-11 12-18 7 12 7 26-3 35-9 8-28 8-37-2-10-12-6-27 4-36 0 10 5 14 9 11-3-11-1-23 4-32Z"/>
+  </g>
+</svg>

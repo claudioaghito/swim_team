@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-fase-tecnica" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8C7CF0"/>
+      <stop offset="100%" stop-color="#6C5CE7"/>
+    </linearGradient>
+    <radialGradient id="gloss-fase-tecnica" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-fase-tecnica" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#4B3BB0" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-fase-tecnica" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-fase-tecnica)" filter="url(#shadow-fase-tecnica)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-fase-tecnica)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-fase-tecnica)" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round">
+    <path d="M20 44 Q10 36 15 24"/>
+    <path d="M80 44 Q90 36 85 24"/>
+    <circle cx="34" cy="52" r="15"/>
+    <circle cx="66" cy="52" r="15"/>
+    <path d="M47 50h6"/>
+  </g>
+</svg>

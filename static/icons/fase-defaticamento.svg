@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad-fase-defaticamento" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6BA3D8"/>
+      <stop offset="100%" stop-color="#3E7FBF"/>
+    </linearGradient>
+    <radialGradient id="gloss-fase-defaticamento" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-fase-defaticamento" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#295C8F" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-fase-defaticamento" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-fase-defaticamento)" filter="url(#shadow-fase-defaticamento)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-fase-defaticamento)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+  <g filter="url(#glyphshadow-fase-defaticamento)" stroke="#ffffff" stroke-width="7" stroke-linecap="round">
+    <path d="M50 14V86"/>
+    <path d="M22 26L78 74"/>
+    <path d="M78 26L22 74"/>
+    <path d="M50 14l-7 8M50 14l7 8M50 86l-7-8M50 86l7-8" stroke-width="5"/>
+    <path d="M22 26l10 1M22 26l1 10M78 74l-10-1M78 74l-1-10" stroke-width="5"/>
+    <path d="M78 26l-10 1M78 26l-1 10M22 74l10-1M22 74l1 10" stroke-width="5"/>
+  </g>
+</svg>

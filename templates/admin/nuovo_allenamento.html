@@ -7,7 +7,7 @@
 </div>
 <div class="card">
     <h2>{{ icon('nuovo-allenamento') }} Nuovo allenamento</h2>
-    <form method="POST">
+    <form method="POST" id="form-allenamento">
         <label>Data</label>
         <input type="date" name="data" required>
 
@@ -20,7 +20,20 @@
         <label>Descrizione</label>
         <textarea name="descrizione" rows="3" required></textarea>
 
-        <button type="submit">{{ icon('nuovo-allenamento') }} Crea allenamento</button>
+        <h3 style="margin-top:24px;">{{ icon('crea-pdf') }} Piano di allenamento a fasi (facoltativo)</h3>
+        <p><small>Aggiungi le fasi della seduta (riscaldamento, tecnica, lavoro principale, ecc.) con le relative
+           serie: verranno mostrate a atleti/admin e sono esportabili in PDF con la struttura dell'esempio.</small></p>
+        <div id="piano-builder"></div>
+        <button type="button" class="btn" id="piano-aggiungi-fase" style="margin-top:8px;">{{ icon('nuovo-allenamento') }} Aggiungi fase</button>
+        <input type="hidden" name="piano_json" id="piano-json-input">
+
+        <button type="submit" style="margin-top:24px;">{{ icon('nuovo-allenamento') }} Crea allenamento</button>
     </form>
 </div>
+
+<script>
+    window.FASI_TIPI = {{ fasi_tipi|map('list')|list|tojson }};
+    window.PIANO_INIZIALE = [];
+</script>
+<script src="{{ url_for('static', filename='js/piano_allenamento.js') }}"></script>
 {% endblock %}
