@@ -20,8 +20,12 @@
 
 <style>
 @media print {
+    @page { size: A4 landscape; margin: 10mm; }
     .no-print, .navbar, .flash { display: none !important; }
-    .card { box-shadow: none; overflow: visible; }
+    .card, .record-card { box-shadow: none; overflow: visible; padding: 6px; }
+    .record-table { min-width: 0; width: 100%; table-layout: fixed; font-size: 0.72em; }
+    .record-table th, .record-table td { white-space: normal; overflow-wrap: break-word; word-break: break-word; padding: 4px 3px; }
+    .record-table tr, .record-card { page-break-inside: avoid; }
 }
 </style>
 {% endblock %}
