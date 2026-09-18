@@ -11,12 +11,6 @@
         <label>Data</label>
         <input type="date" name="data" value="{{ allenamento.data.isoformat() }}" required>
 
-        <label>Gruppo</label>
-        <input type="text" name="gruppo" value="{{ allenamento.gruppo or '' }}" placeholder="es. Agonisti">
-
-        <label>Sede</label>
-        <input type="text" name="sede" value="{{ allenamento.sede or '' }}">
-
         <label>Descrizione</label>
         <textarea name="descrizione" rows="3" required>{{ allenamento.descrizione or '' }}</textarea>
 

@@ -104,7 +104,7 @@ def lista_allenamenti():
     query = Allenamento.query.filter(Allenamento.data >= oggi)
     if q:
         like = f"%{q}%"
-        query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
+        query = query.filter(Allenamento.descrizione.ilike(like))
     allenamenti = query.order_by(Allenamento.data.desc()).all()
     return render_template("athlete/lista_allenamenti.html", allenamenti=allenamenti, q=q)
 
@@ -121,7 +121,7 @@ def archivio_allenamenti():
     )
     if q:
         like = f"%{q}%"
-        query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
+        query = query.filter(Allenamento.descrizione.ilike(like))
     allenamenti = query.order_by(Allenamento.data.desc()).all()
     return render_template("athlete/archivio_allenamenti.html", allenamenti=allenamenti, q=q)
 

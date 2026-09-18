@@ -218,8 +218,7 @@ def ricerca():
         ).order_by(Gara.data.desc()).all()
 
         risultati["allenamenti"] = Allenamento.query.filter(
-            (Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like))
-            | (Allenamento.descrizione.ilike(like))
+            Allenamento.descrizione.ilike(like)
         ).order_by(Allenamento.data.desc()).all()
 
         risultati["movimenti"] = MovimentoContabile.query.join(User, MovimentoContabile.atleta_id == User.id).filter(
@@ -503,8 +502,6 @@ def nuovo_allenamento():
 
         allenamento = Allenamento(
             data=datetime.strptime(request.form["data"], "%Y-%m-%d").date(),
-            gruppo=request.form.get("gruppo", ""),
-            sede=request.form.get("sede", ""),
             descrizione=descrizione,
             piano_json=_pulisci_piano(request.form.get("piano_json")),
         )
@@ -533,7 +530,7 @@ def lista_allenamenti():
 
     if q:
         like = f"%{q}%"
-        query = query.filter((Allenamento.gruppo.ilike(like)) | (Allenamento.sede.ilike(like)))
+        query = query.filter(Allenamento.descrizione.ilike(like))
     allenamenti = query.order_by(Allenamento.data.desc()).all()
     return render_template("admin/lista_allenamenti.html", allenamenti=allenamenti, q=q, vista=vista)
 
@@ -620,8 +617,6 @@ def modifica_allenamento(allenamento_id):
             return redirect(url_for("admin.modifica_allenamento", allenamento_id=allenamento.id))
 
         allenamento.data = datetime.strptime(request.form["data"], "%Y-%m-%d").date()
-        allenamento.gruppo = request.form.get("gruppo", "")
-        allenamento.sede = request.form.get("sede", "")
         allenamento.descrizione = descrizione
         allenamento.piano_json = _pulisci_piano(request.form.get("piano_json"))
         db.session.commit()

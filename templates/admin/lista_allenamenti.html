@@ -18,7 +18,7 @@
 <div class="card">
     <form method="GET" class="search-form">
         <input type="hidden" name="vista" value="{{ vista }}">
-        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per gruppo o sede...">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per descrizione...">
         <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
 </div>
@@ -28,8 +28,6 @@
         <thead>
             <tr>
                 <th data-sort="date">Data</th>
-                <th data-sort="text">Gruppo</th>
-                <th data-sort="text">Sede</th>
                 <th>Descrizione</th>
                 <th></th>
             </tr>
@@ -38,8 +36,6 @@
             {% for al in allenamenti %}
             <tr>
                 <td data-label="Data" data-sort-value="{{ al.data.isoformat() }}">{{ al.data.strftime('%d/%m/%Y') }}</td>
-                <td data-label="Gruppo">{{ al.gruppo or '-' }}</td>
-                <td data-label="Sede">{{ al.sede or '-' }}</td>
                 <td data-label="Descrizione" class="preserve-lines">{{ al.descrizione or '-' }}</td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}" title="Apri">{{ icon('apri') }}</a>
@@ -51,7 +47,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="5">Nessun allenamento registrato.</td></tr>
+            <tr><td colspan="3">Nessun allenamento registrato.</td></tr>
             {% endfor %}
         </tbody>
     </table>

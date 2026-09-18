@@ -34,7 +34,7 @@
         <h3>{{ icon('allenamenti') }} Prossimi allenamenti ({{ prossimi_allenamenti|length }})</h3>
         <ul>
             {% for al in prossimi_allenamenti %}
-                <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo }} ({{ al.sede }})</a></li>
+                <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.descrizione|truncate(60) }}</a></li>
             {% else %}
                 <li>Nessun allenamento programmato.</li>
             {% endfor %}

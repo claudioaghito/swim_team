@@ -18,7 +18,7 @@
 
 <div class="card">
     <form method="GET" class="search-form">
-        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per gruppo o sede...">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca per descrizione...">
         <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
 </div>
@@ -28,8 +28,7 @@
         <thead>
             <tr>
                 <th data-sort="date">Data</th>
-                <th data-sort="text">Gruppo</th>
-                <th data-sort="text">Sede</th>
+                <th>Descrizione</th>
                 <th></th>
             </tr>
         </thead>
@@ -37,8 +36,7 @@
             {% for al in allenamenti %}
             <tr>
                 <td data-sort-value="{{ al.data.isoformat() }}">{{ al.data.strftime('%d/%m/%Y') }}</td>
-                <td>{{ al.gruppo or '-' }}</td>
-                <td>{{ al.sede or '-' }}</td>
+                <td class="preserve-lines">{{ al.descrizione or '-' }}</td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}" title="Apri">{{ icon('apri') }}</a>
                     <form method="POST" action="{{ url_for('athlete.nascondi_allenamento', allenamento_id=al.id) }}" style="display:inline;">
@@ -47,7 +45,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="4">Il tuo archivio e' vuoto.</td></tr>
+            <tr><td colspan="3">Il tuo archivio e' vuoto.</td></tr>
             {% endfor %}
         </tbody>
     </table>

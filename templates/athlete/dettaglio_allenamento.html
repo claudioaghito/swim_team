@@ -9,12 +9,12 @@
 
 <div class="card">
     <h2>{{ icon('allenamenti') }} Allenamento del {{ allenamento.data.strftime('%d/%m/%Y') }}</h2>
+    {% if allenamento.ora_inizio or allenamento.ora_fine %}
     <p>
-        <strong>Gruppo:</strong> {{ allenamento.gruppo or '-' }}<br>
-        <strong>Sede:</strong> {{ allenamento.sede or '-' }}<br>
         {% if allenamento.ora_inizio %}<strong>Ora inizio:</strong> {{ allenamento.ora_inizio.strftime('%H:%M') }}<br>{% endif %}
         {% if allenamento.ora_fine %}<strong>Ora fine:</strong> {{ allenamento.ora_fine.strftime('%H:%M') }}<br>{% endif %}
     </p>
+    {% endif %}
     {% if allenamento.descrizione %}
         <p><strong>Descrizione:</strong><br><span class="preserve-lines">{{ allenamento.descrizione }}</span></p>
     {% endif %}

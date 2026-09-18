@@ -105,8 +105,6 @@ class Allenamento(db.Model):
     data = db.Column(db.Date, nullable=False)
     ora_inizio = db.Column(db.Time, nullable=True)
     ora_fine = db.Column(db.Time, nullable=True)
-    gruppo = db.Column(db.String(64))  # es. "Esordienti", "Agonisti"
-    sede = db.Column(db.String(120))
     descrizione = db.Column(db.Text)
     piano_json = db.Column(db.Text)  # piano strutturato a fasi (vedi piani_allenamento.py), facoltativo
 
@@ -131,7 +129,7 @@ class Allenamento(db.Model):
         return fasi if isinstance(fasi, list) else []
 
     def __repr__(self):
-        return f"<Allenamento {self.data} {self.gruppo}>"
+        return f"<Allenamento {self.data}>"
 
 
 class Presenza(db.Model):

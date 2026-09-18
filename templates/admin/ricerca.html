@@ -44,7 +44,7 @@
         <h3>{{ icon('allenamenti') }} Allenamenti ({{ risultati.allenamenti|length }})</h3>
         <ul>
             {% for al in risultati.allenamenti %}
-                <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.gruppo or '-' }} ({{ al.sede or '-' }})</a></li>
+                <li><a href="{{ url_for('admin.dettaglio_allenamento', allenamento_id=al.id) }}">{{ al.data.strftime('%d/%m/%Y') }} — {{ al.descrizione|truncate(60) }}</a></li>
             {% endfor %}
         </ul>
     </div>
