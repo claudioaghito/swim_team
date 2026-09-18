@@ -23,6 +23,9 @@
     {% if allenamento.descrizione %}
         <p><strong>Descrizione:</strong><br><span class="preserve-lines">{{ allenamento.descrizione }}</span></p>
     {% endif %}
+    {% if allenamento.metri_totali %}
+        <p><strong>Volume totale:</strong> {{ allenamento.metri_totali }} m</p>
+    {% endif %}
     <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella
        finestra di stampa del browser (abilita anche "Grafica di sfondo" per mantenere i colori delle fasi).</small></p>
 </div>

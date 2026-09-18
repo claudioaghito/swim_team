@@ -131,6 +131,12 @@ class Allenamento(db.Model):
             return []
         return normalizza_fasi(fasi)
 
+    @property
+    def metri_totali(self):
+        """Somma dei metri delle fasi del piano; None se nessuna fase ha un volume impostato."""
+        metri = [fase["metri"] for fase in self.piano if fase.get("metri")]
+        return sum(metri) if metri else None
+
     def __repr__(self):
         return f"<Allenamento {self.data}>"
 

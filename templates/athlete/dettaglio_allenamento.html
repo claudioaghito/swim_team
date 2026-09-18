@@ -18,6 +18,9 @@
     {% if allenamento.descrizione %}
         <p><strong>Descrizione:</strong><br><span class="preserve-lines">{{ allenamento.descrizione }}</span></p>
     {% endif %}
+    {% if allenamento.metri_totali %}
+        <p><strong>Volume totale:</strong> {{ allenamento.metri_totali }} m</p>
+    {% endif %}
     <p>
         <strong>Presenza:</strong>
         {% if presenza and presenza.presente %}
