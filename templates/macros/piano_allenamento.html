@@ -29,13 +29,13 @@
                     <tr>
                         {% if loop.first %}
                         <td class="fase-blocco-rip{{ ' fase-blocco-rip-box' if blocco.ripetizioni else '' }}" rowspan="{{ blocco.righe|length }}">
-                            {{ blocco.ripetizioni or '—' }}
+                            {{ blocco.ripetizioni or '' }}
                         </td>
                         {% endif %}
                         <td>{{ riga.serie or '' }}</td>
                         <td class="fase-esercizio">{{ riga.esercizio or '' }}</td>
-                        <td>{{ riga.recupero or '—' }}</td>
-                        <td>{{ riga.ripartenza or '—' }}</td>
+                        <td>{{ riga.recupero or '' }}</td>
+                        <td>{{ riga.ripartenza or '' }}</td>
                     </tr>
                     {% endfor %}
                 {% endfor %}
