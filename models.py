@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from extensions import db
+from piani_allenamento import normalizza_fasi
 
 
 class User(db.Model, UserMixin):
@@ -126,7 +127,9 @@ class Allenamento(db.Model):
             fasi = json.loads(self.piano_json)
         except ValueError:
             return []
-        return fasi if isinstance(fasi, list) else []
+        if not isinstance(fasi, list):
+            return []
+        return normalizza_fasi(fasi)
 
     def __repr__(self):
         return f"<Allenamento {self.data}>"

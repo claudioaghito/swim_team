@@ -31,13 +31,13 @@
     {{ pianomacro.render_piano(allenamento.piano) }}
 {% endif %}
 
-<div class="card">
+<div class="card no-print">
     <h3>{{ icon('presenze') }} Presenze ({{ presenze_per_atleta.values()|selectattr('presente')|list|length }}/{{ atleti|length }})</h3>
     <form method="POST" action="{{ url_for('admin.salva_presenze', allenamento_id=allenamento.id) }}">
         <table class="table">
             <thead>
                 <tr>
-                    <th class="no-print">Presente</th>
+                    <th>Presente</th>
                     <th>Nome Cognome</th>
                 </tr>
             </thead>
@@ -45,7 +45,7 @@
                 {% for atleta in atleti %}
                 {% set presenza = presenze_per_atleta.get(atleta.id) %}
                 <tr>
-                    <td class="no-print">
+                    <td>
                         <input type="checkbox" name="presenti" value="{{ atleta.id }}" style="width:auto;margin-top:0;"
                                {% if presenza and presenza.presente %}checked{% endif %}>
                     </td>
@@ -64,7 +64,7 @@
             </tbody>
         </table>
         {% if atleti %}
-            <button type="submit" class="no-print" title="Salva presenze">{{ icon('salva') }}</button>
+            <button type="submit" title="Salva presenze">{{ icon('salva') }}</button>
         {% endif %}
     </form>
 </div>

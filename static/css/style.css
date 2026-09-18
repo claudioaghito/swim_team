@@ -341,17 +341,33 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-header-meta { font-size: 0.85em; font-weight: 700; white-space: nowrap; }
 .fase-body { padding: 16px 18px; }
 .fase-sottotitolo { font-style: italic; color: var(--muted); margin-top: 0; }
-.fase-table th, .fase-table td { font-size: 0.9em; }
+.fase-table { table-layout: fixed; }
+.fase-table th, .fase-table td { font-size: 0.9em; white-space: normal; vertical-align: top; }
+.fase-table th:nth-child(1), .fase-table td:nth-child(1) { width: 9%; }
+.fase-table th:nth-child(2), .fase-table td:nth-child(2) { width: 13%; }
+.fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 44%; }
+.fase-table th:nth-child(4), .fase-table td:nth-child(4) { width: 13%; }
+.fase-table th:nth-child(5), .fase-table td:nth-child(5) { width: 21%; }
+.fase-table .fase-blocco-rip { text-align: center; font-weight: 700; vertical-align: middle; }
+.fase-table .fase-blocco-rip-box { border: 2px solid var(--blue); border-radius: 8px; background: var(--table-header-bg); }
 .fase-nota { font-style: italic; font-size: 0.9em; color: var(--muted); margin-bottom: 0; }
 
 .fase-builder-card { border-left: 6px solid var(--border); }
 .fase-builder-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
 .fase-builder-head > div { flex: 1; min-width: 140px; }
 .fase-builder-head label { margin-top: 0; }
-.fase-builder-righe-table input { margin-top: 0; }
+.fase-builder-righe-table { table-layout: fixed; }
+.fase-builder-righe-table input, .fase-builder-righe-table textarea { margin-top: 0; }
 .fase-builder-righe-table td { padding: 4px; vertical-align: top; }
+.fase-builder-righe-table th:nth-child(2), .fase-builder-righe-table td:nth-child(2) { width: 44%; }
+.fase-builder-righe-table .riga-esercizio { width: 100%; resize: vertical; }
 .fase-riga-rimuovi, .fase-rimuovi { background: var(--red); }
 .fase-riga-rimuovi:hover, .fase-rimuovi:hover { background: #a83b2b; }
+
+.fase-blocco-builder { border: 1px solid var(--border); border-radius: 8px; padding: 10px 10px 4px; margin-top: 10px; background: var(--table-hover-bg); }
+.fase-blocco-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.fase-blocco-head > div { flex: 1; min-width: 220px; }
+.fase-blocco-head label { margin-top: 0; }
 
 ul { padding-left: 20px; margin: 8px 0; }
 li { margin-bottom: 4px; }

@@ -12,7 +12,7 @@
     </div>
     <div class="fase-body">
         {% if fase.sottotitolo %}<p class="fase-sottotitolo">{{ fase.sottotitolo }}</p>{% endif %}
-        {% if fase.righe %}
+        {% if fase.blocchi %}
         <table class="table fase-table">
             <thead>
                 <tr>
@@ -24,14 +24,20 @@
                 </tr>
             </thead>
             <tbody>
-                {% for riga in fase.righe %}
-                <tr>
-                    <td>{{ riga.rip_blocco or '—' }}</td>
-                    <td>{{ riga.serie or '' }}</td>
-                    <td>{{ riga.esercizio or '' }}</td>
-                    <td>{{ riga.recupero or '—' }}</td>
-                    <td>{{ riga.ripartenza or '—' }}</td>
-                </tr>
+                {% for blocco in fase.blocchi %}
+                    {% for riga in blocco.righe %}
+                    <tr>
+                        {% if loop.first %}
+                        <td class="fase-blocco-rip{{ ' fase-blocco-rip-box' if blocco.ripetizioni else '' }}" rowspan="{{ blocco.righe|length }}">
+                            {{ blocco.ripetizioni or '—' }}
+                        </td>
+                        {% endif %}
+                        <td>{{ riga.serie or '' }}</td>
+                        <td class="fase-esercizio">{{ riga.esercizio or '' }}</td>
+                        <td>{{ riga.recupero or '—' }}</td>
+                        <td>{{ riga.ripartenza or '—' }}</td>
+                    </tr>
+                    {% endfor %}
                 {% endfor %}
             </tbody>
         </table>

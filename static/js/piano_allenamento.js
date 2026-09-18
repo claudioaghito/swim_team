@@ -1,7 +1,9 @@
 // Builder del piano di allenamento a fasi (creazione/modifica allenamento).
-// Si aspetta nella pagina: window.FASI_TIPI = [[codice, nome], ...], window.PIANO_INIZIALE = [fase, ...],
-// un form con id "form-allenamento", un contenitore #piano-builder, un pulsante #piano-aggiungi-fase
-// e un input nascosto #piano-json-input.
+// Ogni fase contiene dei "blocchi" di serie: un blocco raggruppa le serie che vanno
+// ripetute insieme (es. "x2"). Si aspetta nella pagina: window.FASI_TIPI = [[codice, nome], ...],
+// window.PIANO_INIZIALE = [fase, ...] (fase.blocchi = [{ripetizioni, righe}, ...]),
+// un form con id "form-allenamento", un contenitore #piano-builder, un pulsante
+// #piano-aggiungi-fase e un input nascosto #piano-json-input.
 (function () {
     var contenitore = document.getElementById("piano-builder");
     var bottoneAggiungiFase = document.getElementById("piano-aggiungi-fase");
@@ -11,21 +13,39 @@
 
     var FASI_TIPI = window.FASI_TIPI || [];
 
+    // Una "serie" e' una singola <tr>: serie / esercizio (testo anche lungo, va a capo) /
+    // recupero / ripartenza / rimuovi. Le ripetizioni si impostano una volta sola a livello
+    // di blocco (vedi creaBlocco), non per singola serie.
     function creaRiga(riga) {
         riga = riga || {};
         var tr = document.createElement("tr");
 
+        var tdSerie = document.createElement("td");
+        var inputSerie = document.createElement("input");
+        inputSerie.type = "text";
+        inputSerie.className = "riga-serie";
+        inputSerie.placeholder = "es. 4 x 50 m";
+        inputSerie.value = riga.serie || "";
+        tdSerie.appendChild(inputSerie);
+        tr.appendChild(tdSerie);
+
+        var tdEsercizio = document.createElement("td");
+        var textareaEsercizio = document.createElement("textarea");
+        textareaEsercizio.className = "riga-esercizio";
+        textareaEsercizio.rows = 2;
+        textareaEsercizio.placeholder = "Descrizione dell'esercizio (anche un testo lungo)";
+        textareaEsercizio.value = riga.esercizio || "";
+        tdEsercizio.appendChild(textareaEsercizio);
+        tr.appendChild(tdEsercizio);
+
         [
-            ["rip_blocco", riga.rip_blocco, "es. — o x3"],
-            ["serie", riga.serie, "es. 4 x 50 m"],
-            ["esercizio", riga.esercizio, "es. Stile libero a ritmo soglia"],
             ["recupero", riga.recupero, 'es. 15"'],
             ["ripartenza", riga.ripartenza, "es. 1'10\""],
         ].forEach(function (campo) {
             var td = document.createElement("td");
             var input = document.createElement("input");
             input.type = "text";
-            input.className = "fase-riga-" + campo[0];
+            input.className = "riga-" + campo[0];
             input.value = campo[1] || "";
             input.placeholder = campo[2];
             td.appendChild(input);
@@ -33,16 +53,67 @@
         });
 
         var tdBtn = document.createElement("td");
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "fase-riga-rimuovi";
-        btn.title = "Rimuovi riga";
-        btn.textContent = "✖";
-        btn.addEventListener("click", function () { tr.remove(); });
-        tdBtn.appendChild(btn);
+        var btnRimuovi = document.createElement("button");
+        btnRimuovi.type = "button";
+        btnRimuovi.className = "fase-riga-rimuovi";
+        btnRimuovi.title = "Rimuovi serie";
+        btnRimuovi.textContent = "✖";
+        btnRimuovi.addEventListener("click", function () { tr.remove(); });
+        tdBtn.appendChild(btnRimuovi);
         tr.appendChild(tdBtn);
 
         return tr;
+    }
+
+    function creaBlocco(blocco) {
+        blocco = blocco || {};
+        var wrap = document.createElement("div");
+        wrap.className = "fase-blocco-builder";
+
+        var head = document.createElement("div");
+        head.className = "fase-blocco-head";
+
+        var campoRip = document.createElement("div");
+        campoRip.innerHTML = "<label>Ripetizioni blocco</label>";
+        var inputRip = document.createElement("input");
+        inputRip.type = "text";
+        inputRip.className = "blocco-ripetizioni";
+        inputRip.placeholder = "es. x2, x3 — vuoto se una sola volta";
+        inputRip.value = blocco.ripetizioni || "";
+        campoRip.appendChild(inputRip);
+        head.appendChild(campoRip);
+
+        var btnRimuoviBlocco = document.createElement("button");
+        btnRimuoviBlocco.type = "button";
+        btnRimuoviBlocco.className = "btn-danger fase-rimuovi";
+        btnRimuoviBlocco.title = "Rimuovi blocco";
+        btnRimuoviBlocco.textContent = "✖ Rimuovi blocco";
+        btnRimuoviBlocco.addEventListener("click", function () {
+            if (window.confirm("Rimuovere questo blocco di serie?")) wrap.remove();
+        });
+        head.appendChild(btnRimuoviBlocco);
+        wrap.appendChild(head);
+
+        var table = document.createElement("table");
+        table.className = "table fase-builder-righe-table";
+        table.innerHTML =
+            "<thead><tr><th>Serie</th><th>Esercizio</th><th>Recupero</th><th>Tempo di ripartenza</th><th></th></tr></thead>";
+        var tbody = document.createElement("tbody");
+        tbody.className = "blocco-righe-body";
+        (blocco.righe || []).forEach(function (riga) { tbody.appendChild(creaRiga(riga)); });
+        if (!(blocco.righe && blocco.righe.length)) tbody.appendChild(creaRiga());
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+
+        var btnAggiungiRiga = document.createElement("button");
+        btnAggiungiRiga.type = "button";
+        btnAggiungiRiga.className = "btn";
+        btnAggiungiRiga.style.marginTop = "6px";
+        btnAggiungiRiga.textContent = "+ Aggiungi serie al blocco";
+        btnAggiungiRiga.addEventListener("click", function () { tbody.appendChild(creaRiga()); });
+        wrap.appendChild(btnAggiungiRiga);
+
+        return wrap;
     }
 
     function creaFase(fase) {
@@ -128,24 +199,29 @@
         inputSotto.value = fase.sottotitolo || "";
         card.appendChild(inputSotto);
 
-        var table = document.createElement("table");
-        table.className = "table fase-builder-righe-table";
-        table.innerHTML =
-            "<thead><tr><th>Rip. blocco</th><th>Serie</th><th>Esercizio</th><th>Recupero</th>" +
-            "<th>Tempo di ripartenza</th><th></th></tr></thead>";
-        var tbody = document.createElement("tbody");
-        tbody.className = "fase-righe-body";
-        (fase.righe || []).forEach(function (riga) { tbody.appendChild(creaRiga(riga)); });
-        table.appendChild(tbody);
-        card.appendChild(table);
+        var labelBlocchi = document.createElement("label");
+        labelBlocchi.style.marginBottom = "0";
+        labelBlocchi.textContent = "Blocchi di serie";
+        card.appendChild(labelBlocchi);
+        var pAiutoBlocchi = document.createElement("p");
+        pAiutoBlocchi.innerHTML =
+            "<small>Un blocco raggruppa le serie da ripetere insieme (es. \"x2\": tavoletta + catch-up, " +
+            "ripetute due volte di seguito). Lascia \"Ripetizioni blocco\" vuoto per una serie singola.</small>";
+        card.appendChild(pAiutoBlocchi);
 
-        var btnAggiungiRiga = document.createElement("button");
-        btnAggiungiRiga.type = "button";
-        btnAggiungiRiga.className = "btn";
-        btnAggiungiRiga.style.marginTop = "8px";
-        btnAggiungiRiga.textContent = "+ Aggiungi riga";
-        btnAggiungiRiga.addEventListener("click", function () { tbody.appendChild(creaRiga()); });
-        card.appendChild(btnAggiungiRiga);
+        var blocchiContenitore = document.createElement("div");
+        blocchiContenitore.className = "fase-blocchi";
+        (fase.blocchi || []).forEach(function (blocco) { blocchiContenitore.appendChild(creaBlocco(blocco)); });
+        card.appendChild(blocchiContenitore);
+        if (!(fase.blocchi && fase.blocchi.length)) blocchiContenitore.appendChild(creaBlocco());
+
+        var btnAggiungiBlocco = document.createElement("button");
+        btnAggiungiBlocco.type = "button";
+        btnAggiungiBlocco.className = "btn";
+        btnAggiungiBlocco.style.marginTop = "8px";
+        btnAggiungiBlocco.textContent = "+ Aggiungi blocco di serie";
+        btnAggiungiBlocco.addEventListener("click", function () { blocchiContenitore.appendChild(creaBlocco()); });
+        card.appendChild(btnAggiungiBlocco);
 
         var labelNota = document.createElement("label");
         labelNota.textContent = "Nota (facoltativa)";
@@ -155,8 +231,6 @@
         textareaNota.rows = 2;
         textareaNota.value = fase.nota || "";
         card.appendChild(textareaNota);
-
-        if (!(fase.righe && fase.righe.length)) tbody.appendChild(creaRiga());
 
         return card;
     }
@@ -168,19 +242,26 @@
     function serializzaPiano() {
         var fasi = [];
         contenitore.querySelectorAll(".fase-builder-card").forEach(function (card) {
-            var righe = [];
-            card.querySelectorAll(".fase-righe-body tr").forEach(function (tr) {
-                var riga = {
-                    rip_blocco: tr.querySelector(".fase-riga-rip_blocco").value.trim(),
-                    serie: tr.querySelector(".fase-riga-serie").value.trim(),
-                    esercizio: tr.querySelector(".fase-riga-esercizio").value.trim(),
-                    recupero: tr.querySelector(".fase-riga-recupero").value.trim(),
-                    ripartenza: tr.querySelector(".fase-riga-ripartenza").value.trim(),
-                };
-                if (riga.serie || riga.esercizio || riga.rip_blocco || riga.recupero || riga.ripartenza) {
-                    righe.push(riga);
+            var blocchi = [];
+            card.querySelectorAll(".fase-blocco-builder").forEach(function (bloccoEl) {
+                var righe = [];
+                bloccoEl.querySelectorAll(".blocco-righe-body > tr").forEach(function (tr) {
+                    var riga = {
+                        serie: tr.querySelector(".riga-serie").value.trim(),
+                        esercizio: tr.querySelector(".riga-esercizio").value.trim(),
+                        recupero: tr.querySelector(".riga-recupero").value.trim(),
+                        ripartenza: tr.querySelector(".riga-ripartenza").value.trim(),
+                    };
+                    if (riga.serie || riga.esercizio || riga.recupero || riga.ripartenza) righe.push(riga);
+                });
+                if (righe.length) {
+                    blocchi.push({
+                        ripetizioni: bloccoEl.querySelector(".blocco-ripetizioni").value.trim(),
+                        righe: righe,
+                    });
                 }
             });
+
             var durataVal = card.querySelector(".fase-durata").value;
             var metriVal = card.querySelector(".fase-metri").value;
             fasi.push({
@@ -190,7 +271,7 @@
                 metri: metriVal ? parseInt(metriVal, 10) : null,
                 sottotitolo: card.querySelector(".fase-sottotitolo").value.trim(),
                 nota: card.querySelector(".fase-nota").value.trim(),
-                righe: righe,
+                blocchi: blocchi,
             });
         });
         return fasi;

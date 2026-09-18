@@ -77,9 +77,10 @@ def _intero_o_none(valore):
 
 
 def _pulisci_piano(raw_json):
-    """Valida e normalizza il piano JSON inviato dal form del builder; scarta le fasi
-    vuote (senza nome ne' righe) e ignora l'input se non e' JSON valido. Ritorna None
-    se non c'e' alcun piano da salvare."""
+    """Valida e normalizza il piano JSON inviato dal form del builder; scarta blocchi/fasi
+    vuoti e ignora l'input se non e' JSON valido. Ritorna None se non c'e' alcun piano da
+    salvare. Ogni fase ha 'blocchi': [{ripetizioni, righe:[{serie,esercizio,recupero,
+    ripartenza}]}] — un blocco raggruppa le serie che vanno ripetute insieme (es. "x2")."""
     if not raw_json:
         return None
     try:
@@ -94,19 +95,28 @@ def _pulisci_piano(raw_json):
         if not isinstance(fase, dict):
             continue
 
-        righe_pulite = []
-        for riga in fase.get("righe") or []:
-            if not isinstance(riga, dict):
+        blocchi_puliti = []
+        for blocco in fase.get("blocchi") or []:
+            if not isinstance(blocco, dict):
                 continue
-            riga_pulita = {
-                campo: (riga.get(campo) or "").strip()
-                for campo in ("rip_blocco", "serie", "esercizio", "recupero", "ripartenza")
-            }
-            if any(riga_pulita.values()):
-                righe_pulite.append(riga_pulita)
+            righe_pulite = []
+            for riga in blocco.get("righe") or []:
+                if not isinstance(riga, dict):
+                    continue
+                riga_pulita = {
+                    campo: (riga.get(campo) or "").strip()
+                    for campo in ("serie", "esercizio", "recupero", "ripartenza")
+                }
+                if any(riga_pulita.values()):
+                    righe_pulite.append(riga_pulita)
+            if righe_pulite:
+                blocchi_puliti.append({
+                    "ripetizioni": (blocco.get("ripetizioni") or "").strip(),
+                    "righe": righe_pulite,
+                })
 
         nome = (fase.get("nome") or "").strip()
-        if not nome and not righe_pulite:
+        if not nome and not blocchi_puliti:
             continue
 
         pulite.append({
@@ -116,7 +126,7 @@ def _pulisci_piano(raw_json):
             "metri": _intero_o_none(fase.get("metri")),
             "sottotitolo": (fase.get("sottotitolo") or "").strip(),
             "nota": (fase.get("nota") or "").strip(),
-            "righe": righe_pulite,
+            "blocchi": blocchi_puliti,
         })
 
     return json.dumps(pulite) if pulite else None
