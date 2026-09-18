@@ -16,3 +16,4 @@ class Config:
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB limite upload
     ALLOWED_IMAGE_EXT = {"png", "jpg", "jpeg", "gif", "webp"}
     ALLOWED_PDF_EXT = {"pdf"}
+    ALLOWED_CERTIFICATO_EXT = ALLOWED_PDF_EXT | ALLOWED_IMAGE_EXT

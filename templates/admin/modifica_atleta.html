@@ -38,11 +38,11 @@
         {% endif %}
         <input type="file" name="cartellino" accept=".png,.jpg,.jpeg,.gif,.webp">
 
-        <label>Certificato medico (PDF)</label>
+        <label>Certificato medico (PDF o immagine)</label>
         {% if atleta.certificato_medico_file %}
             <p><small>Attuale: <a href="{{ url_for('admin.certificato_atleta', atleta_id=atleta.id) }}" target="_blank">visualizza</a></small></p>
         {% endif %}
-        <input type="file" name="certificato_medico" accept=".pdf">
+        <input type="file" name="certificato_medico" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp">
 
         <label>Scadenza certificato medico</label>
         <input type="date" name="certificato_medico_scadenza"

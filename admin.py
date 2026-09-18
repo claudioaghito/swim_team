@@ -319,7 +319,7 @@ def nuovo_atleta():
             )
             nuovo.certificato_medico_file = _salva_upload(
                 request.files.get("certificato_medico"), "certificati", f"certificato_{nuovo.id}",
-                current_app.config["ALLOWED_PDF_EXT"],
+                current_app.config["ALLOWED_CERTIFICATO_EXT"],
             )
         except ValueError as e:
             db.session.rollback()
@@ -382,7 +382,7 @@ def modifica_atleta(atleta_id):
 
             nuovo_certificato = _salva_upload(
                 request.files.get("certificato_medico"), "certificati", f"certificato_{atleta.id}",
-                current_app.config["ALLOWED_PDF_EXT"],
+                current_app.config["ALLOWED_CERTIFICATO_EXT"],
             )
             if nuovo_certificato:
                 atleta.certificato_medico_file = nuovo_certificato
