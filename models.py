@@ -305,6 +305,29 @@ class Configurazione(db.Model):
         return config
 
 
+class RecordSocietario(db.Model):
+    """Record sociale di nuoto: un record per combinazione sesso/vasca/stile/distanza/categoria
+    (vedi records.py per l'elenco fisso di stili, distanze e categorie ammesse)."""
+    __tablename__ = "record_societari"
+
+    id = db.Column(db.Integer, primary_key=True)
+    sesso = db.Column(db.String(1), nullable=False)  # "M" o "F"
+    vasca = db.Column(db.Integer, nullable=False, default=25)  # metri (25 o 50)
+    stile = db.Column(db.String(2), nullable=False)  # SL, DF, DO, RA, MX
+    distanza = db.Column(db.Integer, nullable=False)  # metri
+    categoria = db.Column(db.String(4), nullable=False)  # es. "M40"
+    tempo = db.Column(db.String(20), nullable=False)  # es. 24"51 o 1'55"55, testo libero
+    nome = db.Column(db.String(120), nullable=False)
+    data = db.Column(db.Date)
+
+    __table_args__ = (
+        db.UniqueConstraint("sesso", "vasca", "stile", "distanza", "categoria", name="uq_record_societario"),
+    )
+
+    def __repr__(self):
+        return f"<RecordSocietario {self.sesso} {self.vasca} {self.stile}{self.distanza} {self.categoria}>"
+
+
 class FormazioneStaffetta(db.Model):
     """Formazione staffetta calcolata e salvata dall'admin per un torneo/tipologia/categoria."""
     __tablename__ = "formazioni_staffetta"

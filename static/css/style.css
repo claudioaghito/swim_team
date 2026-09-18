@@ -315,6 +315,17 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .status-dot.green { background: var(--green); }
 .status-dot.red { background: var(--red); }
 
+.muted { color: var(--muted); }
+
+.record-tab-active { background: var(--btn-bg-hover); }
+.record-table { min-width: 640px; }
+.record-table td { vertical-align: top; white-space: nowrap; }
+.record-table .record-tempo { font-weight: 700; }
+.record-table .record-nome { font-size: 0.9em; white-space: normal; }
+.record-table .record-data { font-size: 0.8em; color: var(--muted); }
+.record-table .record-edit-btn { padding: 3px 6px; margin-top: 6px; }
+.record-table .record-edit-btn .icon { width: 16px; height: 16px; margin-right: 0; }
+
 ul { padding-left: 20px; margin: 8px 0; }
 li { margin-bottom: 4px; }
 

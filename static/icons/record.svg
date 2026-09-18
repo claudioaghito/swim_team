@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200">
+  <defs>
+    <linearGradient id="grad-record" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD54A"/>
+      <stop offset="100%" stop-color="#D89A00"/>
+    </linearGradient>
+    <radialGradient id="gloss-record" cx="30%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow-record" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#D89A00" flood-opacity="0.55"/>
+    </filter>
+    <filter id="glyphshadow-record" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#00000055"/>
+    </filter>
+  </defs>
+
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#grad-record)" filter="url(#shadow-record)"/>
+  <rect x="6" y="6" width="88" height="88" rx="26" fill="url(#gloss-record)"/>
+  <rect x="6" y="50" width="88" height="44" rx="26" fill="#000000" opacity="0.08"/>
+
+  <g filter="url(#glyphshadow-record)" fill="#ffffff" stroke="#ffffff" stroke-width="0">
+    <path d="M36 18h28v20a14 14 0 0 1-28 0V18Z"/>
+    <path d="M36 22H22v6a12 12 0 0 0 14 11.8"/>
+    <path d="M64 22h14v6a12 12 0 0 1-14 11.8"/>
+    <rect x="46" y="48" width="8" height="14" rx="2" fill="#D89A00"/>
+    <path d="M38 80h24l-4-10H42l-4 10Z" fill="#D89A00"/>
+    <circle cx="50" cy="30" r="8.5" fill="#D89A00"/>
+    <path d="M50 25.5l1.7 3.5 3.8.5-2.8 2.7.7 3.8L50 34.2l-3.4 1.8.7-3.8-2.8-2.7 3.8-.5Z" fill="#FFD54A"/>
+  </g>
+</svg>

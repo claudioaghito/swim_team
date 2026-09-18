@@ -10,8 +10,9 @@ from flask_login import login_required, current_user
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
-    Configurazione, AllenamentoNascosto,
+    Configurazione, AllenamentoNascosto, RecordSocietario,
 )
+from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
 
 athlete_bp = Blueprint("athlete", __name__, url_prefix="/atleta")
@@ -263,3 +264,17 @@ def certificato():
         abort(404)
     cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "certificati")
     return send_from_directory(cartella, current_user.certificato_medico_file)
+
+
+@athlete_bp.route("/record")
+@login_required
+def lista_record():
+    """Record societari: solo visualizzazione e stampa/esportazione PDF, la modifica
+    resta riservata all'amministratore."""
+    sesso = request.args.get("sesso", "M")
+    if sesso not in ("M", "F"):
+        sesso = "M"
+    vasca = 25
+    records = RecordSocietario.query.filter_by(sesso=sesso, vasca=vasca).all()
+    griglia = griglia_record(records)
+    return render_template("athlete/record.html", griglia=griglia, sesso=sesso, vasca=vasca)

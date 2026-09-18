@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Modifica record{% endblock %}
+{% block content %}
+<h1>{{ icon('modifica') }} {{ stile_nome }} {{ distanza }}m &mdash; {{ categoria }}
+    ({{ 'Uomini' if sesso == 'M' else 'Donne' }}, vasca {{ vasca }}m)</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('admin.lista_record', sesso=sesso) }}#cella-{{ stile }}-{{ distanza }}-{{ categoria }}">&larr; Record societari</a>
+</div>
+
+<div class="card">
+    <form method="POST">
+        <label>Tempo (es. 24"51 oppure 1'02"35)</label>
+        <input type="text" name="tempo" value="{{ record.tempo if record else '' }}" placeholder='es. 24"51' required>
+
+        <label>Nome atleta</label>
+        <input type="text" name="nome" value="{{ record.nome if record else '' }}" required>
+
+        <label>Data</label>
+        <input type="date" name="data" value="{{ record.data.isoformat() if record and record.data else '' }}">
+
+        <button type="submit" title="Salva">{{ icon('salva') }}</button>
+    </form>
+
+    {% if record %}
+    <form method="POST" action="{{ url_for('admin.elimina_record', sesso=sesso, vasca=vasca, stile=stile, distanza=distanza, categoria=categoria) }}"
+          onsubmit="return confirmSubmit(this, 'Eliminare questo record?');" style="margin-top:12px;">
+        <button type="submit" class="btn-danger">{{ icon('elimina') }} Elimina record</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

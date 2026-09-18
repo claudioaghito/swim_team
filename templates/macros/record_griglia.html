@@ -1,0 +1,39 @@
+{% macro render_griglia(griglia, sesso, vasca, editabile) %}
+{% for sezione in griglia %}
+<div class="card record-card">
+    <h2>{{ sezione.etichetta }}</h2>
+    <table class="table record-table">
+        <thead>
+            <tr>
+                <th>Cat.</th>
+                {% for d in sezione.distanze %}<th>{{ d }} m</th>{% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for categoria, celle in sezione.righe %}
+            <tr>
+                <td><strong>{{ categoria }}</strong></td>
+                {% for distanza, record in celle %}
+                <td id="cella-{{ sezione.codice }}-{{ distanza }}-{{ categoria }}">
+                    {% if record %}
+                        <div class="record-tempo">{{ record.tempo }}</div>
+                        <div class="record-nome">{{ record.nome }}</div>
+                        {% if record.data %}<div class="record-data">{{ record.data.strftime('%d/%m/%Y') }}</div>{% endif %}
+                    {% else %}
+                        <span class="muted">&mdash;</span>
+                    {% endif %}
+                    {% if editabile %}
+                        <a class="btn no-print record-edit-btn" title="{{ 'Modifica record' if record else 'Aggiungi record' }}"
+                           href="{{ url_for('admin.modifica_record', sesso=sesso, vasca=vasca, stile=sezione.codice, distanza=distanza, categoria=categoria) }}">
+                            {{ icon('modifica') }}
+                        </a>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+{% endmacro %}

@@ -15,8 +15,9 @@ from werkzeug.utils import secure_filename
 from extensions import db
 from models import (
     User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
-    FormazioneStaffetta, IscrizioneGara,
+    FormazioneStaffetta, IscrizioneGara, RecordSocietario,
 )
+from records import STILI_RECORD, STILI_CODICI, STILI_NOMI, CATEGORIE_RECORD, griglia_record
 from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
 from utils import (
     tempo_a_secondi as _tempo_a_secondi, secondi_a_tempo as _secondi_a_tempo,
@@ -1233,3 +1234,71 @@ def elimina_messaggio(messaggio_id):
     db.session.commit()
     flash("Messaggio eliminato.", "success")
     return redirect(url_for("admin.lista_messaggi"))
+
+
+@admin_bp.route("/record")
+@login_required
+@admin_required
+def lista_record():
+    sesso = request.args.get("sesso", "M")
+    if sesso not in ("M", "F"):
+        sesso = "M"
+    vasca = 25
+    records = RecordSocietario.query.filter_by(sesso=sesso, vasca=vasca).all()
+    griglia = griglia_record(records)
+    return render_template("admin/record.html", griglia=griglia, sesso=sesso, vasca=vasca)
+
+
+@admin_bp.route("/record/<sesso>/<int:vasca>/<stile>/<int:distanza>/<categoria>/modifica", methods=["GET", "POST"])
+@login_required
+@admin_required
+def modifica_record(sesso, vasca, stile, distanza, categoria):
+    if sesso not in ("M", "F") or stile not in STILI_CODICI or categoria not in CATEGORIE_RECORD:
+        abort(404)
+
+    record = RecordSocietario.query.filter_by(
+        sesso=sesso, vasca=vasca, stile=stile, distanza=distanza, categoria=categoria
+    ).first()
+
+    if request.method == "POST":
+        tempo = (request.form.get("tempo") or "").strip()
+        nome = (request.form.get("nome") or "").strip()
+        data_valore = _parsa_data(request.form.get("data"))
+
+        if not tempo or not nome:
+            flash("Inserisci sia il tempo che il nome per salvare il record.", "danger")
+            return redirect(url_for(
+                "admin.modifica_record", sesso=sesso, vasca=vasca, stile=stile,
+                distanza=distanza, categoria=categoria,
+            ))
+
+        if record:
+            record.tempo = tempo
+            record.nome = nome
+            record.data = data_valore
+        else:
+            db.session.add(RecordSocietario(
+                sesso=sesso, vasca=vasca, stile=stile, distanza=distanza, categoria=categoria,
+                tempo=tempo, nome=nome, data=data_valore,
+            ))
+        db.session.commit()
+        flash("Record salvato.", "success")
+        return redirect(url_for("admin.lista_record", sesso=sesso))
+
+    return render_template(
+        "admin/modifica_record.html", record=record, sesso=sesso, vasca=vasca,
+        stile=stile, stile_nome=STILI_NOMI[stile], distanza=distanza, categoria=categoria,
+    )
+
+
+@admin_bp.route("/record/<sesso>/<int:vasca>/<stile>/<int:distanza>/<categoria>/elimina", methods=["POST"])
+@login_required
+@admin_required
+def elimina_record(sesso, vasca, stile, distanza, categoria):
+    record = RecordSocietario.query.filter_by(
+        sesso=sesso, vasca=vasca, stile=stile, distanza=distanza, categoria=categoria
+    ).first_or_404()
+    db.session.delete(record)
+    db.session.commit()
+    flash("Record eliminato.", "success")
+    return redirect(url_for("admin.lista_record", sesso=sesso))

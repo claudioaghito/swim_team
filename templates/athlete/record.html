@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "macros/record_griglia.html" as recmacro with context %}
+{% block title %}Record societari{% endblock %}
+{% block content %}
+<h1>{{ icon('record') }} Record societari {{ 'Uomini' if sesso == 'M' else 'Donne' }} &mdash; Vasca {{ vasca }}m</h1>
+
+<p class="no-print"><small>I record sono aggiornati solo dall'amministratore: da qui puoi solo visualizzarli e stamparli/esportarli in PDF.</small></p>
+
+<div class="actions no-print">
+    <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+    <button type="button" class="btn" onclick="window.print()" title="Stampa / esporta PDF">{{ icon('stampa') }} Stampa / esporta PDF</button>
+</div>
+
+<div class="actions no-print">
+    <a class="btn {{ 'record-tab-active' if sesso == 'M' }}" href="{{ url_for('athlete.lista_record', sesso='M') }}">Uomini</a>
+    <a class="btn {{ 'record-tab-active' if sesso == 'F' }}" href="{{ url_for('athlete.lista_record', sesso='F') }}">Donne</a>
+</div>
+
+{{ recmacro.render_griglia(griglia, sesso, vasca, False) }}
+
+<style>
+@media print {
+    .no-print, .navbar, .flash { display: none !important; }
+    .card { box-shadow: none; overflow: visible; }
+}
+</style>
+{% endblock %}
