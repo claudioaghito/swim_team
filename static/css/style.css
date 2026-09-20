@@ -378,6 +378,28 @@ li { margin-bottom: 4px; }
 h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; }
 .theme-toggle .icon { margin-right: 0; width: 22px; height: 22px; vertical-align: -1px; }
 
+.password-field { position: relative; }
+.password-field input { padding-right: 40px; }
+.password-toggle {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    color: var(--label-color);
+}
+.password-toggle:hover { color: var(--ink); }
+.password-toggle .eye-icon { width: 20px; height: 20px; }
+
 .confirm-dialog {
     border: none;
     border-radius: var(--radius);

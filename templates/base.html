@@ -132,6 +132,23 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".password-toggle").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var input = btn.closest(".password-field").querySelector("input");
+                    var visibile = input.type === "text";
+                    input.type = visibile ? "password" : "text";
+                    btn.querySelector(".eye-open").hidden = !visibile;
+                    btn.querySelector(".eye-closed").hidden = visibile;
+                    var label = visibile ? "Mostra password" : "Nascondi password";
+                    btn.setAttribute("aria-label", label);
+                    btn.setAttribute("title", label);
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
             var navToggle = document.getElementById("navbar-toggle");
             var navMenu = document.getElementById("navbar-right");
             if (navToggle && navMenu) {
