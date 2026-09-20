@@ -2,6 +2,8 @@ import csv
 import io
 import json
 import os
+import shutil
+import zipfile
 from datetime import datetime
 from functools import wraps
 
@@ -292,21 +294,140 @@ def impostazioni():
     return render_template("admin/impostazioni.html", config=config)
 
 
+def _percorso_db():
+    """Percorso assoluto del file .db, o None se non si tratta di SQLite."""
+    uri = current_app.config["SQLALCHEMY_DATABASE_URI"]
+    prefisso = "sqlite:///"
+    if not uri.startswith(prefisso):
+        return None
+    percorso = uri[len(prefisso):]
+    if not os.path.isabs(percorso):
+        percorso = os.path.join(current_app.root_path, percorso)
+    return percorso
+
+
+def _crea_zip_backup():
+    """Zip in memoria con database + cartella uploads (foto, certificati). None se non SQLite."""
+    percorso_db = _percorso_db()
+    if not percorso_db or not os.path.exists(percorso_db):
+        return None
+
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.write(percorso_db, "squadra.db")
+        cartella_uploads = current_app.config["UPLOAD_FOLDER"]
+        for radice, _dirs, nomi_file in os.walk(cartella_uploads):
+            for nome in nomi_file:
+                assoluto = os.path.join(radice, nome)
+                relativo = os.path.join("uploads", os.path.relpath(assoluto, cartella_uploads))
+                zf.write(assoluto, relativo)
+    buffer.seek(0)
+    return buffer
+
+
 @admin_bp.route("/backup")
 @login_required
 @admin_required
 def backup():
-    """Scarica una copia completa del database SQLite (tutte le tabelle)."""
-    uri = current_app.config["SQLALCHEMY_DATABASE_URI"]
-    prefisso = "sqlite:///"
-    if not uri.startswith(prefisso):
+    """Scarica il solo file del database SQLite (senza foto/certificati)."""
+    percorso_db = _percorso_db()
+    if not percorso_db:
         abort(404)  # backup diretto disponibile solo per SQLite
-    percorso_db = uri[len(prefisso):]
-    if not os.path.isabs(percorso_db):
-        percorso_db = os.path.join(current_app.root_path, percorso_db)
-
     nome_file = f"backup_squadra_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.db"
     return send_file(percorso_db, as_attachment=True, download_name=nome_file)
+
+
+@admin_bp.route("/backup/completo")
+@login_required
+@admin_required
+def backup_completo():
+    """Scarica un archivio zip con database + tutte le foto/certificati caricati."""
+    buffer = _crea_zip_backup()
+    if buffer is None:
+        abort(404)
+    nome_file = f"backup_completo_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.zip"
+    return send_file(buffer, as_attachment=True, download_name=nome_file, mimetype="application/zip")
+
+
+@admin_bp.route("/backup/ripristina", methods=["POST"])
+@login_required
+@admin_required
+def ripristina_backup():
+    """Sovrascrive database (e, se presenti nello zip, i file caricati) con un backup precedente."""
+    password_attuale = request.form.get("password_attuale", "")
+    if not current_user.check_password(password_attuale):
+        flash("Password non corretta: ripristino annullato.", "danger")
+        return redirect(url_for("admin.impostazioni"))
+
+    file_caricato = request.files.get("file_backup")
+    if not file_caricato or not file_caricato.filename:
+        flash("Seleziona un file di backup da caricare.", "danger")
+        return redirect(url_for("admin.impostazioni"))
+
+    estensione = _estensione(file_caricato.filename)
+    if estensione not in {"zip", "db"}:
+        flash("Formato file non valido: carica un backup .zip o .db.", "danger")
+        return redirect(url_for("admin.impostazioni"))
+
+    percorso_db = _percorso_db()
+    if not percorso_db:
+        abort(404)
+
+    if estensione == "zip":
+        try:
+            zf = zipfile.ZipFile(file_caricato.stream)
+        except zipfile.BadZipFile:
+            flash("Il file caricato non è un archivio zip valido.", "danger")
+            return redirect(url_for("admin.impostazioni"))
+
+        nomi = zf.namelist()
+        if "squadra.db" not in nomi:
+            flash("Lo zip non contiene 'squadra.db': ripristino annullato.", "danger")
+            return redirect(url_for("admin.impostazioni"))
+
+        for nome in nomi:
+            normalizzato = os.path.normpath(nome)
+            if normalizzato.startswith("..") or os.path.isabs(normalizzato):
+                flash("Archivio non valido (percorso sospetto): ripristino annullato.", "danger")
+                return redirect(url_for("admin.impostazioni"))
+
+    # Copia di sicurezza dei dati attuali, prima di sovrascrivere qualsiasi cosa
+    cartella_backups = os.path.join(current_app.instance_path, "backups")
+    os.makedirs(cartella_backups, exist_ok=True)
+    buffer_sicurezza = _crea_zip_backup()
+    if buffer_sicurezza:
+        nome_sicurezza = f"pre_ripristino_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.zip"
+        with open(os.path.join(cartella_backups, nome_sicurezza), "wb") as f:
+            f.write(buffer_sicurezza.getvalue())
+
+    # Il file sta per essere sostituito sotto ai piedi delle connessioni aperte: le chiudiamo prima
+    db.session.remove()
+    db.engine.dispose()
+
+    if estensione == "db":
+        file_caricato.save(percorso_db)
+    else:
+        with zf.open("squadra.db") as origine, open(percorso_db, "wb") as destinazione:
+            shutil.copyfileobj(origine, destinazione)
+
+        cartella_uploads = current_app.config["UPLOAD_FOLDER"]
+        voci_uploads = [n for n in nomi if n.startswith("uploads/") and not n.endswith("/")]
+        if voci_uploads:
+            shutil.rmtree(cartella_uploads, ignore_errors=True)
+            os.makedirs(cartella_uploads, exist_ok=True)
+            for nome in voci_uploads:
+                destino = os.path.join(cartella_uploads, os.path.relpath(nome, "uploads"))
+                os.makedirs(os.path.dirname(destino), exist_ok=True)
+                with zf.open(nome) as origine, open(destino, "wb") as f_out:
+                    shutil.copyfileobj(origine, f_out)
+        zf.close()
+
+    flash(
+        "Ripristino completato. Se l'app non mostra subito i nuovi dati, ricarica la web app "
+        "(su PythonAnywhere: pagina Web → Reload).",
+        "success",
+    )
+    return redirect(url_for("admin.impostazioni"))
 
 
 @admin_bp.route("/atleti")

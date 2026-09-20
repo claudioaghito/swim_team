@@ -4,5 +4,6 @@ __pycache__/
 instance/*.db
 instance/*.db.bak*
 instance/uploads/
+instance/backups/
 .env
 .vs/

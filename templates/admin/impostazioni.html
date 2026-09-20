@@ -26,9 +26,33 @@
 </div>
 
 <div class="card">
-    <h2>{{ icon('download') }} Backup dati</h2>
-    <p><small>Scarica una copia completa del database (atleti, tornei, movimenti, messaggi, staffette, ecc.).
-       Conservala in un posto sicuro: contiene dati personali.</small></p>
-    <a class="btn" href="{{ url_for('admin.backup') }}">{{ icon('download') }} Scarica backup</a>
+    <h2>{{ icon('download') }} Backup e ripristino</h2>
+    <p><small>Il backup completo include database (atleti, tornei, movimenti, messaggi, staffette, ecc.) e i file
+       caricati (cartellini, certificati medici). Conservalo in un posto sicuro: contiene dati personali.</small></p>
+    <div class="actions">
+        <a class="btn" href="{{ url_for('admin.backup_completo') }}">{{ icon('download') }} Scarica backup completo</a>
+        <a class="btn" href="{{ url_for('admin.backup') }}">{{ icon('download') }} Scarica solo database</a>
+    </div>
+
+    <h3 style="margin-top:24px;">Ripristina da backup</h3>
+    <p><small><strong>Attenzione:</strong> sovrascrive tutti i dati attuali con quelli del file caricato.
+       Prima di procedere viene comunque salvata automaticamente una copia di sicurezza dei dati attuali sul
+       server, per poter tornare indietro in caso di errore.</small></p>
+    <form method="POST" action="{{ url_for('admin.ripristina_backup') }}" enctype="multipart/form-data"
+          onsubmit="return confirmSubmit(this, 'Sei sicuro di voler ripristinare questo backup? Tutti i dati attuali (atleti, presenze, movimenti, ecc.) verranno sostituiti.');">
+        <label>File di backup (.zip completo, oppure solo .db)</label>
+        <input type="file" name="file_backup" accept=".zip,.db" required>
+
+        <label>Password attuale (obbligatoria per confermare)</label>
+        <div class="password-field">
+            <input type="password" name="password_attuale" required>
+            <button type="button" class="password-toggle" aria-label="Mostra password" title="Mostra password">
+                <svg class="eye-icon eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-icon eye-closed" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.66 3.79M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+        </div>
+
+        <button type="submit" class="btn-danger">{{ icon('warning') }} Ripristina backup</button>
+    </form>
 </div>
 {% endblock %}

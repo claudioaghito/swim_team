@@ -13,7 +13,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     UPLOAD_FOLDER = os.path.join(BASE_DIR, "instance", "uploads")
-    MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB limite upload
+    MAX_CONTENT_LENGTH = 200 * 1024 * 1024  # 200 MB (serve margine per il ripristino di un backup completo)
     ALLOWED_IMAGE_EXT = {"png", "jpg", "jpeg", "gif", "webp"}
     ALLOWED_PDF_EXT = {"pdf"}
     ALLOWED_CERTIFICATO_EXT = ALLOWED_PDF_EXT | ALLOWED_IMAGE_EXT
