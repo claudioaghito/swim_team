@@ -73,6 +73,12 @@ def create_app(config_class=Config):
     def index():
         return redirect(url_for("auth.login"))
 
+    @app.route("/sw.js")
+    def service_worker():
+        # Servito dalla root (non da /static/) cosi' lo scope copre tutta l'app,
+        # necessario perche' il browser consideri il sito "installabile".
+        return app.send_static_file("sw.js")
+
     @app.route("/dashboard")
     @login_required
     def dashboard_redirect():
