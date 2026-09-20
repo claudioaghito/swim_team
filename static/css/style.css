@@ -135,7 +135,7 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     top: 0;
     z-index: 10;
 }
-.navbar a {
+.navbar a:not(.btn):not(.btn-danger) {
     color: white;
     margin-left: 16px;
     text-decoration: none;

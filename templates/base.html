@@ -7,7 +7,7 @@
     <title>{% block title %}Derthona Nuoto Master{% endblock %}</title>
 
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="theme-color" content="#1565c0">
+    <meta name="theme-color" content="#14407a">
     <link rel="icon" href="{{ url_for('static', filename='icons/pwa/favicon-32.png') }}" sizes="32x32">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/pwa/apple-touch-icon.png') }}">
     <meta name="mobile-web-app-capable" content="yes">
@@ -17,12 +17,16 @@
 
     <script>
         (function () {
+            // Tema scuro di default per tutti (PC e telefoni), a prescindere dal tema
+            // di sistema, finche' l'utente non sceglie esplicitamente chiaro/scuro.
+            var tema = "dark";
             try {
                 var stored = localStorage.getItem("theme");
                 if (stored === "light" || stored === "dark") {
-                    document.documentElement.setAttribute("data-theme", stored);
+                    tema = stored;
                 }
             } catch (e) {}
+            document.documentElement.setAttribute("data-theme", tema);
         })();
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
