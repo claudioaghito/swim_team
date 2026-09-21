@@ -307,7 +307,10 @@ def _percorso_db():
 
 
 def _crea_zip_backup():
-    """Zip in memoria con database + cartella uploads (foto, certificati). None se non SQLite."""
+    """Zip in memoria con database + cartella uploads (foto, certificati). None se non SQLite.
+
+    Il file .db viene copiato per intero: include automaticamente ogni tabella (record
+    personali compresi), senza bisogno di elencarle qui una per una."""
     percorso_db = _percorso_db()
     if not percorso_db or not os.path.exists(percorso_db):
         return None

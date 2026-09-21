@@ -27,7 +27,8 @@
 
 <div class="card">
     <h2>{{ icon('download') }} Backup e ripristino</h2>
-    <p><small>Il backup completo include database (atleti, tornei, movimenti, messaggi, staffette, ecc.) e i file
+    <p><small>Il backup completo include l'intero database (atleti, tornei, movimenti, messaggi, staffette, record
+       societari e personali, ecc. — ogni tabella, comprese quelle aggiunte in futuro) e i file
        caricati (cartellini, certificati medici). Conservalo in un posto sicuro: contiene dati personali.</small></p>
     <div class="actions">
         <a class="btn" href="{{ url_for('admin.backup_completo') }}">{{ icon('download') }} Scarica backup completo</a>
