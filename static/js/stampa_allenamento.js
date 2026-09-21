@@ -8,6 +8,28 @@
     // anche il layout, non solo l'aspetto visivo: a differenza di transform: scale(),
     // l'impaginazione di stampa lo rispetta e non lascia pagine vuote residue.
     var SUPPORTA_ZOOM = "zoom" in document.documentElement.style;
+    // I browser propongono il "titolo" del documento come nome del file quando si
+    // salva la stampa in PDF: lo teniamo da parte per poterlo ripristinare dopo.
+    var TITOLO_ORIGINALE = document.title;
+
+    function nomeFileValido(testo) {
+        if (!testo) return "";
+        return testo
+            .replace(/[\r\n]+/g, " ")
+            .replace(/[\\/:*?"<>|]/g, "-")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 120);
+    }
+
+    function impostaTitoloPerStampa() {
+        var nome = nomeFileValido(window.STAMPA_NOME_FILE);
+        if (nome) document.title = nome;
+    }
+
+    function ripristinaTitolo() {
+        document.title = TITOLO_ORIGINALE;
+    }
 
     function chiudiMenu() {
         var menu = document.getElementById("print-menu");
@@ -79,6 +101,7 @@
     function ripristinaStampa() {
         document.body.classList.remove("print-mode");
         ripristinaAdattamento();
+        ripristinaTitolo();
     }
 
     function stampaAllenamento(formato, adatta) {
@@ -87,6 +110,7 @@
         // .print-mode): va applicato PRIMA di misurare l'altezza per "adatta a 1 pagina",
         // altrimenti la misura non corrisponderebbe a quello che verra' davvero stampato.
         document.body.classList.add("print-mode");
+        impostaTitoloPerStampa();
         impostaFormatoPagina(formato);
         if (adatta) {
             adattaAUnaPagina(formato);

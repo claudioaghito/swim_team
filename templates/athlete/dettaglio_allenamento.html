@@ -58,6 +58,9 @@
     .card { box-shadow: none; border: none; }
 }
 </style>
+<script>
+    window.STAMPA_NOME_FILE = {{ (allenamento.descrizione or ('Allenamento del ' ~ allenamento.data.strftime('%d-%m-%Y')))|tojson }};
+</script>
 <script src="{{ url_for('static', filename='js/stampa_allenamento.js') }}"></script>
 <script src="{{ url_for('static', filename='js/fase_table_scroll.js') }}"></script>
 {% endblock %}
