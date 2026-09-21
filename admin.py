@@ -183,6 +183,9 @@ def dashboard():
     # Atleti con saldo negativo, utile a colpo d'occhio
     atleti_in_debito = [a for a in atleti if a.saldo_attuale() < 0]
 
+    # Somma dei saldi di tutti gli atleti: rappresenta il fondo economico della squadra
+    saldo_totale = sum(a.saldo_attuale() for a in atleti)
+
     # Certificati medici scaduti o in scadenza entro 30 giorni
     atleti_certificato_scaduto = [a for a in atleti if a.certificato_medico_valido is False]
     atleti_certificato_in_scadenza = [a for a in atleti if a.certificato_medico_in_scadenza]
@@ -207,6 +210,7 @@ def dashboard():
         prossime_gare=prossime_gare,
         grafico_presenze=grafico_presenze,
         atleti_in_debito=atleti_in_debito,
+        saldo_totale=saldo_totale,
         atleti_certificato_scaduto=atleti_certificato_scaduto,
         atleti_certificato_in_scadenza=atleti_certificato_in_scadenza,
     )

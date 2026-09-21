@@ -3,6 +3,12 @@
 {% block content %}
 <h1>{{ icon('home') }} Pannello Amministratore</h1>
 
+<div class="card">
+    <h3>{{ icon('movimenti-contabili') }} Fondo economico della squadra</h3>
+    <p class="saldo {{ 'negativo' if saldo_totale < 0 else 'positivo' }}">{{ "%.2f"|format(saldo_totale) }} €</p>
+    <p><small>Somma dei saldi di tutti gli atleti ({{ atleti|length }}).</small></p>
+</div>
+
 <div class="actions">
     <a class="btn" href="{{ url_for('admin.lista_atleti') }}">{{ icon('atleti') }} Atleti</a>
     <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">{{ icon('allenamenti') }} Allenamenti</a>
