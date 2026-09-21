@@ -21,7 +21,7 @@
         var btn = document.getElementById("print-menu-btn");
         if (!menu || !btn) return;
         var apri = menu.hidden;
-        if (apri) ripristinaAdattamento();
+        if (apri) ripristinaStampa();
         menu.hidden = !apri;
         btn.setAttribute("aria-expanded", apri ? "true" : "false");
     }
@@ -76,8 +76,17 @@
         }
     }
 
+    function ripristinaStampa() {
+        document.body.classList.remove("print-mode");
+        ripristinaAdattamento();
+    }
+
     function stampaAllenamento(formato, adatta) {
         chiudiMenu();
+        // In stampa le tabelle tornano al layout "a capo su larghezza fissa" (vedi CSS
+        // .print-mode): va applicato PRIMA di misurare l'altezza per "adatta a 1 pagina",
+        // altrimenti la misura non corrisponderebbe a quello che verra' davvero stampato.
+        document.body.classList.add("print-mode");
         impostaFormatoPagina(formato);
         if (adatta) {
             adattaAUnaPagina(formato);
@@ -93,19 +102,19 @@
     // stampa nativo di Android non lo scatena sempre): ripristiniamo il layout normale
     // con piu' meccanismi di sicurezza, cosi' non restano stili residui che rompono il
     // resto della pagina.
-    window.addEventListener("afterprint", ripristinaAdattamento);
+    window.addEventListener("afterprint", ripristinaStampa);
     if (window.matchMedia) {
         try {
             window.matchMedia("print").addEventListener("change", function (e) {
-                if (!e.matches) ripristinaAdattamento();
+                if (!e.matches) ripristinaStampa();
             });
         } catch (e) {}
     }
     document.addEventListener("visibilitychange", function () {
-        if (document.visibilityState === "visible") ripristinaAdattamento();
+        if (document.visibilityState === "visible") ripristinaStampa();
     });
-    window.addEventListener("pageshow", ripristinaAdattamento);
-    window.addEventListener("focus", ripristinaAdattamento);
+    window.addEventListener("pageshow", ripristinaStampa);
+    window.addEventListener("focus", ripristinaStampa);
 
     document.addEventListener("DOMContentLoaded", function () {
         var btn = document.getElementById("print-menu-btn");

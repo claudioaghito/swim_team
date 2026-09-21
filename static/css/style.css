@@ -371,11 +371,12 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-header-meta { font-size: 0.85em; font-weight: 700; white-space: nowrap; }
 .fase-body { padding: 16px 18px; }
 .fase-sottotitolo { font-style: italic; color: var(--muted); margin-top: 0; }
-.fase-table { table-layout: fixed; }
-.fase-table th, .fase-table td {
-    font-size: 0.9em; white-space: normal; vertical-align: top;
-    overflow-wrap: break-word; word-break: break-word;
-}
+/* A schermo la tabella non va mai a capo: le colonne restano leggibili e, se non
+   entrano nello spazio disponibile, si scorre in orizzontale (vedi .fase-table-scroll
+   e .fase-table-hint). In stampa/PDF invece si torna al comportamento "a capo su
+   larghezza fissa", perche' una pagina di carta non si puo' scorrere (vedi .print-mode). */
+.fase-table { table-layout: auto; }
+.fase-table th, .fase-table td { font-size: 0.9em; white-space: nowrap; vertical-align: top; }
 .fase-table th:nth-child(1), .fase-table td:nth-child(1) { width: 9%; }
 .fase-table th:nth-child(2), .fase-table td:nth-child(2) { width: 13%; }
 .fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 44%; }
@@ -384,6 +385,34 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-table .fase-blocco-rip { text-align: center; font-weight: 700; vertical-align: middle; }
 .fase-table .fase-blocco-rip-box { border: 2px solid var(--blue); border-radius: 8px; background: var(--table-header-bg); }
 .fase-nota { font-style: italic; font-size: 0.9em; color: var(--muted); margin-bottom: 0; }
+
+.fase-table-hint {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.8em; color: var(--muted); margin: 0 0 6px;
+}
+.fase-table-scroll {
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.fase-table-scroll::before, .fase-table-scroll::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 22px; pointer-events: none;
+    opacity: 0; transition: opacity 0.15s ease;
+}
+.fase-table-scroll::before { left: 0; background: linear-gradient(to right, rgba(0,0,0,.18), transparent); }
+.fase-table-scroll::after { right: 0; background: linear-gradient(to left, rgba(0,0,0,.18), transparent); }
+.fase-table-scroll.scroll-left::before { opacity: 1; }
+.fase-table-scroll.scroll-right::after { opacity: 1; }
+
+/* Stampa/PDF: niente scorrimento (non stampabile), si torna al layout a capo su
+   larghezza fissa cosi' nessuna colonna resta tagliata fuori dal foglio. */
+.print-mode .fase-table-hint { display: none !important; }
+.print-mode .fase-table-scroll { overflow: visible !important; }
+.print-mode .fase-table-scroll::before, .print-mode .fase-table-scroll::after { display: none !important; }
+.print-mode .fase-table { table-layout: fixed !important; }
+.print-mode .fase-table th, .print-mode .fase-table td {
+    white-space: normal !important; overflow-wrap: break-word; word-break: break-word;
+}
 
 .fase-builder-card { border-left: 6px solid var(--border); }
 .fase-builder-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
