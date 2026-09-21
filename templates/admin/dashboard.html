@@ -6,7 +6,10 @@
 <div class="card">
     <h3>{{ icon('movimenti-contabili') }} Fondo economico della squadra</h3>
     <p class="saldo {{ 'negativo' if saldo_totale < 0 else 'positivo' }}">{{ "%.2f"|format(saldo_totale) }} €</p>
-    <p><small>Somma dei saldi di tutti gli atleti ({{ atleti|length }}).</small></p>
+    <details class="info-toggle">
+        <summary title="Mostra/nascondi descrizione">{{ icon('apri') }}</summary>
+        <p><small>Somma dei saldi di tutti gli atleti ({{ atleti|length }}).</small></p>
+    </details>
 </div>
 
 <div class="actions">
