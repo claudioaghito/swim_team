@@ -206,6 +206,34 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
 .actions { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* Menu a tendina "Stampa / Esporta PDF" con scelta formato foglio */
+.print-menu-wrap { position: relative; display: inline-flex; }
+.print-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 16px var(--shadow-color);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 230px;
+}
+.print-menu button {
+    background: transparent;
+    color: var(--ink);
+    box-shadow: none;
+    justify-content: flex-start;
+    padding: 8px 10px;
+    font-weight: 500;
+    width: 100%;
+}
+.print-menu button:hover { background: var(--table-hover-bg); box-shadow: none; }
+
 .btn, button, input[type="submit"] {
     background: var(--btn-bg);
     color: white;
@@ -457,6 +485,9 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
     .actions .btn, .actions button, .actions form { justify-content: center; width: 100%; margin: 0; }
     .actions form button { width: 100%; margin-top: 0; }
     .actions .btn, .actions button { white-space: normal; text-align: center; }
+    .actions .print-menu-wrap { width: 100%; }
+    .actions .print-menu-wrap > .btn { width: 100%; }
+    .print-menu { left: 0; right: 0; min-width: 0; }
 
     .table th, .table td { padding: 8px 6px; font-size: 0.9em; }
 

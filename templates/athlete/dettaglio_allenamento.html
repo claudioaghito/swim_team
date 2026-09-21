@@ -4,8 +4,19 @@
 {% block content %}
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('athlete.lista_allenamenti') }}">&larr; Allenamenti</a>
-    <button type="button" class="btn" onclick="window.print()" title="Stampa / Esporta PDF">{{ icon('stampa') }}</button>
+    <div class="print-menu-wrap">
+        <button type="button" class="btn" id="print-menu-btn" aria-haspopup="true" aria-expanded="false" title="Stampa / Esporta PDF">{{ icon('stampa') }}</button>
+        <div class="print-menu" id="print-menu" hidden>
+            <button type="button" data-formato="A4">Formato A4 &mdash; stampa normale</button>
+            <button type="button" data-formato="A4" data-adatta="1">Formato A4 &mdash; adatta a 1 pagina</button>
+            <button type="button" data-formato="A3">Formato A3 &mdash; stampa normale</button>
+            <button type="button" data-formato="A3" data-adatta="1">Formato A3 &mdash; adatta a 1 pagina</button>
+        </div>
+    </div>
 </div>
+
+<div id="print-fit-outer">
+<div id="print-fit-inner">
 
 <div class="card">
     <h2>{{ icon('allenamenti') }} Allenamento del {{ allenamento.data.strftime('%d/%m/%Y') }}</h2>
@@ -31,13 +42,17 @@
             non ancora registrata
         {% endif %}
     </p>
-    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella
-       finestra di stampa del browser (abilita anche "Grafica di sfondo" per mantenere i colori delle fasi).</small></p>
+    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF", scegli il formato foglio dal menu e poi
+       "Salva come PDF" come stampante nella finestra di stampa del browser (abilita anche "Grafica di sfondo" per mantenere
+       i colori delle fasi).</small></p>
 </div>
 
 {% if allenamento.piano %}
     {{ pianomacro.render_piano(allenamento.piano) }}
 {% endif %}
+
+</div>
+</div>
 
 <style>
 @media print {
@@ -45,4 +60,5 @@
     .card { box-shadow: none; border: none; }
 }
 </style>
+<script src="{{ url_for('static', filename='js/stampa_allenamento.js') }}"></script>
 {% endblock %}

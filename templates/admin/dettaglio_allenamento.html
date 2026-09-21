@@ -5,12 +5,23 @@
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">&larr; Allenamenti</a>
     <a class="btn" href="{{ url_for('admin.modifica_allenamento', allenamento_id=allenamento.id) }}" title="Modifica">{{ icon('modifica') }}</a>
-    <button type="button" class="btn" onclick="window.print()" title="Stampa / Esporta PDF">{{ icon('stampa') }}</button>
+    <div class="print-menu-wrap">
+        <button type="button" class="btn" id="print-menu-btn" aria-haspopup="true" aria-expanded="false" title="Stampa / Esporta PDF">{{ icon('stampa') }}</button>
+        <div class="print-menu" id="print-menu" hidden>
+            <button type="button" data-formato="A4">Formato A4 &mdash; stampa normale</button>
+            <button type="button" data-formato="A4" data-adatta="1">Formato A4 &mdash; adatta a 1 pagina</button>
+            <button type="button" data-formato="A3">Formato A3 &mdash; stampa normale</button>
+            <button type="button" data-formato="A3" data-adatta="1">Formato A3 &mdash; adatta a 1 pagina</button>
+        </div>
+    </div>
     <form method="POST" action="{{ url_for('admin.elimina_allenamento', allenamento_id=allenamento.id) }}"
           onsubmit="return confirmSubmit(this, 'Eliminare questo allenamento?');" style="display:inline;">
         <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
     </form>
 </div>
+
+<div id="print-fit-outer">
+<div id="print-fit-inner">
 
 <div class="card">
     <h2>{{ icon('allenamenti') }} Allenamento del {{ allenamento.data.strftime('%d/%m/%Y') }}</h2>
@@ -26,13 +37,17 @@
     {% if allenamento.metri_totali %}
         <p><strong>Volume totale:</strong> {{ allenamento.metri_totali }} m</p>
     {% endif %}
-    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF" e scegli "Salva come PDF" come stampante nella
-       finestra di stampa del browser (abilita anche "Grafica di sfondo" per mantenere i colori delle fasi).</small></p>
+    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF", scegli il formato foglio dal menu e poi
+       "Salva come PDF" come stampante nella finestra di stampa del browser (abilita anche "Grafica di sfondo" per mantenere
+       i colori delle fasi).</small></p>
 </div>
 
 {% if allenamento.piano %}
     {{ pianomacro.render_piano(allenamento.piano) }}
 {% endif %}
+
+</div>
+</div>
 
 <div class="card no-print">
     <h3>{{ icon('presenze') }} Presenze ({{ presenze_per_atleta.values()|selectattr('presente')|list|length }}/{{ atleti|length }})</h3>
@@ -78,4 +93,5 @@
     .card { box-shadow: none; border: none; }
 }
 </style>
+<script src="{{ url_for('static', filename='js/stampa_allenamento.js') }}"></script>
 {% endblock %}
