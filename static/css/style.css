@@ -233,6 +233,7 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     width: 100%;
 }
 .print-menu button:hover { background: var(--table-hover-bg); box-shadow: none; }
+.print-menu[hidden] { display: none; }
 
 .btn, button, input[type="submit"] {
     background: var(--btn-bg);
@@ -371,7 +372,10 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-body { padding: 16px 18px; }
 .fase-sottotitolo { font-style: italic; color: var(--muted); margin-top: 0; }
 .fase-table { table-layout: fixed; }
-.fase-table th, .fase-table td { font-size: 0.9em; white-space: normal; vertical-align: top; }
+.fase-table th, .fase-table td {
+    font-size: 0.9em; white-space: normal; vertical-align: top;
+    overflow-wrap: break-word; word-break: break-word;
+}
 .fase-table th:nth-child(1), .fase-table td:nth-child(1) { width: 9%; }
 .fase-table th:nth-child(2), .fase-table td:nth-child(2) { width: 13%; }
 .fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 44%; }
