@@ -10,10 +10,14 @@ from flask_login import login_required, current_user
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
-    Configurazione, AllenamentoNascosto, RecordSocietario,
+    Configurazione, AllenamentoNascosto, RecordSocietario, RecordPersonale,
 )
 from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
+
+# Stessa lista di tipologie di gara usata per i tornei (vedi admin.py), riusata qui
+# per il menu a tendina del tipo di gara nei record personali.
+from admin import TIPI_GARA_BASE
 
 athlete_bp = Blueprint("athlete", __name__, url_prefix="/atleta")
 
@@ -278,3 +282,84 @@ def lista_record():
     records = RecordSocietario.query.filter_by(sesso=sesso, vasca=vasca).all()
     griglia = griglia_record(records)
     return render_template("athlete/record.html", griglia=griglia, sesso=sesso, vasca=vasca)
+
+
+@athlete_bp.route("/record-personali")
+@login_required
+def record_personali():
+    """Record personali: sezione riservata all'atleta, che gestisce da solo i propri
+    tempi (a differenza dei record societari, qui non c'e' alcun ruolo dell'admin)."""
+    record_list = RecordPersonale.query.filter_by(atleta_id=current_user.id).order_by(
+        RecordPersonale.data.desc()
+    ).all()
+    return render_template("athlete/record_personali.html", record_list=record_list)
+
+
+@athlete_bp.route("/record-personali/nuovo", methods=["GET", "POST"])
+@login_required
+def nuovo_record_personale():
+    if request.method == "POST":
+        secondi = min_sec_a_secondi(request.form.get("tempo_min"), request.form.get("tempo_sec"))
+        if secondi is None:
+            flash("Indica il tempo ottenuto.", "danger")
+            return redirect(url_for("athlete.nuovo_record_personale"))
+
+        config = Configurazione.ottieni()
+        record = RecordPersonale(
+            atleta_id=current_user.id,
+            torneo=request.form["torneo"].strip(),
+            tipo_gara=request.form["tipo_gara"],
+            vasca=int(request.form["vasca"]),
+            tempo=secondi_a_tempo(secondi),
+            data=datetime.strptime(request.form["data"], "%Y-%m-%d").date(),
+            categoria=current_user.categoria_master(config.anno_stagione),
+        )
+        db.session.add(record)
+        db.session.commit()
+        flash("Record aggiunto.", "success")
+        return redirect(url_for("athlete.record_personali"))
+
+    return render_template("athlete/nuovo_record_personale.html", tipi_gara=TIPI_GARA_BASE)
+
+
+@athlete_bp.route("/record-personali/<int:record_id>/modifica", methods=["GET", "POST"])
+@login_required
+def modifica_record_personale(record_id):
+    record = RecordPersonale.query.get_or_404(record_id)
+    if record.atleta_id != current_user.id:
+        abort(403)
+
+    if request.method == "POST":
+        secondi = min_sec_a_secondi(request.form.get("tempo_min"), request.form.get("tempo_sec"))
+        if secondi is None:
+            flash("Indica il tempo ottenuto.", "danger")
+            return redirect(url_for("athlete.modifica_record_personale", record_id=record.id))
+
+        config = Configurazione.ottieni()
+        record.torneo = request.form["torneo"].strip()
+        record.tipo_gara = request.form["tipo_gara"]
+        record.vasca = int(request.form["vasca"])
+        record.tempo = secondi_a_tempo(secondi)
+        record.data = datetime.strptime(request.form["data"], "%Y-%m-%d").date()
+        record.categoria = current_user.categoria_master(config.anno_stagione)
+        db.session.commit()
+        flash("Record aggiornato.", "success")
+        return redirect(url_for("athlete.record_personali"))
+
+    tempo_min, tempo_sec = tempo_stringa_a_min_sec_str(record.tempo)
+    return render_template(
+        "athlete/modifica_record_personale.html", record=record, tipi_gara=TIPI_GARA_BASE,
+        tempo_min=tempo_min, tempo_sec=tempo_sec,
+    )
+
+
+@athlete_bp.route("/record-personali/<int:record_id>/elimina", methods=["POST"])
+@login_required
+def elimina_record_personale(record_id):
+    record = RecordPersonale.query.get_or_404(record_id)
+    if record.atleta_id != current_user.id:
+        abort(403)
+    db.session.delete(record)
+    db.session.commit()
+    flash("Record eliminato.", "success")
+    return redirect(url_for("athlete.record_personali"))

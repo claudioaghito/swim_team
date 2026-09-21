@@ -33,6 +33,9 @@ class User(db.Model, UserMixin):
         "MovimentoContabile", backref="atleta", lazy=True,
         foreign_keys="MovimentoContabile.atleta_id", cascade="all, delete-orphan"
     )
+    record_personali = db.relationship(
+        "RecordPersonale", backref="atleta", lazy=True, cascade="all, delete-orphan"
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -345,6 +348,26 @@ class RecordSocietario(db.Model):
 
     def __repr__(self):
         return f"<RecordSocietario {self.sesso} {self.vasca} {self.stile}{self.distanza} {self.categoria}>"
+
+
+class RecordPersonale(db.Model):
+    """Record personale che un atleta registra per se stesso (tempo ottenuto in un
+    torneo): gestito interamente dall'atleta, non dall'amministratore. La categoria
+    e' calcolata in automatico da User.categoria_master alla stagione corrente."""
+    __tablename__ = "record_personali"
+
+    id = db.Column(db.Integer, primary_key=True)
+    atleta_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    torneo = db.Column(db.String(120), nullable=False)
+    tipo_gara = db.Column(db.String(60), nullable=False)  # dalla stessa lista usata per i tornei (TIPI_GARA_BASE)
+    vasca = db.Column(db.Integer, nullable=False, default=25)  # metri (25 o 50)
+    tempo = db.Column(db.String(20), nullable=False)  # es. "01:02.35"
+    data = db.Column(db.Date, nullable=False)
+    categoria = db.Column(db.String(4))  # es. "M40", calcolata al salvataggio
+    creato_il = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<RecordPersonale atleta={self.atleta_id} {self.tipo_gara} {self.tempo}>"
 
 
 class FormazioneStaffetta(db.Model):

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}I miei record{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+    <a class="btn" href="{{ url_for('athlete.nuovo_record_personale') }}">{{ icon('medaglia') }} Nuovo record</a>
+</div>
+
+<div class="card">
+    <h2>{{ icon('medaglia') }} I miei record</h2>
+    <p><small>Registra qui i tuoi tempi ottenuti nei tornei: la categoria viene assegnata automaticamente in base alla tua età.</small></p>
+    <div style="overflow-x:auto;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th data-sort="date">Data</th>
+                <th>Torneo</th>
+                <th>Tipo di gara</th>
+                <th>Vasca</th>
+                <th data-sort="text">Tempo</th>
+                <th>Categoria</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in record_list %}
+            <tr>
+                <td data-sort-value="{{ record.data.isoformat() }}">{{ record.data.strftime('%d/%m/%Y') }}</td>
+                <td>{{ record.torneo }}</td>
+                <td>{{ record.tipo_gara }}</td>
+                <td>{{ record.vasca }} m</td>
+                <td>{{ record.tempo }}</td>
+                <td>{{ record.categoria or '-' }}</td>
+                <td>
+                    <a class="btn" href="{{ url_for('athlete.modifica_record_personale', record_id=record.id) }}" title="Modifica">{{ icon('modifica') }}</a>
+                    <form method="POST" action="{{ url_for('athlete.elimina_record_personale', record_id=record.id) }}"
+                          onsubmit="return confirmSubmit(this, 'Eliminare questo record?');" style="display:inline;">
+                        <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">Non hai ancora registrato nessun record.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}

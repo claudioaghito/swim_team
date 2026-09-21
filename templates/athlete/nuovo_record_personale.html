@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Nuovo record{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.record_personali') }}">&larr; I miei record</a>
+</div>
+<div class="card">
+    <h2>{{ icon('medaglia') }} Nuovo record</h2>
+    <form method="POST">
+        <label>Nome del torneo</label>
+        <input type="text" name="torneo" required>
+
+        <label>Tipo di gara</label>
+        <select name="tipo_gara" required>
+            {% for tipo in tipi_gara %}
+                <option value="{{ tipo }}">{{ tipo }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Lunghezza vasca</label>
+        <select name="vasca" required>
+            <option value="25">25 m</option>
+            <option value="50">50 m</option>
+        </select>
+
+        <label>Tempo</label>
+        <div style="display:flex;gap:6px;align-items:center;white-space:nowrap;">
+            <input type="number" min="0" max="59" step="1" style="width:64px;margin-top:0;" name="tempo_min" required>
+            <small>min</small>
+            <input type="number" min="0" max="59.99" step="0.01" style="width:80px;margin-top:0;" name="tempo_sec" required>
+            <small>sec</small>
+        </div>
+
+        <label>Data</label>
+        <input type="date" name="data" required>
+
+        <p><small>La categoria viene assegnata automaticamente in base alla tua età, non serve indicarla.</small></p>
+
+        <button type="submit">{{ icon('salva') }} Salva record</button>
+    </form>
+</div>
+{% endblock %}

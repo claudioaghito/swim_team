@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Modifica record{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.record_personali') }}">&larr; I miei record</a>
+</div>
+<div class="card">
+    <h2>{{ icon('medaglia') }} Modifica record</h2>
+    <form method="POST">
+        <label>Nome del torneo</label>
+        <input type="text" name="torneo" value="{{ record.torneo }}" required>
+
+        <label>Tipo di gara</label>
+        <select name="tipo_gara" required>
+            {% for tipo in tipi_gara %}
+                <option value="{{ tipo }}" {% if tipo == record.tipo_gara %}selected{% endif %}>{{ tipo }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Lunghezza vasca</label>
+        <select name="vasca" required>
+            <option value="25" {% if record.vasca == 25 %}selected{% endif %}>25 m</option>
+            <option value="50" {% if record.vasca == 50 %}selected{% endif %}>50 m</option>
+        </select>
+
+        <label>Tempo</label>
+        <div style="display:flex;gap:6px;align-items:center;white-space:nowrap;">
+            <input type="number" min="0" max="59" step="1" style="width:64px;margin-top:0;" name="tempo_min" value="{{ tempo_min }}" required>
+            <small>min</small>
+            <input type="number" min="0" max="59.99" step="0.01" style="width:80px;margin-top:0;" name="tempo_sec" value="{{ tempo_sec }}" required>
+            <small>sec</small>
+        </div>
+
+        <label>Data</label>
+        <input type="date" name="data" value="{{ record.data.isoformat() }}" required>
+
+        <p><small>La categoria (attuale: <strong>{{ record.categoria or '-' }}</strong>) viene ricalcolata automaticamente al salvataggio.</small></p>
+
+        <button type="submit">{{ icon('salva') }} Salva modifiche</button>
+    </form>
+</div>
+{% endblock %}
