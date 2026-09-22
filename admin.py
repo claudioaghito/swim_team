@@ -20,6 +20,7 @@ from models import (
     FormazioneStaffetta, IscrizioneGara, RecordSocietario,
 )
 from piani_allenamento import FASI_TIPI, FASI_TIPI_CODICI
+from piano_excel import genera_template_excel, leggi_piano_da_excel
 from records import STILI_RECORD, STILI_CODICI, STILI_NOMI, CATEGORIE_RECORD, griglia_record
 from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
 from utils import (
@@ -649,6 +650,42 @@ def nuovo_allenamento():
         return redirect(url_for("admin.dashboard"))
 
     return render_template("admin/nuovo_allenamento.html", fasi_tipi=FASI_TIPI)
+
+
+@admin_bp.route("/allenamenti/template-excel")
+@login_required
+@admin_required
+def template_excel_allenamento():
+    buffer = genera_template_excel()
+    return send_file(
+        buffer, as_attachment=True, download_name="modello_allenamento.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+@admin_bp.route("/allenamenti/importa-excel", methods=["POST"])
+@login_required
+@admin_required
+def importa_excel_allenamento():
+    file = request.files.get("file_excel")
+    if not file or not file.filename:
+        flash("Seleziona un file Excel da importare.", "danger")
+        return redirect(url_for("admin.nuovo_allenamento"))
+
+    if _estensione(file.filename) != "xlsx":
+        flash("Il file deve essere in formato .xlsx (usa il modello scaricabile).", "danger")
+        return redirect(url_for("admin.nuovo_allenamento"))
+
+    fasi, errori = leggi_piano_da_excel(file.stream)
+    for errore in errori:
+        flash(errore, "warning")
+
+    if not fasi:
+        flash("Nessuna fase importata: correggi il file e riprova.", "danger")
+        return redirect(url_for("admin.nuovo_allenamento"))
+
+    flash(f"Importate {len(fasi)} fasi dal file. Controlla il piano prima di salvare l'allenamento.", "success")
+    return render_template("admin/nuovo_allenamento.html", fasi_tipi=FASI_TIPI, piano_importato=fasi)
 
 
 @admin_bp.route("/allenamenti")

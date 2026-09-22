@@ -7,6 +7,20 @@
 </div>
 <div class="card">
     <h2>{{ icon('nuovo-allenamento') }} Nuovo allenamento</h2>
+
+    <div class="card">
+        <h3 style="margin-top:0;">{{ icon('download') }} Importa il piano da Excel</h3>
+        <p><small>Scarica il modello, fallo compilare secondo le istruzioni al suo interno e ricaricalo qui: il
+           piano importato viene inserito nel builder qui sotto, dove puoi ancora controllarlo e correggerlo prima
+           di salvare. Importa il piano prima di compilare data e descrizione, perche' ricaricando la pagina
+           andrebbero perse.</small></p>
+        <a class="btn" href="{{ url_for('admin.template_excel_allenamento') }}">{{ icon('download') }} Scarica modello Excel</a>
+        <form method="POST" action="{{ url_for('admin.importa_excel_allenamento') }}" enctype="multipart/form-data" style="margin-top:12px;">
+            <input type="file" name="file_excel" accept=".xlsx" required>
+            <button type="submit" class="btn" style="margin-top:8px;">{{ icon('apri') }} Importa da Excel</button>
+        </form>
+    </div>
+
     <form method="POST" id="form-allenamento">
         <label>Data</label>
         <input type="date" name="data" required>
@@ -27,7 +41,7 @@
 
 <script>
     window.FASI_TIPI = {{ fasi_tipi|map('list')|list|tojson }};
-    window.PIANO_INIZIALE = [];
+    window.PIANO_INIZIALE = {{ piano_importato|default([])|tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/piano_allenamento.js') }}"></script>
 {% endblock %}
