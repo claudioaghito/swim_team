@@ -21,7 +21,7 @@
         </form>
     </div>
 
-    <form method="POST" id="form-allenamento">
+    <form method="POST" action="{{ url_for('admin.nuovo_allenamento') }}" id="form-allenamento">
         <label>Data</label>
         <input type="date" name="data" required>
 
