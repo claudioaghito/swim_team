@@ -181,23 +181,20 @@ def leggi_piano_da_excel(file_stream):
             errori.append(f"Riga {numero}: manca il tipo fase e non c'e' una fase precedente da cui ereditarlo, riga ignorata.")
             continue
 
-        if nome_raw:
-            nome = nome_raw
-        elif tipo_raw:
-            nome = FASI_TIPI_NOMI.get(tipo_codice, "")
-        else:
-            nome = fase_corrente["nome"] if fase_corrente else FASI_TIPI_NOMI.get(tipo_codice, "")
-
-        nuova_fase = fase_corrente is None or tipo_codice != fase_corrente["tipo"] or nome != fase_corrente["nome"]
+        nuova_fase = fase_corrente is None or tipo_codice != fase_corrente["tipo"]
         if nuova_fase:
+            nome = nome_raw or FASI_TIPI_NOMI.get(tipo_codice, "")
             fase_corrente = {
-                "tipo": tipo_codice, "nome": nome,
+                "tipo": tipo_codice, "nome": nome, "_nome_esplicito": bool(nome_raw),
                 "durata_min": None, "metri": None, "sottotitolo": "", "nota": "",
                 "blocchi": [],
             }
             fasi.append(fase_corrente)
             blocco_corrente = None
             chiave_blocco_corrente = None
+        elif nome_raw and not fase_corrente["_nome_esplicito"]:
+            fase_corrente["nome"] = nome_raw
+            fase_corrente["_nome_esplicito"] = True
 
         if durata is not None and fase_corrente["durata_min"] is None:
             fase_corrente["durata_min"] = durata
@@ -217,6 +214,9 @@ def leggi_piano_da_excel(file_stream):
         blocco_corrente["righe"].append({
             "serie": serie, "esercizio": esercizio, "recupero": recupero, "ripartenza": ripartenza,
         })
+
+    for fase in fasi:
+        fase.pop("_nome_esplicito", None)
 
     if not fasi and not errori:
         errori.append("Il file non contiene righe compilate.")
