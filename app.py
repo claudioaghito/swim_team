@@ -67,7 +67,20 @@ def create_app(config_class=Config):
         def icon(name, cls="icon"):
             src = url_for("static", filename=f"icons/{name}.svg")
             return Markup(f'<img src="{src}" class="{cls}" alt="">')
-        return dict(icon=icon, fase_colore=fase_colore, fase_icona=fase_icona)
+
+        def static_url(filename):
+            """URL di un file statico con la data di modifica in query string,
+            cosi' un deploy invalida subito la cache del browser (il file statico
+            non ha header di cache espliciti, quindi altrimenti puo' restare
+            in cache euristica del browser anche dopo un refresh normale)."""
+            path = os.path.join(app.static_folder, filename)
+            try:
+                v = int(os.path.getmtime(path))
+            except OSError:
+                v = 0
+            return f"{url_for('static', filename=filename)}?v={v}"
+
+        return dict(icon=icon, static_url=static_url, fase_colore=fase_colore, fase_icona=fase_icona)
 
     @app.route("/")
     def index():
