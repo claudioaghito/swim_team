@@ -85,7 +85,7 @@
 
 * { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidden; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -382,7 +382,7 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-table th, .fase-table td { font-size: 0.9em; white-space: nowrap; vertical-align: top; }
 .fase-table th:nth-child(1), .fase-table td:nth-child(1) { width: 9%; }
 .fase-table th:nth-child(2), .fase-table td:nth-child(2) { width: 13%; }
-.fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 44%; }
+.fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 44%; white-space: normal; overflow-wrap: break-word; word-break: break-word; }
 .fase-table th:nth-child(4), .fase-table td:nth-child(4) { width: 13%; }
 .fase-table th:nth-child(5), .fase-table td:nth-child(5) { width: 21%; }
 .fase-table .fase-blocco-rip { text-align: center; font-weight: 700; vertical-align: middle; }
@@ -397,6 +397,10 @@ form button, form input[type="submit"] { margin-top: 16px; }
     position: relative;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    /* Evita che lo scroll orizzontale "trabocchi" nella pagina quando si raggiunge il
+       bordo della tabella: su alcuni browser mobile quel rimbalzo causava uno sfondo
+       visibilmente discontinuo intorno alla tabella durante lo scorrimento. */
+    overscroll-behavior-x: contain;
 }
 .fase-table-scroll::before, .fase-table-scroll::after {
     content: ""; position: absolute; top: 0; bottom: 0; width: 22px; pointer-events: none;
