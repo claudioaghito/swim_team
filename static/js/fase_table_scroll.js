@@ -3,33 +3,19 @@
 
     var TOLLERANZA = 2;
 
-    function aggiornaOmbre(el) {
-        var scrollaSinistra = el.scrollLeft > TOLLERANZA;
-        var scrollaDestra = el.scrollLeft < (el.scrollWidth - el.clientWidth - TOLLERANZA);
-        el.classList.toggle("scroll-left", scrollaSinistra);
-        el.classList.toggle("scroll-right", scrollaDestra);
-    }
-
     function aggiornaHint(el) {
         var hint = el.previousElementSibling;
         if (!hint || !hint.classList.contains("fase-table-hint")) return;
         hint.hidden = el.scrollWidth <= el.clientWidth + TOLLERANZA;
     }
 
-    // Collega l'ombra/hint di scorrimento a un elemento .fase-table-scroll, anche se
-    // e' stato aggiunto al DOM dopo il caricamento iniziale (es. dal builder del piano).
-    function inizializzaElemento(el) {
-        if (el.dataset.ftsInit) return;
-        el.dataset.ftsInit = "1";
-        el.addEventListener("scroll", function () { aggiornaOmbre(el); }, { passive: true });
-    }
-
     function aggiornaTutto() {
-        document.querySelectorAll(".fase-table-scroll").forEach(function (el) {
-            inizializzaElemento(el);
-            aggiornaOmbre(el);
-            aggiornaHint(el);
-        });
+        // Niente piu' ombra/classe scroll-left/scroll-right legata all'evento "scroll":
+        // su alcuni browser/WebView Android l'ombra a gradiente, animata a ogni scroll
+        // della tabella, restava incollata sullo schermo come una fascia semitrasparente
+        // anche fuori dai bordi della tabella. Resta solo il testo di aiuto sopra la
+        // tabella, che non ha questo problema perche' non cambia durante lo scroll.
+        document.querySelectorAll(".fase-table-scroll").forEach(aggiornaHint);
     }
 
     document.addEventListener("DOMContentLoaded", aggiornaTutto);
@@ -42,6 +28,6 @@
     window.addEventListener("afterprint", aggiornaTutto);
 
     // Esposto cosi' il builder del piano (piano_allenamento.js) puo' ricalcolare
-    // ombre/hint quando aggiunge tabelle dopo il caricamento della pagina.
+    // l'hint quando aggiunge tabelle dopo il caricamento della pagina.
     window.FaseTableScroll = { aggiorna: aggiornaTutto };
 })();
