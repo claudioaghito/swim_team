@@ -404,11 +404,17 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-table-scroll {
     position: relative;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     /* Evita che lo scroll orizzontale "trabocchi" nella pagina quando si raggiunge il
        bordo della tabella: su alcuni browser mobile quel rimbalzo causava uno sfondo
        visibilmente discontinuo intorno alla tabella durante lo scorrimento. */
     overscroll-behavior-x: contain;
+    /* Forza un livello di composizione isolato per questa area di scroll: su alcuni
+       browser/WebView Android, scorrendo una tabella con textarea al suo interno,
+       restava visibile un "fantasma" del contenuto scrollato anche fuori dai bordi
+       della tabella. Rimossa anche -webkit-overflow-scrolling: touch (proprieta'
+       legacy iOS non necessaria su Android e concausa dello stesso bug). */
+    transform: translateZ(0);
+    will-change: transform;
 }
 .fase-table-scroll::before, .fase-table-scroll::after {
     content: ""; position: absolute; top: 0; bottom: 0; width: 22px; pointer-events: none;
