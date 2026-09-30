@@ -64,10 +64,6 @@ def create_app(config_class=Config):
 
     @app.context_processor
     def inject_icon_helper():
-        def icon(name, cls="icon"):
-            src = url_for("static", filename=f"icons/{name}.svg")
-            return Markup(f'<img src="{src}" class="{cls}" alt="">')
-
         def static_url(filename):
             """URL di un file statico con la data di modifica in query string,
             cosi' un deploy invalida subito la cache del browser (il file statico
@@ -79,6 +75,10 @@ def create_app(config_class=Config):
             except OSError:
                 v = 0
             return f"{url_for('static', filename=filename)}?v={v}"
+
+        def icon(name, cls="icon"):
+            src = static_url(f"icons/{name}.svg")
+            return Markup(f'<img src="{src}" class="{cls}" alt="">')
 
         return dict(icon=icon, static_url=static_url, fase_colore=fase_colore, fase_icona=fase_icona)
 
