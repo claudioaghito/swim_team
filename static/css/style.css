@@ -374,23 +374,25 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-header-meta { font-size: 0.85em; font-weight: 700; white-space: nowrap; }
 .fase-body { padding: 16px 18px; }
 .fase-sottotitolo { font-style: italic; color: var(--muted); margin-top: 0; }
-/* A schermo le colonne restano a larghezza fissa (table-layout: fixed) e il testo
-   va a capo dentro la propria colonna: con "nowrap" un'intestazione o un valore piu'
-   largo della colonna (es. "TEMPO DI RIPARTENZA") straripava visivamente sopra la
-   colonna accanto invece di restringersi. Se le colonne non entrano comunque nello
-   spazio disponibile si scorre in orizzontale (vedi .fase-table-scroll e
-   .fase-table-hint). In stampa/PDF invece si torna al comportamento "a capo su
-   larghezza fissa", perche' una pagina di carta non si puo' scorrere (vedi .print-mode). */
-/* Larghezze in px (non %): su schermi stretti danno a ogni intestazione/valore
-   spazio a sufficienza per andare a capo su poche righe invece che su una per
-   lettera, lasciando il resto allo scorrimento orizzontale (vedi sopra). */
-.fase-table { table-layout: fixed; min-width: 700px; }
-.fase-table th, .fase-table td { font-size: 0.9em; white-space: normal; overflow-wrap: break-word; vertical-align: top; }
-.fase-table th:nth-child(1), .fase-table td:nth-child(1) { width: 110px; }
-.fase-table th:nth-child(2), .fase-table td:nth-child(2) { width: 90px; }
-.fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 260px; }
-.fase-table th:nth-child(4), .fase-table td:nth-child(4) { width: 90px; }
-.fase-table th:nth-child(5), .fase-table td:nth-child(5) { width: 150px; }
+/* A schermo le colonne restano a larghezza fissa (table-layout: fixed); le
+   intestazioni non vanno mai a capo, i valori si' dentro la propria colonna. Se le
+   colonne non entrano comunque nello spazio disponibile si scorre in orizzontale
+   (vedi .fase-table-scroll e .fase-table-hint). In stampa/PDF invece si torna al
+   comportamento "a capo su larghezza fissa", perche' una pagina di carta non si
+   puo' scorrere (vedi .print-mode).
+   Le larghezze sono impostate sul <colgroup> (non su th/td:nth-child): la prima
+   riga di un blocco con piu' serie ha una cella in meno (rowspan di "Rip. blocco"
+   sulle righe successive), quindi nth-child assegnava la larghezza sbagliata alle
+   celle di quelle righe, facendo straripare il testo sulla colonna accanto. */
+.fase-table { table-layout: fixed; min-width: 770px; }
+.fase-table th, .fase-table td { font-size: 0.9em; vertical-align: top; }
+.fase-table th { white-space: nowrap; }
+.fase-table td { white-space: normal; overflow-wrap: break-word; }
+.fase-col-rip { width: 130px; }
+.fase-col-serie { width: 90px; }
+.fase-col-esercizio { width: 260px; }
+.fase-col-recupero { width: 100px; }
+.fase-col-ripartenza { width: 190px; }
 .fase-table .fase-blocco-rip { text-align: center; font-weight: 700; vertical-align: middle; }
 .fase-table .fase-blocco-rip-box { border: 2px solid var(--blue); border-radius: 8px; background: var(--table-header-bg); }
 .fase-nota { font-style: italic; font-size: 0.9em; color: var(--muted); margin-bottom: 0; }
@@ -426,14 +428,15 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .print-mode .fase-table th, .print-mode .fase-table td {
     white-space: normal !important; overflow-wrap: break-word; word-break: break-word;
 }
-/* Le larghezze delle colonne a schermo sono in px per lo scorrimento orizzontale
-   (vedi sopra): in stampa tornano proporzionali cosi' la tabella si adatta alla
-   larghezza del foglio invece di restare a 700px fissi. */
-.print-mode .fase-table th:nth-child(1), .print-mode .fase-table td:nth-child(1) { width: 16% !important; }
-.print-mode .fase-table th:nth-child(2), .print-mode .fase-table td:nth-child(2) { width: 13% !important; }
-.print-mode .fase-table th:nth-child(3), .print-mode .fase-table td:nth-child(3) { width: 37% !important; }
-.print-mode .fase-table th:nth-child(4), .print-mode .fase-table td:nth-child(4) { width: 13% !important; }
-.print-mode .fase-table th:nth-child(5), .print-mode .fase-table td:nth-child(5) { width: 21% !important; }
+/* Le larghezze delle colonne a schermo sono in px sul <colgroup> per lo scorrimento
+   orizzontale (vedi sopra): in stampa tornano proporzionali cosi' la tabella si
+   adatta alla larghezza del foglio invece di restare a 770px fissi. Il <colgroup>
+   ha priorita' sulla larghezza dei singoli td, va quindi sovrascritto anche lui. */
+.print-mode .fase-col-rip { width: 16% !important; }
+.print-mode .fase-col-serie { width: 13% !important; }
+.print-mode .fase-col-esercizio { width: 37% !important; }
+.print-mode .fase-col-recupero { width: 13% !important; }
+.print-mode .fase-col-ripartenza { width: 21% !important; }
 
 .fase-builder-card { border-left: 6px solid var(--border); }
 .fase-builder-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
