@@ -12,8 +12,13 @@
 </div>
 
 <div class="actions no-print">
-    <a class="btn {{ 'record-tab-active' if sesso == 'M' }}" href="{{ url_for('athlete.lista_record', sesso='M') }}">Uomini</a>
-    <a class="btn {{ 'record-tab-active' if sesso == 'F' }}" href="{{ url_for('athlete.lista_record', sesso='F') }}">Donne</a>
+    <a class="btn {{ 'record-tab-active' if sesso == 'M' }}" href="{{ url_for('athlete.lista_record', sesso='M', vasca=vasca) }}">Uomini</a>
+    <a class="btn {{ 'record-tab-active' if sesso == 'F' }}" href="{{ url_for('athlete.lista_record', sesso='F', vasca=vasca) }}">Donne</a>
+</div>
+
+<div class="actions no-print">
+    <a class="btn {{ 'record-tab-active' if vasca == 25 }}" href="{{ url_for('athlete.lista_record', sesso=sesso, vasca=25) }}">Vasca 25m</a>
+    <a class="btn {{ 'record-tab-active' if vasca == 50 }}" href="{{ url_for('athlete.lista_record', sesso=sesso, vasca=50) }}">Vasca 50m</a>
 </div>
 
 {{ recmacro.render_griglia(griglia, sesso, vasca, False) }}

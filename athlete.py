@@ -278,7 +278,9 @@ def lista_record():
     sesso = request.args.get("sesso", "M")
     if sesso not in ("M", "F"):
         sesso = "M"
-    vasca = 25
+    vasca = request.args.get("vasca", 25, type=int)
+    if vasca not in (25, 50):
+        vasca = 25
     records = RecordSocietario.query.filter_by(sesso=sesso, vasca=vasca).all()
     griglia = griglia_record(records)
     return render_template("athlete/record.html", griglia=griglia, sesso=sesso, vasca=vasca)

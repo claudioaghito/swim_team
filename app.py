@@ -35,6 +35,11 @@ def _migra_schema(app):
             if "modalita_pagamento" not in colonne_config:
                 with db.engine.begin() as conn:
                     conn.execute(text("ALTER TABLE configurazione ADD COLUMN modalita_pagamento TEXT"))
+        if "record_societari" in inspector.get_table_names():
+            colonne_record = {c["name"] for c in inspector.get_columns("record_societari")}
+            if "evento" not in colonne_record:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE record_societari ADD COLUMN evento VARCHAR(60)"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
 

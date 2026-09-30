@@ -1471,7 +1471,9 @@ def lista_record():
     sesso = request.args.get("sesso", "M")
     if sesso not in ("M", "F"):
         sesso = "M"
-    vasca = 25
+    vasca = request.args.get("vasca", 25, type=int)
+    if vasca not in (25, 50):
+        vasca = 25
     records = RecordSocietario.query.filter_by(sesso=sesso, vasca=vasca).all()
     griglia = griglia_record(records)
     return render_template("admin/record.html", griglia=griglia, sesso=sesso, vasca=vasca)
@@ -1492,6 +1494,7 @@ def modifica_record(sesso, vasca, stile, distanza, categoria):
         tempo = (request.form.get("tempo") or "").strip()
         nome = (request.form.get("nome") or "").strip()
         data_valore = _parsa_data(request.form.get("data"))
+        evento = (request.form.get("evento") or "").strip() or None
 
         if not tempo or not nome:
             flash("Inserisci sia il tempo che il nome per salvare il record.", "danger")
@@ -1504,10 +1507,11 @@ def modifica_record(sesso, vasca, stile, distanza, categoria):
             record.tempo = tempo
             record.nome = nome
             record.data = data_valore
+            record.evento = evento
         else:
             db.session.add(RecordSocietario(
                 sesso=sesso, vasca=vasca, stile=stile, distanza=distanza, categoria=categoria,
-                tempo=tempo, nome=nome, data=data_valore,
+                tempo=tempo, nome=nome, data=data_valore, evento=evento,
             ))
         db.session.commit()
         flash("Record salvato.", "success")

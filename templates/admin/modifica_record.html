@@ -5,7 +5,7 @@
     ({{ 'Uomini' if sesso == 'M' else 'Donne' }}, vasca {{ vasca }}m)</h1>
 
 <div class="actions">
-    <a class="btn" href="{{ url_for('admin.lista_record', sesso=sesso) }}#cella-{{ stile }}-{{ distanza }}-{{ categoria }}">&larr; Record societari</a>
+    <a class="btn" href="{{ url_for('admin.lista_record', sesso=sesso, vasca=vasca) }}#cella-{{ stile }}-{{ distanza }}-{{ categoria }}">&larr; Record societari</a>
 </div>
 
 <div class="card">
@@ -18,6 +18,9 @@
 
         <label>Data</label>
         <input type="date" name="data" value="{{ record.data.isoformat() if record and record.data else '' }}">
+
+        <label>Manifestazione (facoltativa, se non si conosce la data esatta)</label>
+        <input type="text" name="evento" value="{{ record.evento if record and record.evento else '' }}" placeholder="es. Campionati Italiani 2012">
 
         <button type="submit" title="Salva">{{ icon('salva') }}</button>
     </form>

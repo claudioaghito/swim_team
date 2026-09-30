@@ -341,6 +341,9 @@ class RecordSocietario(db.Model):
     tempo = db.Column(db.String(20), nullable=False)  # es. 24"51 o 1'55"55, testo libero
     nome = db.Column(db.String(120), nullable=False)
     data = db.Column(db.Date)
+    evento = db.Column(db.String(60))  # es. "Mondiali 2012": usato quando il record non ha una data
+    # precisa nota ma solo il nome/anno della manifestazione (tipico per la vasca da 50m).
+    # Se valorizzato si mostra al posto di "data".
 
     __table_args__ = (
         db.UniqueConstraint("sesso", "vasca", "stile", "distanza", "categoria", name="uq_record_societario"),
