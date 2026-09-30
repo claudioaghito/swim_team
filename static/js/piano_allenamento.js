@@ -94,6 +94,18 @@
         head.appendChild(btnRimuoviBlocco);
         wrap.appendChild(head);
 
+        // Sullo schermo del telefono la tabella non va mai a capo/schiacciata: se non
+        // entra nello spazio disponibile si scorre in orizzontale, come nella vista di
+        // sola lettura dell'allenamento (vedi .fase-table-scroll in style.css).
+        var hint = document.createElement("p");
+        hint.className = "fase-table-hint";
+        hint.hidden = true;
+        hint.innerHTML = "&harr; Scorri orizzontalmente per vedere tutte le colonne";
+        wrap.appendChild(hint);
+
+        var scrollWrap = document.createElement("div");
+        scrollWrap.className = "fase-table-scroll";
+
         var table = document.createElement("table");
         table.className = "table fase-builder-righe-table";
         table.innerHTML =
@@ -103,14 +115,18 @@
         (blocco.righe || []).forEach(function (riga) { tbody.appendChild(creaRiga(riga)); });
         if (!(blocco.righe && blocco.righe.length)) tbody.appendChild(creaRiga());
         table.appendChild(tbody);
-        wrap.appendChild(table);
+        scrollWrap.appendChild(table);
+        wrap.appendChild(scrollWrap);
 
         var btnAggiungiRiga = document.createElement("button");
         btnAggiungiRiga.type = "button";
         btnAggiungiRiga.className = "btn";
         btnAggiungiRiga.style.marginTop = "6px";
         btnAggiungiRiga.textContent = "+ Aggiungi serie al blocco";
-        btnAggiungiRiga.addEventListener("click", function () { tbody.appendChild(creaRiga()); });
+        btnAggiungiRiga.addEventListener("click", function () {
+            tbody.appendChild(creaRiga());
+            aggiornaScrollTabelle();
+        });
         wrap.appendChild(btnAggiungiRiga);
 
         return wrap;
@@ -220,7 +236,10 @@
         btnAggiungiBlocco.className = "btn";
         btnAggiungiBlocco.style.marginTop = "8px";
         btnAggiungiBlocco.textContent = "+ Aggiungi blocco di serie";
-        btnAggiungiBlocco.addEventListener("click", function () { blocchiContenitore.appendChild(creaBlocco()); });
+        btnAggiungiBlocco.addEventListener("click", function () {
+            blocchiContenitore.appendChild(creaBlocco());
+            aggiornaScrollTabelle();
+        });
         card.appendChild(btnAggiungiBlocco);
 
         var labelNota = document.createElement("label");
@@ -235,8 +254,15 @@
         return card;
     }
 
+    // Ricalcola ombre/hint di scorrimento orizzontale delle tabelle del builder
+    // (window.FaseTableScroll e' definito da fase_table_scroll.js, incluso in pagina).
+    function aggiornaScrollTabelle() {
+        if (window.FaseTableScroll) window.FaseTableScroll.aggiorna();
+    }
+
     function aggiungiFase(fase) {
         contenitore.appendChild(creaFase(fase));
+        aggiornaScrollTabelle();
     }
 
     function serializzaPiano() {

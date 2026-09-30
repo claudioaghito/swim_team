@@ -421,10 +421,16 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-builder-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
 .fase-builder-head > div { flex: 1; min-width: 140px; }
 .fase-builder-head label { margin-top: 0; }
-.fase-builder-righe-table { table-layout: fixed; }
+/* Come .fase-table (vedi sopra): su schermi stretti la tabella del builder non si
+   schiaccia, scorre in orizzontale dentro .fase-table-scroll mantenendo colonne leggibili. */
+.fase-builder-righe-table { table-layout: fixed; min-width: 560px; }
 .fase-builder-righe-table input, .fase-builder-righe-table textarea { margin-top: 0; }
 .fase-builder-righe-table td { padding: 4px; vertical-align: top; }
+.fase-builder-righe-table th:nth-child(1), .fase-builder-righe-table td:nth-child(1) { width: 15%; }
 .fase-builder-righe-table th:nth-child(2), .fase-builder-righe-table td:nth-child(2) { width: 44%; }
+.fase-builder-righe-table th:nth-child(3), .fase-builder-righe-table td:nth-child(3) { width: 15%; }
+.fase-builder-righe-table th:nth-child(4), .fase-builder-righe-table td:nth-child(4) { width: 18%; }
+.fase-builder-righe-table th:nth-child(5), .fase-builder-righe-table td:nth-child(5) { width: 36px; }
 .fase-builder-righe-table .riga-esercizio { width: 100%; resize: vertical; }
 .fase-riga-rimuovi, .fase-rimuovi { background: var(--red); }
 .fase-riga-rimuovi:hover, .fase-rimuovi:hover { background: #a83b2b; }

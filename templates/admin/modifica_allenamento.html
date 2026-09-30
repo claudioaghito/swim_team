@@ -29,6 +29,7 @@
     window.FASI_TIPI = {{ fasi_tipi|map('list')|list|tojson }};
     window.PIANO_INIZIALE = {{ allenamento.piano|tojson }};
 </script>
+<script src="{{ url_for('static', filename='js/fase_table_scroll.js') }}"></script>
 <script src="{{ url_for('static', filename='js/piano_allenamento.js') }}"></script>
 
 <div class="actions">
