@@ -476,8 +476,8 @@ def esporta_atleti():
             f"{a.saldo_attuale():.2f}",
         ])
 
-    resp = Response(output.getvalue().encode("utf-8-sig"), mimetype="text/csv")
-    resp.headers["Content-Type"] = "text/csv; charset=utf-8-sig"
+    resp = Response(output.getvalue().encode("cp1252", errors="replace"), mimetype="text/csv")
+    resp.headers["Content-Type"] = "text/csv; charset=windows-1252"
     resp.headers["Content-Disposition"] = "attachment; filename=atleti.csv"
     return resp
 
@@ -1373,8 +1373,8 @@ def esporta_movimenti():
             f"{m.importo:.2f}",
         ])
 
-    resp = Response(output.getvalue().encode("utf-8-sig"), mimetype="text/csv")
-    resp.headers["Content-Type"] = "text/csv; charset=utf-8-sig"
+    resp = Response(output.getvalue().encode("cp1252", errors="replace"), mimetype="text/csv")
+    resp.headers["Content-Type"] = "text/csv; charset=windows-1252"
     resp.headers["Content-Disposition"] = "attachment; filename=movimenti.csv"
     return resp
 
