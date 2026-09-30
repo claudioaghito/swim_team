@@ -1520,7 +1520,7 @@ def modifica_record(sesso, vasca, stile, distanza, categoria):
             ))
         db.session.commit()
         flash("Record salvato.", "success")
-        return redirect(url_for("admin.lista_record", sesso=sesso))
+        return redirect(url_for("admin.lista_record", sesso=sesso, vasca=vasca))
 
     return render_template(
         "admin/modifica_record.html", record=record, sesso=sesso, vasca=vasca,
@@ -1538,4 +1538,4 @@ def elimina_record(sesso, vasca, stile, distanza, categoria):
     db.session.delete(record)
     db.session.commit()
     flash("Record eliminato.", "success")
-    return redirect(url_for("admin.lista_record", sesso=sesso))
+    return redirect(url_for("admin.lista_record", sesso=sesso, vasca=vasca))
