@@ -374,17 +374,18 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .fase-header-meta { font-size: 0.85em; font-weight: 700; white-space: nowrap; }
 .fase-body { padding: 16px 18px; }
 .fase-sottotitolo { font-style: italic; color: var(--muted); margin-top: 0; }
-/* A schermo le colonne restano leggibili e a larghezza fissa (table-layout: fixed:
-   con "auto" il browser, avendo spazio stretto sul telefono, arrivava a schiacciare
-   la colonna Esercizio fino a mandarla a capo lettera per lettera). Se non entrano
-   nello spazio disponibile si scorre in orizzontale (vedi .fase-table-scroll e
+/* A schermo le colonne restano a larghezza fissa (table-layout: fixed) e il testo
+   va a capo dentro la propria colonna: con "nowrap" un'intestazione o un valore piu'
+   largo della colonna (es. "TEMPO DI RIPARTENZA") straripava visivamente sopra la
+   colonna accanto invece di restringersi. Se le colonne non entrano comunque nello
+   spazio disponibile si scorre in orizzontale (vedi .fase-table-scroll e
    .fase-table-hint). In stampa/PDF invece si torna al comportamento "a capo su
    larghezza fissa", perche' una pagina di carta non si puo' scorrere (vedi .print-mode). */
-.fase-table { table-layout: fixed; min-width: 480px; }
-.fase-table th, .fase-table td { font-size: 0.9em; white-space: nowrap; vertical-align: top; }
+.fase-table { table-layout: fixed; min-width: 560px; }
+.fase-table th, .fase-table td { font-size: 0.9em; white-space: normal; overflow-wrap: break-word; vertical-align: top; }
 .fase-table th:nth-child(1), .fase-table td:nth-child(1) { width: 9%; }
 .fase-table th:nth-child(2), .fase-table td:nth-child(2) { width: 13%; }
-.fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 44%; white-space: normal; overflow-wrap: break-word; }
+.fase-table th:nth-child(3), .fase-table td:nth-child(3) { width: 44%; }
 .fase-table th:nth-child(4), .fase-table td:nth-child(4) { width: 13%; }
 .fase-table th:nth-child(5), .fase-table td:nth-child(5) { width: 21%; }
 .fase-table .fase-blocco-rip { text-align: center; font-weight: 700; vertical-align: middle; }
