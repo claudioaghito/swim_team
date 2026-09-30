@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, abort,
-    current_app, send_from_directory,
+    current_app, send_from_directory, make_response,
 )
 from flask_login import login_required, current_user
 
@@ -283,7 +283,12 @@ def lista_record():
         vasca = 25
     records = RecordSocietario.query.filter_by(sesso=sesso, vasca=vasca).all()
     griglia = griglia_record(records)
-    return render_template("athlete/record.html", griglia=griglia, sesso=sesso, vasca=vasca)
+    risposta = make_response(render_template("athlete/record.html", griglia=griglia, sesso=sesso, vasca=vasca))
+    # Alcuni browser mobile mettono in cache la pagina ignorando la query string
+    # (?sesso=&vasca=), mostrando sempre la prima vista aperta anche cambiando scheda:
+    # niente cache per essere sicuri che il passaggio uomini/donne e 25m/50m sia sempre visibile.
+    risposta.headers["Cache-Control"] = "no-store"
+    return risposta
 
 
 @athlete_bp.route("/record-personali")

@@ -9,7 +9,7 @@ from functools import wraps
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash, request, abort,
-    current_app, send_from_directory, send_file, Response,
+    current_app, send_from_directory, send_file, Response, make_response,
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -1476,7 +1476,12 @@ def lista_record():
         vasca = 25
     records = RecordSocietario.query.filter_by(sesso=sesso, vasca=vasca).all()
     griglia = griglia_record(records)
-    return render_template("admin/record.html", griglia=griglia, sesso=sesso, vasca=vasca)
+    risposta = make_response(render_template("admin/record.html", griglia=griglia, sesso=sesso, vasca=vasca))
+    # Alcuni browser mobile mettono in cache la pagina ignorando la query string
+    # (?sesso=&vasca=), mostrando sempre la prima vista aperta anche cambiando scheda:
+    # niente cache per essere sicuri che il passaggio uomini/donne e 25m/50m sia sempre visibile.
+    risposta.headers["Cache-Control"] = "no-store"
+    return risposta
 
 
 @admin_bp.route("/record/<sesso>/<int:vasca>/<stile>/<int:distanza>/<categoria>/modifica", methods=["GET", "POST"])
