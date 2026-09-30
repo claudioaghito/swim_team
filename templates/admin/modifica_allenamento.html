@@ -29,8 +29,8 @@
     window.FASI_TIPI = {{ fasi_tipi|map('list')|list|tojson }};
     window.PIANO_INIZIALE = {{ allenamento.piano|tojson }};
 </script>
-<script src="{{ url_for('static', filename='js/fase_table_scroll.js') }}"></script>
-<script src="{{ url_for('static', filename='js/piano_allenamento.js') }}"></script>
+<script src="{{ static_url('js/fase_table_scroll.js') }}"></script>
+<script src="{{ static_url('js/piano_allenamento.js') }}"></script>
 
 <div class="actions">
     <form method="POST" action="{{ url_for('admin.elimina_allenamento', allenamento_id=allenamento.id) }}"
