@@ -471,12 +471,13 @@ def esporta_atleti():
             a.username,
             a.sesso or "",
             a.email or "",
-            a.data_nascita.strftime("%d/%m/%Y") if a.data_nascita else "",
+            "'" + a.data_nascita.strftime("%d/%m/%Y") if a.data_nascita else "",
             a.categoria_master(anno_stagione) or "",
             f"{a.saldo_attuale():.2f}",
         ])
 
-    resp = Response("\N{ZERO WIDTH NO-BREAK SPACE}" + output.getvalue(), mimetype="text/csv")
+    resp = Response(output.getvalue().encode("utf-8-sig"), mimetype="text/csv")
+    resp.headers["Content-Type"] = "text/csv; charset=utf-8-sig"
     resp.headers["Content-Disposition"] = "attachment; filename=atleti.csv"
     return resp
 
@@ -1366,13 +1367,14 @@ def esporta_movimenti():
     writer.writerow(["Data", "Atleta", "Causale", "Importo (€)"])
     for m in movimenti:
         writer.writerow([
-            m.data.strftime("%d/%m/%Y"),
+            "'" + m.data.strftime("%d/%m/%Y"),
             m.atleta.nome_completo,
             m.causale,
             f"{m.importo:.2f}",
         ])
 
-    resp = Response("\N{ZERO WIDTH NO-BREAK SPACE}" + output.getvalue(), mimetype="text/csv")
+    resp = Response(output.getvalue().encode("utf-8-sig"), mimetype="text/csv")
+    resp.headers["Content-Type"] = "text/csv; charset=utf-8-sig"
     resp.headers["Content-Disposition"] = "attachment; filename=movimenti.csv"
     return resp
 
