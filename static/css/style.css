@@ -320,6 +320,7 @@ form button, form input[type="submit"] { margin-top: 16px; }
 }
 .table tbody tr:hover { background: var(--table-hover-bg); }
 .table-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.table-actions .btn, .table-actions form { flex-shrink: 0; }
 .table-actions form { display: inline-flex; }
 .table-actions form button { margin-top: 0; }
 .table th[data-sort] { cursor: pointer; user-select: none; }
