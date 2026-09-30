@@ -438,7 +438,10 @@ form button, form input[type="submit"] { margin-top: 16px; }
 .print-mode .fase-col-recupero { width: 13% !important; }
 .print-mode .fase-col-ripartenza { width: 21% !important; }
 
-.fase-builder-card { border-left: 6px solid var(--border); }
+/* Il colore del contorno e' impostato via JS in base al tipo di fase (stessa
+   regola colori della vista di sola lettura/PDF, vedi piano_allenamento.js),
+   cosi' si distinguono a colpo d'occhio blocchi e serie della stessa fase. */
+.fase-builder-card { border: 2px solid var(--border); }
 .fase-builder-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
 .fase-builder-head > div { flex: 1; min-width: 140px; }
 .fase-builder-head label { margin-top: 0; }

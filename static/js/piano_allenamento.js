@@ -12,6 +12,21 @@
     if (!contenitore || !form || !inputNascosto) return;
 
     var FASI_TIPI = window.FASI_TIPI || [];
+    // codice -> colore (stessa regola usata per l'header della fase nella vista di sola
+    // lettura/PDF, vedi fase_colore() in piani_allenamento.py): qui colora anche la
+    // casella "Tipo" e il contorno dell'intera fase nel builder, cosi' si distinguono
+    // a colpo d'occhio blocchi e serie appartenenti alla stessa fase.
+    var FASI_TIPI_COLORE = {};
+    FASI_TIPI.forEach(function (t) { FASI_TIPI_COLORE[t[0]] = t[2]; });
+
+    function applicaColoreFase(selectTipo, card) {
+        var colore = FASI_TIPI_COLORE[selectTipo.value] || FASI_TIPI_COLORE.altro;
+        if (!colore) return;
+        card.style.borderColor = colore;
+        selectTipo.style.background = colore;
+        selectTipo.style.borderColor = colore;
+        selectTipo.style.color = "#fff";
+    }
 
     // Una "serie" e' una singola <tr>: serie / esercizio (testo anche lungo, va a capo) /
     // recupero / ripartenza / rimuovi. Le ripetizioni si impostano una volta sola a livello
@@ -153,6 +168,7 @@
         });
         campoTipo.appendChild(selectTipo);
         head.appendChild(campoTipo);
+        applicaColoreFase(selectTipo, card);
 
         var campoNome = document.createElement("div");
         campoNome.innerHTML = "<label>Nome fase</label>";
@@ -169,6 +185,7 @@
                 var scelto = FASI_TIPI.find(function (t) { return t[0] === selectTipo.value; });
                 if (scelto) inputNome.value = scelto[1];
             }
+            applicaColoreFase(selectTipo, card);
         });
 
         var campoDurata = document.createElement("div");
@@ -235,7 +252,7 @@
         btnAggiungiBlocco.type = "button";
         btnAggiungiBlocco.className = "btn";
         btnAggiungiBlocco.style.marginTop = "8px";
-        btnAggiungiBlocco.textContent = "+ Aggiungi blocco di serie";
+        btnAggiungiBlocco.textContent = "+ Aggiungi serie";
         btnAggiungiBlocco.addEventListener("click", function () {
             blocchiContenitore.appendChild(creaBlocco());
             aggiornaScrollTabelle();
