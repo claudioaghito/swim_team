@@ -465,7 +465,11 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 .fase-riga-rimuovi, .fase-rimuovi { background: var(--red); }
 .fase-riga-rimuovi:hover, .fase-rimuovi:hover { background: #a83b2b; }
 
-.fase-blocco-builder { border: 1px solid var(--border); border-radius: 8px; padding: 10px 10px 4px; margin-top: 10px; background: var(--table-hover-bg); }
+.fase-blocco-builder { border: 1px dashed var(--border); border-radius: 8px; padding: 10px 10px 4px; margin-top: 10px; background: var(--table-hover-bg); transition: border-color 0.15s ease, background-color 0.15s ease; }
+/* Un blocco con ripetizioni (es. "x2") e' un gruppo di serie da ripetere insieme: il
+   contorno pieno e colorato lo distingue a colpo d'occhio dai blocchi "liberi" (bordo
+   tratteggiato neutro sopra) che contengono una singola serie senza gruppo. */
+.fase-blocco-builder.fase-blocco-con-gruppo { border: 2px solid var(--blue); background: var(--table-header-bg); }
 .fase-blocco-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
 .fase-blocco-head > div { flex: 1; min-width: 220px; }
 .fase-blocco-head label { margin-top: 0; }

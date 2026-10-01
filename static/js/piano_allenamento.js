@@ -334,9 +334,20 @@
         elementoVolumeTotale.textContent = totale + " m";
     }
 
+    // Evidenzia il contorno dei blocchi che sono un gruppo di serie ripetute insieme
+    // (hanno un valore in "Ripetizioni blocco"), per distinguerli a colpo d'occhio dai
+    // blocchi "liberi" con una singola serie senza gruppo (vedi .fase-blocco-con-gruppo).
+    function aggiornaStileBlocchi() {
+        contenitore.querySelectorAll(".fase-blocco-builder").forEach(function (blocco) {
+            var haGruppo = !!blocco.querySelector(".blocco-ripetizioni").value.trim();
+            blocco.classList.toggle("fase-blocco-con-gruppo", haGruppo);
+        });
+    }
+
     function aggiornaTuttiIVolumi() {
         contenitore.querySelectorAll(".fase-builder-card").forEach(aggiornaVolumeFase);
         aggiornaVolumeTotale();
+        aggiornaStileBlocchi();
     }
 
     // Il volume si ricalcola da solo: digitando in una serie o nelle ripetizioni di un
