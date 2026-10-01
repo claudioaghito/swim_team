@@ -3,12 +3,14 @@
 // ripetute insieme (es. "x2"). Si aspetta nella pagina: window.FASI_TIPI = [[codice, nome], ...],
 // window.PIANO_INIZIALE = [fase, ...] (fase.blocchi = [{ripetizioni, righe}, ...]),
 // un form con id "form-allenamento", un contenitore #piano-builder, un pulsante
-// #piano-aggiungi-fase e un input nascosto #piano-json-input.
+// #piano-aggiungi-fase, un input nascosto #piano-json-input e, facoltativo, un elemento
+// #piano-volume-totale dove viene mostrato il volume totale calcolato man mano.
 (function () {
     var contenitore = document.getElementById("piano-builder");
     var bottoneAggiungiFase = document.getElementById("piano-aggiungi-fase");
     var form = document.getElementById("form-allenamento");
     var inputNascosto = document.getElementById("piano-json-input");
+    var elementoVolumeTotale = document.getElementById("piano-volume-totale");
     if (!contenitore || !form || !inputNascosto) return;
 
     var FASI_TIPI = window.FASI_TIPI || [];
@@ -322,8 +324,19 @@
         card.querySelector(".fase-metri").value = totale > 0 ? totale : "";
     }
 
+    // Volume totale dell'intero allenamento: somma del volume di tutte le fasi del builder.
+    function aggiornaVolumeTotale() {
+        if (!elementoVolumeTotale) return;
+        var totale = 0;
+        contenitore.querySelectorAll(".fase-builder-card").forEach(function (card) {
+            totale += calcolaVolumeFase(card);
+        });
+        elementoVolumeTotale.textContent = totale + " m";
+    }
+
     function aggiornaTuttiIVolumi() {
         contenitore.querySelectorAll(".fase-builder-card").forEach(aggiornaVolumeFase);
+        aggiornaVolumeTotale();
     }
 
     // Il volume si ricalcola da solo: digitando in una serie o nelle ripetizioni di un
@@ -340,7 +353,7 @@
         var card = creaFase(fase);
         contenitore.appendChild(card);
         aggiornaScrollTabelle();
-        aggiornaVolumeFase(card);
+        aggiornaTuttiIVolumi();
     }
 
     function serializzaPiano() {
