@@ -204,6 +204,8 @@
         inputMetri.type = "number";
         inputMetri.min = "0";
         inputMetri.className = "fase-metri";
+        inputMetri.readOnly = true;
+        inputMetri.title = "Calcolato automaticamente dalla colonna Serie dei blocchi";
         inputMetri.value = fase.metri != null ? fase.metri : "";
         campoMetri.appendChild(inputMetri);
         head.appendChild(campoMetri);
@@ -223,12 +225,12 @@
         card.appendChild(head);
 
         var labelSotto = document.createElement("label");
-        labelSotto.textContent = "Sottotitolo (facoltativo)";
+        labelSotto.textContent = "Attrezzi richiesti:";
         card.appendChild(labelSotto);
         var inputSotto = document.createElement("input");
         inputSotto.type = "text";
         inputSotto.className = "fase-sottotitolo";
-        inputSotto.placeholder = "es. Attivazione cardiovascolare graduale e risveglio muscolare";
+        inputSotto.placeholder = "es. Tavoletta, pull buoy, elastico";
         inputSotto.value = fase.sottotitolo || "";
         card.appendChild(inputSotto);
 
@@ -277,9 +279,68 @@
         if (window.FaseTableScroll) window.FaseTableScroll.aggiorna();
     }
 
+    // Interpreta il testo di una cella "Serie" come un prodotto di numeri separati da
+    // "x"/"X" (es. "2x100" o "2 X 100" => 200; "4x50 m" => 200, ignorando l'unita').
+    // Spazi e lettere non numeriche vengono ignorati; un solo numero vale per se' stesso.
+    function parseValoreSerie(testo) {
+        if (!testo) return 0;
+        var pulito = testo.replace(/\s+/g, "");
+        var numeri = pulito.split(/[xX]/).map(function (parte) {
+            var m = parte.match(/\d+(?:[.,]\d+)?/);
+            return m ? parseFloat(m[0].replace(",", ".")) : null;
+        }).filter(function (n) { return n !== null; });
+        if (!numeri.length) return 0;
+        return numeri.reduce(function (a, b) { return a * b; }, 1);
+    }
+
+    // Interpreta il moltiplicatore di un blocco (es. "x2", "x3"): 1 se vuoto o non numerico.
+    function parseMoltiplicatoreBlocco(testo) {
+        if (!testo) return 1;
+        var m = testo.replace(/\s+/g, "").match(/\d+(?:[.,]\d+)?/);
+        if (!m) return 1;
+        var n = parseFloat(m[0].replace(",", "."));
+        return (!n || n <= 0) ? 1 : n;
+    }
+
+    // Volume di lavoro di una fase: somma, per ogni blocco, delle serie del blocco
+    // moltiplicata per le ripetizioni del blocco; poi somma di tutti i blocchi della fase.
+    function calcolaVolumeFase(card) {
+        var totale = 0;
+        card.querySelectorAll(".fase-blocco-builder").forEach(function (blocco) {
+            var moltiplicatore = parseMoltiplicatoreBlocco(blocco.querySelector(".blocco-ripetizioni").value);
+            var sommaBlocco = 0;
+            blocco.querySelectorAll(".blocco-righe-body > tr").forEach(function (tr) {
+                sommaBlocco += parseValoreSerie(tr.querySelector(".riga-serie").value);
+            });
+            totale += sommaBlocco * moltiplicatore;
+        });
+        return totale;
+    }
+
+    function aggiornaVolumeFase(card) {
+        var totale = calcolaVolumeFase(card);
+        card.querySelector(".fase-metri").value = totale > 0 ? totale : "";
+    }
+
+    function aggiornaTuttiIVolumi() {
+        contenitore.querySelectorAll(".fase-builder-card").forEach(aggiornaVolumeFase);
+    }
+
+    // Il volume si ricalcola da solo: digitando in una serie o nelle ripetizioni di un
+    // blocco (bubbling dell'evento "input"), oppure aggiungendo/rimuovendo righe, blocchi
+    // o fasi (bubbling del "click" dei relativi pulsanti, dopo che il DOM e' stato aggiornato).
+    contenitore.addEventListener("input", function (e) {
+        if (e.target.classList.contains("riga-serie") || e.target.classList.contains("blocco-ripetizioni")) {
+            aggiornaTuttiIVolumi();
+        }
+    });
+    contenitore.addEventListener("click", function () { aggiornaTuttiIVolumi(); });
+
     function aggiungiFase(fase) {
-        contenitore.appendChild(creaFase(fase));
+        var card = creaFase(fase);
+        contenitore.appendChild(card);
         aggiornaScrollTabelle();
+        aggiornaVolumeFase(card);
     }
 
     function serializzaPiano() {
