@@ -123,7 +123,17 @@
         } else {
             ripristinaAdattamento();
         }
-        window.print();
+        // Se window.print() viene chiamato nello stesso ciclo in cui abbiamo appena
+        // cambiato classi/stili, il browser potrebbe non aver ancora dipinto un frame con
+        // il nuovo layout: su iOS/Safari in particolare l'anteprima di stampa nativa puo'
+        // essere generata sullo stato precedente, ignorando lo scaling di "adatta a 1
+        // pagina" appena applicato. Il doppio requestAnimationFrame garantisce che almeno
+        // un ciclo di paint sia avvenuto prima di aprire il foglio di stampa.
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                window.print();
+            });
+        });
     }
 
     window.stampaAllenamento = stampaAllenamento;
