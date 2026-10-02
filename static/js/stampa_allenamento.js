@@ -126,6 +126,11 @@
     // stampa nativo di Android non lo scatena sempre): ripristiniamo il layout normale
     // con piu' meccanismi di sicurezza, cosi' non restano stili residui che rompono il
     // resto della pagina.
+    // NB: niente listener su "focus". Su iOS Safari la comparsa del foglio di stampa
+    // nativo scatena un "focus" spurio sulla finestra pochi istanti dopo window.print():
+    // se a quel punto ripristiniamo lo zoom/scala di "adatta a 1 pagina", l'anteprima di
+    // stampa viene generata con il layout a piena altezza non scalato, mostrando piu'
+    // pagine anche quando l'utente ha scelto "adatta a 1 pagina".
     window.addEventListener("afterprint", ripristinaStampa);
     if (window.matchMedia) {
         try {
@@ -138,7 +143,6 @@
         if (document.visibilityState === "visible") ripristinaStampa();
     });
     window.addEventListener("pageshow", ripristinaStampa);
-    window.addEventListener("focus", ripristinaStampa);
 
     document.addEventListener("DOMContentLoaded", function () {
         var btn = document.getElementById("print-menu-btn");
