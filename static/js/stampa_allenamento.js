@@ -4,10 +4,6 @@
     var PAGE_SIZES_MM = { A4: { w: 210, h: 297 }, A3: { w: 297, h: 420 } };
     var MARGIN_MM = 10;
     var MM_TO_PX = 96 / 25.4;
-    // "zoom" (non standard ma supportato da Chrome/Edge/WebView Android) ridimensiona
-    // anche il layout, non solo l'aspetto visivo: a differenza di transform: scale(),
-    // l'impaginazione di stampa lo rispetta e non lascia pagine vuote residue.
-    var SUPPORTA_ZOOM = "zoom" in document.documentElement.style;
     // I browser propongono il "titolo" del documento come nome del file quando si
     // salva la stampa in PDF: lo teniamo da parte per poterlo ripristinare dopo.
     var TITOLO_ORIGINALE = document.title;
@@ -61,16 +57,22 @@
 
     function ripristinaAdattamento() {
         var inner = document.getElementById("print-fit-inner");
-        if (!inner) return;
-        inner.style.width = "";
-        inner.style.zoom = "";
-        inner.style.transform = "";
-        inner.style.transformOrigin = "";
+        var outer = document.getElementById("print-fit-outer");
+        if (inner) {
+            inner.style.width = "";
+            inner.style.transform = "";
+            inner.style.transformOrigin = "";
+        }
+        if (outer) {
+            outer.style.height = "";
+            outer.style.overflow = "";
+        }
     }
 
     function adattaAUnaPagina(formato) {
         var inner = document.getElementById("print-fit-inner");
-        if (!inner) return;
+        var outer = document.getElementById("print-fit-outer");
+        if (!inner || !outer) return;
 
         ripristinaAdattamento();
 
@@ -85,17 +87,21 @@
         if (!naturalH) return;
 
         var scale = Math.min(pageHpx / naturalH, 1);
-        if (scale >= 1) return; // ci sta gia' su una pagina: nessun rimpicciolimento necessario
+        if (scale >= 1) { inner.style.width = ""; return; } // ci sta gia' su una pagina
 
-        if (SUPPORTA_ZOOM) {
-            inner.style.zoom = scale;
-            // compensa: a larghezza pageWpx/scale, con zoom scale, la larghezza finale torna pageWpx
-            inner.style.width = (pageWpx / scale) + "px";
-        } else {
-            inner.style.transformOrigin = "top left";
-            inner.style.transform = "scale(" + scale + ")";
-            inner.style.width = (pageWpx / scale) + "px";
-        }
+        // "zoom" non e' affidabile in stampa su iOS/Safari (scala la resa a schermo ma
+        // l'anteprima di stampa nativa puo' ignorarlo e impaginare sull'altezza originale).
+        // transform: scale() funziona ovunque per la resa visiva, ma di per se' non
+        // cambia l'altezza di LAYOUT del contenuto: l'interruzione di pagina in stampa
+        // continuerebbe a basarsi sull'altezza non scalata. Per questo il contenitore
+        // esterno (che non viene trasformato) riceve un'altezza fissa gia' pari
+        // all'altezza scalata: e' quella che determina quanto spazio il contenuto
+        // occupa nel flusso di stampa, quindi corrisponde davvero a una pagina sola.
+        inner.style.transformOrigin = "top left";
+        inner.style.transform = "scale(" + scale + ")";
+        inner.style.width = (pageWpx / scale) + "px";
+        outer.style.height = (naturalH * scale) + "px";
+        outer.style.overflow = "hidden";
     }
 
     function ripristinaStampa() {
