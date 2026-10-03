@@ -71,10 +71,14 @@
             inner.style.width = "";
             inner.style.transform = "";
             inner.style.transformOrigin = "";
+            inner.style.position = "";
+            inner.style.top = "";
+            inner.style.left = "";
         }
         if (outer) {
             outer.style.height = "";
             outer.style.overflow = "";
+            outer.style.position = "";
         }
     }
 
@@ -111,6 +115,17 @@
         inner.style.width = (pageWpx / scale) + "px";
         outer.style.height = (naturalH * scale) + "px";
         outer.style.overflow = "hidden";
+        // Safari/iOS ha un bug noto: anche con l'altezza fissa e overflow:hidden qui
+        // sopra, l'impaginazione di STAMPA a volte continua a contare l'altezza di
+        // layout NON scalata di #print-fit-inner (quella oltre il bordo clippato, mai
+        // visibile) come se fosse contenuto reale, aggiungendo una pagina vuota in piu'
+        // dopo quella con il contenuto. "position: absolute" toglie l'elemento dal
+        // flusso normale del documento: cosi' il suo overflow non scalato non viene piu'
+        // conteggiato nell'impaginazione, e resta solo l'altezza esplicita di #print-fit-outer.
+        outer.style.position = "relative";
+        inner.style.position = "absolute";
+        inner.style.top = "0";
+        inner.style.left = "0";
     }
 
     function ripristinaStampa() {
