@@ -3,6 +3,15 @@
 
     var PAGE_SIZES_MM = { A4: { w: 210, h: 297 }, A3: { w: 297, h: 420 } };
     var MARGIN_MM = 10;
+    // Le anteprime di stampa NATIVE di iOS e Android (non quella del browser desktop)
+    // aggiungono in automatico un'intestazione/piede pagina (titolo, data, "Pagina X di
+    // Y") che occupa spazio reale sul foglio ma non fa parte del margine CSS "@page":
+    // il nostro calcolo non puo' saperne l'altezza esatta (varia per OS/stampante), quindi
+    // in fase di "adatta a 1 pagina" consideriamo l'area utile piu' piccola di questo
+    // margine extra, cosi' il contenuto scalato ci sta comunque anche con quello spazio
+    // in meno. Si applica solo al calcolo della scala, non al margine "@page" vero e
+    // proprio (che resta identico anche per la stampa "normale").
+    var MARGINE_SICUREZZA_ADATTA_MM = 20;
     var MM_TO_PX = 96 / 25.4;
     // I browser propongono il "titolo" del documento come nome del file quando si
     // salva la stampa in PDF: lo teniamo da parte per poterlo ripristinare dopo.
@@ -78,7 +87,7 @@
 
         var size = PAGE_SIZES_MM[formato] || PAGE_SIZES_MM.A4;
         var pageWpx = (size.w - MARGIN_MM * 2) * MM_TO_PX;
-        var pageHpx = (size.h - MARGIN_MM * 2) * MM_TO_PX;
+        var pageHpx = (size.h - MARGIN_MM * 2 - MARGINE_SICUREZZA_ADATTA_MM) * MM_TO_PX;
 
         // Misura l'altezza reale del contenuto alla larghezza piena del foglio scelto
         // (non alla larghezza dello schermo, altrimenti su un telefono il calcolo e' sbagliato).
