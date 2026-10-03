@@ -66,26 +66,15 @@
 
     function ripristinaAdattamento() {
         var inner = document.getElementById("print-fit-inner");
-        var outer = document.getElementById("print-fit-outer");
         if (inner) {
             inner.style.width = "";
-            inner.style.transform = "";
-            inner.style.transformOrigin = "";
-            inner.style.position = "";
-            inner.style.top = "";
-            inner.style.left = "";
-        }
-        if (outer) {
-            outer.style.height = "";
-            outer.style.overflow = "";
-            outer.style.position = "";
+            inner.style.fontSize = "";
         }
     }
 
     function adattaAUnaPagina(formato) {
         var inner = document.getElementById("print-fit-inner");
-        var outer = document.getElementById("print-fit-outer");
-        if (!inner || !outer) return;
+        if (!inner) return;
 
         ripristinaAdattamento();
 
@@ -96,36 +85,25 @@
         // Misura l'altezza reale del contenuto alla larghezza piena del foglio scelto
         // (non alla larghezza dello schermo, altrimenti su un telefono il calcolo e' sbagliato).
         inner.style.width = pageWpx + "px";
-        var naturalH = inner.scrollHeight;
-        if (!naturalH) return;
+        if (!inner.scrollHeight || inner.scrollHeight <= pageHpx) { inner.style.width = ""; return; } // ci sta gia' su una pagina
 
-        var scale = Math.min(pageHpx / naturalH, 1);
-        if (scale >= 1) { inner.style.width = ""; return; } // ci sta gia' su una pagina
-
-        // "zoom" non e' affidabile in stampa su iOS/Safari (scala la resa a schermo ma
-        // l'anteprima di stampa nativa puo' ignorarlo e impaginare sull'altezza originale).
-        // transform: scale() funziona ovunque per la resa visiva, ma di per se' non
-        // cambia l'altezza di LAYOUT del contenuto: l'interruzione di pagina in stampa
-        // continuerebbe a basarsi sull'altezza non scalata. Per questo il contenitore
-        // esterno (che non viene trasformato) riceve un'altezza fissa gia' pari
-        // all'altezza scalata: e' quella che determina quanto spazio il contenuto
-        // occupa nel flusso di stampa, quindi corrisponde davvero a una pagina sola.
-        inner.style.transformOrigin = "top left";
-        inner.style.transform = "scale(" + scale + ")";
-        inner.style.width = (pageWpx / scale) + "px";
-        outer.style.height = (naturalH * scale) + "px";
-        outer.style.overflow = "hidden";
-        // Safari/iOS ha un bug noto: anche con l'altezza fissa e overflow:hidden qui
-        // sopra, l'impaginazione di STAMPA a volte continua a contare l'altezza di
-        // layout NON scalata di #print-fit-inner (quella oltre il bordo clippato, mai
-        // visibile) come se fosse contenuto reale, aggiungendo una pagina vuota in piu'
-        // dopo quella con il contenuto. "position: absolute" toglie l'elemento dal
-        // flusso normale del documento: cosi' il suo overflow non scalato non viene piu'
-        // conteggiato nell'impaginazione, e resta solo l'altezza esplicita di #print-fit-outer.
-        outer.style.position = "relative";
-        inner.style.position = "absolute";
-        inner.style.top = "0";
-        inner.style.left = "0";
+        // Qui sotto erano gia' state provate "zoom" e poi "transform: scale()" (con un
+        // contenitore esterno ad altezza fissa per simulare il ridimensionamento nel
+        // flusso di stampa): la prima non viene rispettata dal motore di stampa nativo
+        // di iOS/Safari (scala solo a schermo), la seconda sembra rispettata nella resa
+        // visiva ma lascia comunque, dietro le quinte, un'area di contenuto alla sua
+        // altezza NON scalata (quella "ritagliata" via overflow/posizionamento): Safari
+        // la conta ugualmente nell'impaginazione di stampa e genera una pagina vuota in
+        // piu', anche se a schermo non si vede nulla oltre il bordo.
+        // Riducendo invece davvero la dimensione del testo (font-size, proprieta' CSS
+        // standard rispettata ovunque) l'altezza di LAYOUT del contenuto si riduce per
+        // davvero: non resta alcuna area di overflow nascosta da poter conteggiare per
+        // errore, quindi niente piu' pagine vuote residue.
+        var percento = 100;
+        while (inner.scrollHeight > pageHpx && percento > 40) {
+            percento -= 3;
+            inner.style.fontSize = percento + "%";
+        }
     }
 
     function ripristinaStampa() {
