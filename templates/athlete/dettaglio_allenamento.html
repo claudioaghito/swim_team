@@ -15,7 +15,6 @@
     </div>
 </div>
 
-<div id="print-fit-outer">
 <div id="print-fit-inner">
 
 <div class="card">
@@ -42,16 +41,14 @@
             non ancora registrata
         {% endif %}
     </p>
-    <p class="no-print"><small>Per esportare in PDF, usa "Stampa / Esporta PDF", scegli il formato foglio dal menu e poi
-       "Salva come PDF" come stampante nella finestra di stampa del browser (abilita anche "Grafica di sfondo" per mantenere
-       i colori delle fasi).</small></p>
+    <p class="no-print"><small>Usa "Stampa / Esporta PDF": "adatta a 1 pagina" scarica subito un PDF di una sola pagina,
+       "stampa normale" apre la finestra di stampa del browser (su piu' pagine se serve).</small></p>
 </div>
 
 {% if allenamento.piano %}
     {{ pianomacro.render_piano(allenamento.piano) }}
 {% endif %}
 
-</div>
 </div>
 
 <style>
@@ -63,6 +60,8 @@
 <script>
     window.STAMPA_NOME_FILE = {{ (allenamento.descrizione or ('Allenamento del ' ~ allenamento.data.strftime('%d-%m-%Y')))|tojson }};
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="{{ static_url('js/stampa_allenamento.js') }}"></script>
 <script src="{{ static_url('js/fase_table_scroll.js') }}"></script>
 {% endblock %}
