@@ -66,10 +66,8 @@
 
     function ripristinaAdattamento() {
         var inner = document.getElementById("print-fit-inner");
-        if (inner) {
-            inner.style.width = "";
-            inner.style.fontSize = "";
-        }
+        if (inner) inner.style.width = "";
+        document.documentElement.style.removeProperty("--pf-scale");
     }
 
     function adattaAUnaPagina(formato) {
@@ -87,22 +85,26 @@
         inner.style.width = pageWpx + "px";
         if (!inner.scrollHeight || inner.scrollHeight <= pageHpx) { inner.style.width = ""; return; } // ci sta gia' su una pagina
 
-        // Qui sotto erano gia' state provate "zoom" e poi "transform: scale()" (con un
-        // contenitore esterno ad altezza fissa per simulare il ridimensionamento nel
-        // flusso di stampa): la prima non viene rispettata dal motore di stampa nativo
-        // di iOS/Safari (scala solo a schermo), la seconda sembra rispettata nella resa
-        // visiva ma lascia comunque, dietro le quinte, un'area di contenuto alla sua
-        // altezza NON scalata (quella "ritagliata" via overflow/posizionamento): Safari
-        // la conta ugualmente nell'impaginazione di stampa e genera una pagina vuota in
-        // piu', anche se a schermo non si vede nulla oltre il bordo.
-        // Riducendo invece davvero la dimensione del testo (font-size, proprieta' CSS
-        // standard rispettata ovunque) l'altezza di LAYOUT del contenuto si riduce per
-        // davvero: non resta alcuna area di overflow nascosta da poter conteggiare per
-        // errore, quindi niente piu' pagine vuote residue.
-        var percento = 100;
-        while (inner.scrollHeight > pageHpx && percento > 40) {
-            percento -= 3;
-            inner.style.fontSize = percento + "%";
+        // Gia' provate: "zoom" (ignorato dal motore di stampa nativo di iOS, che
+        // impagina sull'altezza originale) e "transform: scale()" con un contenitore
+        // esterno ritagliato (la resa visiva e' corretta, ma lascia comunque, dietro le
+        // quinte, un'area di contenuto alla sua altezza NON scalata: Safari la conta
+        // ugualmente nell'impaginazione di stampa, generando una pagina vuota in piu'
+        // anche se a schermo non si vede nulla oltre il bordo). Riducendo solo il
+        // font-size, invece, il testo si rimpicciola ma i padding/margini FISSI in px
+        // (intestazioni colorate delle fasi, celle delle tabelle, icone, spazio tra i
+        // blocchi) restano invariati: con piu' fasi pesano piu' del testo stesso e il
+        // contenuto continua a non entrare in una pagina nemmeno al minimo consentito.
+        // La custom property --pf-scale (vedi style.css: .card, .fase-header,
+        // .fase-header-icon, .fase-body, .table th/td, #print-fit-inner) fa scalare
+        // TUTTO insieme e per davvero (vera altezza di layout, non uno zoom/transform
+        // visivo): qui serve solo trovare, per tentativi, il valore che fa entrare il
+        // contenuto in una pagina.
+        var root = document.documentElement;
+        var scale = 1;
+        while (inner.scrollHeight > pageHpx && scale > 0.4) {
+            scale -= 0.03;
+            root.style.setProperty("--pf-scale", scale.toFixed(2));
         }
     }
 

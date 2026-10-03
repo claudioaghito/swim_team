@@ -193,9 +193,12 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 20px;
+    /* calc(... * var(--pf-scale, 1)): a scala 1 (default, sempre fuori da "adatta a 1
+       pagina") equivale al valore fisso di prima, zero effetto. Vedi #print-fit-inner
+       piu' sotto e stampa_allenamento.js per il perche'. */
+    padding: calc(20px * var(--pf-scale, 1));
     box-shadow: 0 1px 3px var(--shadow-color);
-    margin-bottom: 16px;
+    margin-bottom: calc(16px * var(--pf-scale, 1));
     transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     max-width: 100%;
     overflow-x: auto;
@@ -311,7 +314,10 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 .saldo.negativo { color: var(--red); }
 
 .table { width: 100%; border-collapse: collapse; }
-.table th, .table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); }
+.table th, .table td {
+    text-align: left; padding: calc(10px * var(--pf-scale, 1)) calc(8px * var(--pf-scale, 1));
+    border-bottom: 1px solid var(--border);
+}
 .table th {
     background: var(--table-header-bg);
     color: var(--table-header-text);
@@ -367,13 +373,17 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
     -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;
 }
 .fase-header {
-    display: flex; align-items: center; gap: 12px; padding: 14px 18px; color: #ffffff;
+    display: flex; align-items: center; gap: calc(12px * var(--pf-scale, 1));
+    padding: calc(14px * var(--pf-scale, 1)) calc(18px * var(--pf-scale, 1)); color: #ffffff;
     -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact;
 }
-.fase-header-icon { width: 40px; height: 40px; margin-right: 0; flex-shrink: 0; }
+.fase-header-icon {
+    width: calc(40px * var(--pf-scale, 1)); height: calc(40px * var(--pf-scale, 1));
+    margin-right: 0; flex-shrink: 0;
+}
 .fase-header-titolo { color: #ffffff; margin: 0; flex: 1; font-size: 1.1em; }
 .fase-header-meta { font-size: 0.85em; font-weight: 700; white-space: nowrap; }
-.fase-body { padding: 16px 18px; }
+.fase-body { padding: calc(16px * var(--pf-scale, 1)) calc(18px * var(--pf-scale, 1)); }
 .fase-sottotitolo { font-style: italic; color: var(--muted); margin-top: 0; }
 /* A schermo le colonne restano a larghezza fissa (table-layout: fixed); le
    intestazioni non vanno mai a capo, i valori si' dentro la propria colonna. Se le
@@ -443,6 +453,15 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 .print-mode .fase-col-esercizio { width: 37% !important; }
 .print-mode .fase-col-recupero { width: 13% !important; }
 .print-mode .fase-col-ripartenza { width: 21% !important; }
+
+/* "Adatta a 1 pagina" (vedi stampa_allenamento.js): riduce --pf-scale finche' il
+   contenuto non entra nell'altezza di una pagina. Qui il font-size dell'intero blocco
+   stampato segue la stessa scala dei padding/margini fissi sopra (.card, .fase-header,
+   .table th/td, ecc.), cosi' TUTTO si rimpicciolisce davvero in proporzione (vera
+   altezza di layout, non uno zoom/transform visivo) e non resta nessuna area di
+   overflow nascosta che l'anteprima di stampa nativa di iOS possa conteggiare per
+   errore come pagina in piu'. */
+#print-fit-inner { font-size: calc(100% * var(--pf-scale, 1)); }
 
 /* Il colore del contorno e' impostato via JS in base al tipo di fase (stessa
    regola colori della vista di sola lettura/PDF, vedi piano_allenamento.js),
