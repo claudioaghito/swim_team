@@ -103,6 +103,23 @@
         if (btn) btn.disabled = true;
 
         document.body.classList.add("print-mode");
+        // Con il tema scuro attivo (manuale o da preferenza di sistema) gli sfondi di
+        // .card/.fase-body/ecc. sono scuri: in stampa reale "@media print" li forza
+        // sempre a chiaro (vedi piu' sotto nel foglio di stile), ma qui non stiamo
+        // davvero stampando, quindi quella regola non si applica da sola. Il tema
+        // chiaro e' quello attivato anche da "data-theme=light" (vedi CSS), che
+        // sovrascrive sia la scelta manuale che quella di sistema: lo forziamo solo
+        // per la cattura e lo ripristiniamo subito dopo.
+        var root = document.documentElement;
+        var temaOriginale = root.getAttribute("data-theme");
+        root.setAttribute("data-theme", "light");
+        // Il tema chiaro usa comunque uno sfondo pagina leggermente grigio (--bg), non
+        // bianco puro: lo sovrascriviamo qui, cosi' anche gli spazi tra le card nel PDF
+        // risultano bianchi (stesso sfondo bianco forzato dalla stampa reale, vedi
+        // "@media print" piu' sotto nel foglio di stile, che pero' da sola non si
+        // applica a una cattura che non e' una stampa vera).
+        var bgOriginale = document.body.style.backgroundColor;
+        document.body.style.backgroundColor = "#ffffff";
         var size = PAGE_SIZES_MM[formato] || PAGE_SIZES_MM.A4;
         var pageWpx = (size.w - MARGIN_MM * 2) * MM_TO_PX;
         // Stessa larghezza che avrebbe il contenuto stampato sul foglio scelto (non la
@@ -113,6 +130,9 @@
             if (btn) btn.disabled = false;
             document.body.classList.remove("print-mode");
             inner.style.width = "";
+            if (temaOriginale === null) root.removeAttribute("data-theme");
+            else root.setAttribute("data-theme", temaOriginale);
+            document.body.style.backgroundColor = bgOriginale;
         }
 
         // Doppio requestAnimationFrame: come per la stampa normale, assicura che il
