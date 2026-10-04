@@ -30,7 +30,14 @@
 
     // Mostra il PDF gia' pronto in un'anteprima, prima di scaricarlo davvero: l'utente
     // puo' controllare il risultato e decidere se scaricarlo o annullare.
-    function mostraAnteprima(doc, nomeFile) {
+    //
+    // L'anteprima NON usa un <iframe> sul PDF: su Chrome Android (il browser piu'
+    // comune per chi usa l'app da telefono) gli iframe non hanno un visualizzatore PDF
+    // integrato, quindi un blob: PDF dentro un iframe viene mostrato come una card di
+    // download generica ("Apri"), senza anteprima visibile. Mostriamo invece
+    // direttamente le immagini gia' catturate per ogni pagina (le stesse che finiscono
+    // nel PDF): sono garantite renderizzabili ovunque, essendo semplici <img>.
+    function mostraAnteprima(doc, nomeFile, immaginiPagine) {
         return new Promise(function (resolve) {
             var dialog = document.getElementById("pdf-preview-dialog");
             if (!dialog) {
@@ -42,7 +49,7 @@
                         '<span>Anteprima PDF</span>' +
                         '<button type="button" id="pdf-preview-close" aria-label="Chiudi" title="Chiudi">×</button>' +
                     '</div>' +
-                    '<iframe id="pdf-preview-frame" class="pdf-preview-frame" title="Anteprima PDF"></iframe>' +
+                    '<div id="pdf-preview-pages" class="pdf-preview-pages"></div>' +
                     '<div class="pdf-preview-actions">' +
                         '<button type="button" id="pdf-preview-annulla">Annulla</button>' +
                         '<button type="button" class="btn" id="pdf-preview-scarica">' + '⬇' + ' Scarica PDF</button>' +
@@ -50,9 +57,15 @@
                 document.body.appendChild(dialog);
             }
 
-            var frame = dialog.querySelector("#pdf-preview-frame");
-            var url = doc.output("bloburl");
-            frame.src = url;
+            var pagine = dialog.querySelector("#pdf-preview-pages");
+            pagine.innerHTML = "";
+            immaginiPagine.forEach(function (dataUrl) {
+                var img = document.createElement("img");
+                img.className = "pdf-preview-page";
+                img.src = dataUrl;
+                img.alt = "Pagina PDF";
+                pagine.appendChild(img);
+            });
 
             var btnChiudi = dialog.querySelector("#pdf-preview-close");
             var btnAnnulla = dialog.querySelector("#pdf-preview-annulla");
@@ -67,8 +80,7 @@
             function chiudi() {
                 cleanup();
                 dialog.close();
-                frame.src = "about:blank";
-                URL.revokeObjectURL(url);
+                pagine.innerHTML = "";
                 resolve();
             }
             function scarica() {
@@ -84,10 +96,9 @@
             if (typeof dialog.showModal === "function") {
                 dialog.showModal();
             } else {
-                // Fallback per browser senza <dialog> nativo: apriamo il PDF in una
-                // nuova scheda, che fa gia' da anteprima (visualizzatore PDF del browser).
-                window.open(url, "_blank");
-                resolve();
+                // Fallback per browser senza <dialog> nativo: scarichiamo direttamente,
+                // non c'e' un modo affidabile per mostrare un'anteprima modale.
+                scarica();
             }
         });
     }
@@ -149,6 +160,7 @@
             requestAnimationFrame(function () {
                 var jsPDF = window.jspdf.jsPDF;
                 var doc = null;
+                var immaginiPagine = [];
 
                 var catture = Array.prototype.reduce.call(cards, function (promessa, card) {
                     return promessa.then(function () {
@@ -165,22 +177,24 @@
                             imgHmm = contentHmm;
                         }
                         var x = MARGIN_MM + (contentWmm - imgWmm) / 2;
+                        var dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+                        immaginiPagine.push(dataUrl);
                         if (!doc) {
                             doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
                         } else {
                             doc.addPage("a4", "landscape");
                         }
-                        doc.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", x, MARGIN_MM, imgWmm, imgHmm);
+                        doc.addImage(dataUrl, "JPEG", x, MARGIN_MM, imgWmm, imgHmm);
                     });
                 }, Promise.resolve());
 
                 catture.then(function () {
                     // Il PDF e' gia' pronto in memoria: ripristiniamo subito tema/layout
-                    // della pagina (l'anteprima mostra il PDF catturato, non ha piu'
-                    // bisogno dello stato "da stampa" sulla pagina sottostante).
+                    // della pagina (l'anteprima mostra le immagini gia' catturate, non ha
+                    // piu' bisogno dello stato "da stampa" sulla pagina sottostante).
                     pulisci();
                     var nome = nomeFileValido(window.STAMPA_NOME_FILE) || "record-societari";
-                    return mostraAnteprima(doc, nome);
+                    return mostraAnteprima(doc, nome, immaginiPagine);
                 }).catch(function () {
                     pulisci();
                     alert("Non e' stato possibile generare il PDF. Riprova.");
