@@ -534,14 +534,14 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
 
 .pdf-preview-dialog {
     border: none;
-    border-radius: var(--radius);
+    margin: 0;
     padding: 0;
     background: var(--card-bg);
     color: var(--ink);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-    width: 95vw;
-    max-width: 1000px;
-    height: 90vh;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
     flex-direction: column;
 }
 .pdf-preview-dialog[open] { display: flex; }
@@ -559,14 +559,11 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
     padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 16px;
 }
 .pdf-preview-page { max-width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+.pdf-preview-loading { margin: auto; color: #fff; }
 .pdf-preview-actions {
     display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px;
     border-top: 1px solid var(--border);
 }
-@media (max-width: 640px) {
-    .pdf-preview-dialog { width: 100vw; height: 100vh; max-width: none; border-radius: 0; }
-}
-
 /* Mobile: la maggior parte degli accessi arriva da smartphone */
 @media (max-width: 640px) {
     .container { margin: 12px auto; padding: 0 10px; }

@@ -28,35 +28,47 @@
             .slice(0, 120);
     }
 
-    // Mostra il PDF gia' pronto in un'anteprima, prima di scaricarlo davvero: l'utente
-    // puo' controllare il risultato e decidere se scaricarlo o annullare.
-    //
-    // L'anteprima NON usa un <iframe> sul PDF: su Chrome Android (il browser piu'
-    // comune per chi usa l'app da telefono) gli iframe non hanno un visualizzatore PDF
-    // integrato, quindi un blob: PDF dentro un iframe viene mostrato come una card di
-    // download generica ("Apri"), senza anteprima visibile. Mostriamo invece
-    // direttamente le immagini gia' catturate per ogni pagina (le stesse che finiscono
-    // nel PDF): sono garantite renderizzabili ovunque, essendo semplici <img>.
-    function mostraAnteprima(doc, nomeFile, immaginiPagine) {
-        return new Promise(function (resolve) {
-            var dialog = document.getElementById("pdf-preview-dialog");
-            if (!dialog) {
-                dialog = document.createElement("dialog");
-                dialog.id = "pdf-preview-dialog";
-                dialog.className = "pdf-preview-dialog";
-                dialog.innerHTML =
-                    '<div class="pdf-preview-header">' +
-                        '<span>Anteprima PDF</span>' +
-                        '<button type="button" id="pdf-preview-close" aria-label="Chiudi" title="Chiudi">×</button>' +
-                    '</div>' +
-                    '<div id="pdf-preview-pages" class="pdf-preview-pages"></div>' +
-                    '<div class="pdf-preview-actions">' +
-                        '<button type="button" id="pdf-preview-annulla">Annulla</button>' +
-                        '<button type="button" class="btn" id="pdf-preview-scarica">' + '⬇' + ' Scarica PDF</button>' +
-                    '</div>';
-                document.body.appendChild(dialog);
-            }
+    function creaDialogAnteprima() {
+        var dialog = document.getElementById("pdf-preview-dialog");
+        if (dialog) return dialog;
+        dialog = document.createElement("dialog");
+        dialog.id = "pdf-preview-dialog";
+        dialog.className = "pdf-preview-dialog";
+        dialog.innerHTML =
+            '<div class="pdf-preview-header">' +
+                '<span>Anteprima PDF</span>' +
+                '<button type="button" id="pdf-preview-close" aria-label="Chiudi" title="Chiudi">×</button>' +
+            '</div>' +
+            '<div id="pdf-preview-pages" class="pdf-preview-pages"></div>' +
+            '<div class="pdf-preview-actions">' +
+                '<button type="button" id="pdf-preview-annulla">Annulla</button>' +
+                '<button type="button" class="btn" id="pdf-preview-scarica">' + '⬇' + ' Scarica PDF</button>' +
+            '</div>';
+        document.body.appendChild(dialog);
+        return dialog;
+    }
 
+    // Apriamo subito il dialogo, con un semplice messaggio di caricamento, PRIMA di
+    // forzare tema chiaro/sfondo bianco sulla pagina sottostante per la cattura: senza
+    // questo, l'utente vedrebbe per i secondi della cattura la pagina reale "sfarfallare"
+    // in chiaro, dietro al punto in cui comparira' poi l'anteprima vera. Il dialogo a
+    // schermo intero copre subito la pagina, quindi quel passaggio non si vede piu'.
+    function mostraCaricamento() {
+        var dialog = creaDialogAnteprima();
+        dialog.querySelector("#pdf-preview-pages").innerHTML =
+            '<p class="pdf-preview-loading">Generazione del PDF in corso…</p>';
+        dialog.querySelector("#pdf-preview-close").hidden = true;
+        dialog.querySelector("#pdf-preview-annulla").hidden = true;
+        dialog.querySelector("#pdf-preview-scarica").hidden = true;
+        if (typeof dialog.showModal === "function" && !dialog.open) dialog.showModal();
+        return dialog;
+    }
+
+    // Sostituisce il messaggio di caricamento con le pagine vere e proprie (le stesse
+    // immagini gia' catturate che finiscono nel PDF: niente <iframe>, su Chrome Android
+    // non ha un visualizzatore PDF integrato e mostrerebbe solo una card di download).
+    function mostraAnteprima(dialog, doc, nomeFile, immaginiPagine) {
+        return new Promise(function (resolve) {
             var pagine = dialog.querySelector("#pdf-preview-pages");
             pagine.innerHTML = "";
             immaginiPagine.forEach(function (dataUrl) {
@@ -70,6 +82,9 @@
             var btnChiudi = dialog.querySelector("#pdf-preview-close");
             var btnAnnulla = dialog.querySelector("#pdf-preview-annulla");
             var btnScarica = dialog.querySelector("#pdf-preview-scarica");
+            btnChiudi.hidden = false;
+            btnAnnulla.hidden = false;
+            btnScarica.hidden = false;
 
             function cleanup() {
                 btnChiudi.removeEventListener("click", chiudi);
@@ -93,12 +108,12 @@
             btnScarica.addEventListener("click", scarica);
             dialog.addEventListener("cancel", chiudi);
 
-            if (typeof dialog.showModal === "function") {
-                dialog.showModal();
-            } else {
+            if (typeof dialog.showModal !== "function") {
                 // Fallback per browser senza <dialog> nativo: scarichiamo direttamente,
                 // non c'e' un modo affidabile per mostrare un'anteprima modale.
                 scarica();
+            } else if (!dialog.open) {
+                dialog.showModal();
             }
         });
     }
@@ -113,6 +128,8 @@
 
         var btn = document.getElementById("stampa-record-btn");
         if (btn) btn.disabled = true;
+
+        var dialog = mostraCaricamento();
 
         document.body.classList.add("print-mode");
         // Stesso motivo di stampa_allenamento.js: forziamo tema chiaro e sfondo
@@ -194,9 +211,10 @@
                     // piu' bisogno dello stato "da stampa" sulla pagina sottostante).
                     pulisci();
                     var nome = nomeFileValido(window.STAMPA_NOME_FILE) || "record-societari";
-                    return mostraAnteprima(doc, nome, immaginiPagine);
+                    return mostraAnteprima(dialog, doc, nome, immaginiPagine);
                 }).catch(function () {
                     pulisci();
+                    dialog.close();
                     alert("Non e' stato possibile generare il PDF. Riprova.");
                 });
             });
