@@ -18,8 +18,8 @@
                     {% if record %}
                         <div class="record-tempo">{{ record.tempo }}</div>
                         <div class="record-nome">{{ record.nome }}</div>
-                        {% if record.data %}<div class="record-data">{{ record.data.strftime('%d/%m/%Y') }}</div>
-                        {% elif record.evento %}<div class="record-data">{{ record.evento }}</div>{% endif %}
+                        {% if record.data %}<div class="record-data">{{ record.data.strftime('%d/%m/%Y') }}</div>{% endif %}
+                        {% if record.evento %}<div class="record-data record-evento">{{ record.evento }}</div>{% endif %}
                     {% else %}
                         <span class="muted">&mdash;</span>
                     {% endif %}

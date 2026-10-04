@@ -6,7 +6,7 @@
 
 <div class="actions no-print">
     <a class="btn" href="{{ url_for('admin.dashboard') }}">&larr; Home</a>
-    <button type="button" class="btn" onclick="window.print()" title="Stampa / esporta PDF">{{ icon('stampa') }} Stampa / esporta PDF</button>
+    <button type="button" class="btn" id="stampa-record-btn" onclick="esportaRecordPdf()" title="Esporta PDF">{{ icon('stampa') }} Esporta PDF</button>
 </div>
 
 <div class="actions no-print">
@@ -23,14 +23,10 @@
 
 {{ recmacro.render_griglia(griglia, sesso, vasca, True) }}
 
-<style>
-@media print {
-    @page { size: A4 landscape; margin: 10mm; }
-    .no-print, .navbar, .flash { display: none !important; }
-    .card, .record-card { box-shadow: none; overflow: visible; padding: 6px; }
-    .record-table { min-width: 0; width: 100%; table-layout: fixed; font-size: 0.72em; }
-    .record-table th, .record-table td { white-space: normal; overflow-wrap: break-word; word-break: break-word; padding: 4px 3px; }
-    .record-table tr, .record-card { page-break-inside: avoid; }
-}
-</style>
+<script>
+    window.STAMPA_NOME_FILE = {{ ('Record societari ' ~ ('Uomini' if sesso == 'M' else 'Donne') ~ ' vasca ' ~ vasca ~ 'm')|tojson }};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="{{ static_url('js/stampa_record.js') }}"></script>
 {% endblock %}

@@ -356,7 +356,8 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 .record-table td { vertical-align: top; white-space: nowrap; }
 .record-table .record-tempo { font-weight: 700; }
 .record-table .record-nome { font-size: 0.9em; white-space: normal; }
-.record-table .record-data { font-size: 0.8em; color: var(--muted); }
+.record-table .record-data { font-size: 0.8em; color: var(--muted); white-space: normal; }
+.record-table .record-evento { font-style: italic; }
 .record-table .record-edit-btn { padding: 3px 6px; margin-top: 6px; }
 .record-table .record-edit-btn .icon { width: 16px; height: 16px; margin-right: 0; }
 
