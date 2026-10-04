@@ -26,7 +26,7 @@
         <input type="date" name="scadenza_iscrizione">
 
         <label>Tipologie di gara</label>
-        <div class="checkbox-list">
+        <div class="checkbox-list checkbox-list-scroll">
             {% for tipo in tipi_gara_base %}
                 <label class="checkbox-item">
                     <input type="checkbox" name="tipologie" value="{{ tipo }}"> {{ tipo }}

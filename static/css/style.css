@@ -613,6 +613,20 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
 
     .checkbox-list { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
 
+    /* Liste con testo lungo (es. tipologie di gara/staffette): invece di
+       stringere le colonne fino a troncare il testo, le teniamo larghe e
+       lasciamo scorrere la lista in orizzontale, come le tabelle larghe. */
+    .checkbox-list.checkbox-list-scroll {
+        grid-auto-flow: column;
+        grid-template-columns: none;
+        grid-template-rows: repeat(7, auto);
+        grid-auto-columns: minmax(max-content, 1fr);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+    }
+    .checkbox-list-scroll .checkbox-item { white-space: nowrap; }
+
     /* Tabelle "a card": ogni riga diventa un blocco con etichetta:valore,
        invece di una tabella larga da scorrere in orizzontale. Le tabelle che
        usano rowspan (piu' righe collegate, es. iscrizioni) restano con lo
