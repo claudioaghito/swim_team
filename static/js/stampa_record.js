@@ -28,6 +28,70 @@
             .slice(0, 120);
     }
 
+    // Mostra il PDF gia' pronto in un'anteprima, prima di scaricarlo davvero: l'utente
+    // puo' controllare il risultato e decidere se scaricarlo o annullare.
+    function mostraAnteprima(doc, nomeFile) {
+        return new Promise(function (resolve) {
+            var dialog = document.getElementById("pdf-preview-dialog");
+            if (!dialog) {
+                dialog = document.createElement("dialog");
+                dialog.id = "pdf-preview-dialog";
+                dialog.className = "pdf-preview-dialog";
+                dialog.innerHTML =
+                    '<div class="pdf-preview-header">' +
+                        '<span>Anteprima PDF</span>' +
+                        '<button type="button" id="pdf-preview-close" aria-label="Chiudi" title="Chiudi">×</button>' +
+                    '</div>' +
+                    '<iframe id="pdf-preview-frame" class="pdf-preview-frame" title="Anteprima PDF"></iframe>' +
+                    '<div class="pdf-preview-actions">' +
+                        '<button type="button" id="pdf-preview-annulla">Annulla</button>' +
+                        '<button type="button" class="btn" id="pdf-preview-scarica">' + '⬇' + ' Scarica PDF</button>' +
+                    '</div>';
+                document.body.appendChild(dialog);
+            }
+
+            var frame = dialog.querySelector("#pdf-preview-frame");
+            var url = doc.output("bloburl");
+            frame.src = url;
+
+            var btnChiudi = dialog.querySelector("#pdf-preview-close");
+            var btnAnnulla = dialog.querySelector("#pdf-preview-annulla");
+            var btnScarica = dialog.querySelector("#pdf-preview-scarica");
+
+            function cleanup() {
+                btnChiudi.removeEventListener("click", chiudi);
+                btnAnnulla.removeEventListener("click", chiudi);
+                btnScarica.removeEventListener("click", scarica);
+                dialog.removeEventListener("cancel", chiudi);
+            }
+            function chiudi() {
+                cleanup();
+                dialog.close();
+                frame.src = "about:blank";
+                URL.revokeObjectURL(url);
+                resolve();
+            }
+            function scarica() {
+                doc.save(nomeFile + ".pdf");
+                chiudi();
+            }
+
+            btnChiudi.addEventListener("click", chiudi);
+            btnAnnulla.addEventListener("click", chiudi);
+            btnScarica.addEventListener("click", scarica);
+            dialog.addEventListener("cancel", chiudi);
+
+            if (typeof dialog.showModal === "function") {
+                dialog.showModal();
+            } else {
+                // Fallback per browser senza <dialog> nativo: apriamo il PDF in una
+                // nuova scheda, che fa gia' da anteprima (visualizzatore PDF del browser).
+                window.open(url, "_blank");
+                resolve();
+            }
+        });
+    }
+
     function esportaRecordPdf() {
         var cards = document.querySelectorAll(".record-card");
         if (!cards.length) return;
@@ -111,11 +175,16 @@
                 }, Promise.resolve());
 
                 catture.then(function () {
+                    // Il PDF e' gia' pronto in memoria: ripristiniamo subito tema/layout
+                    // della pagina (l'anteprima mostra il PDF catturato, non ha piu'
+                    // bisogno dello stato "da stampa" sulla pagina sottostante).
+                    pulisci();
                     var nome = nomeFileValido(window.STAMPA_NOME_FILE) || "record-societari";
-                    doc.save(nome + ".pdf");
+                    return mostraAnteprima(doc, nome);
                 }).catch(function () {
+                    pulisci();
                     alert("Non e' stato possibile generare il PDF. Riprova.");
-                }).then(pulisci, pulisci);
+                });
             });
         });
     }

@@ -532,6 +532,37 @@ h1 .icon, h2 .icon, h3 .icon { width: 26px; height: 26px; vertical-align: -6px; 
 .confirm-dialog-body p { margin: 0; }
 .confirm-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 0 20px 20px; }
 
+.pdf-preview-dialog {
+    border: none;
+    border-radius: var(--radius);
+    padding: 0;
+    background: var(--card-bg);
+    color: var(--ink);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    width: 95vw;
+    max-width: 1000px;
+    height: 90vh;
+    flex-direction: column;
+}
+.pdf-preview-dialog[open] { display: flex; }
+.pdf-preview-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.pdf-preview-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 600;
+}
+.pdf-preview-header button {
+    background: none; border: none; color: var(--ink); font-size: 1.4em;
+    line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.pdf-preview-frame { flex: 1; width: 100%; border: none; background: #525659; }
+.pdf-preview-actions {
+    display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px;
+    border-top: 1px solid var(--border);
+}
+@media (max-width: 640px) {
+    .pdf-preview-dialog { width: 100vw; height: 100vh; max-width: none; border-radius: 0; }
+}
+
 /* Mobile: la maggior parte degli accessi arriva da smartphone */
 @media (max-width: 640px) {
     .container { margin: 12px auto; padding: 0 10px; }
