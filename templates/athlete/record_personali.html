@@ -11,7 +11,7 @@
     <h2>{{ icon('medaglia') }} I miei record</h2>
     <p class="no-print"><small>Registra qui i tuoi tempi ottenuti nei tornei: la categoria viene assegnata automaticamente in base alla tua età.</small></p>
     <div style="overflow-x:auto;">
-    <table class="table">
+    <table class="table record-table">
         <thead>
             <tr>
                 <th data-sort="date">Data</th>
@@ -32,10 +32,10 @@
                 <td>{{ record.vasca }} m</td>
                 <td>{{ record.tempo }}</td>
                 <td>{{ record.categoria or '-' }}</td>
-                <td class="no-print">
+                <td class="no-print table-actions">
                     <a class="btn" href="{{ url_for('athlete.modifica_record_personale', record_id=record.id) }}" title="Modifica">{{ icon('modifica') }}</a>
                     <form method="POST" action="{{ url_for('athlete.elimina_record_personale', record_id=record.id) }}"
-                          onsubmit="return confirmSubmit(this, 'Eliminare questo record?');" style="display:inline;">
+                          onsubmit="return confirmSubmit(this, 'Eliminare questo record?');">
                         <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
                     </form>
                 </td>
