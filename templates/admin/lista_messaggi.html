@@ -32,7 +32,12 @@
                 <td>{{ m.data.strftime('%d/%m/%Y %H:%M') }}</td>
                 <td>{{ m.mittente.nome_completo }}</td>
                 <td>{{ "Tutta la squadra" if m.is_comunicazione_generale else m.destinatario.nome_completo }}</td>
-                <td class="preserve-lines">{{ m.testo }}</td>
+                <td class="preserve-lines">
+                    {{ m.testo }}
+                    {% if m.allegato_file %}
+                        <br><a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
+                    {% endif %}
+                </td>
                 <td>
                     <form method="POST" action="{{ url_for('admin.elimina_messaggio', messaggio_id=m.id) }}"
                           onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');">

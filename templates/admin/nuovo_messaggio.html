@@ -7,7 +7,7 @@
 </div>
 <div class="card">
     <h2>{{ icon('nuovo-messaggio') }} Nuovo messaggio</h2>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <label>Destinatario</label>
         <select name="destinatario_id">
             <option value="">Tutta la squadra (comunicazione generale)</option>
@@ -18,6 +18,9 @@
 
         <label>Testo</label>
         <textarea name="testo" rows="4" required></textarea>
+
+        <label>Allegato (PDF o immagine, facoltativo)</label>
+        <input type="file" name="allegato" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp">
 
         <button type="submit">{{ icon('invio-messaggio') }} Invia</button>
     </form>

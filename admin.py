@@ -1433,6 +1433,18 @@ def nuovo_messaggio():
             testo=request.form["testo"].strip(),
         )
         db.session.add(messaggio)
+        db.session.flush()
+
+        try:
+            messaggio.allegato_file = _salva_upload(
+                request.files.get("allegato"), "messaggi", f"allegato_{messaggio.id}",
+                current_app.config["ALLOWED_ALLEGATO_EXT"],
+            )
+        except ValueError as e:
+            db.session.rollback()
+            flash(str(e), "danger")
+            return redirect(url_for("admin.nuovo_messaggio"))
+
         db.session.commit()
         flash("Messaggio inviato.", "success")
         return redirect(url_for("admin.dashboard"))
@@ -1458,10 +1470,23 @@ def lista_messaggi():
 @admin_required
 def elimina_messaggio(messaggio_id):
     messaggio = Messaggio.query.get_or_404(messaggio_id)
+    _elimina_file("messaggi", messaggio.allegato_file)
     db.session.delete(messaggio)
     db.session.commit()
     flash("Messaggio eliminato.", "success")
     return redirect(url_for("admin.lista_messaggi"))
+
+
+@admin_bp.route("/messaggi/<int:messaggio_id>/allegato")
+@login_required
+def allegato_messaggio(messaggio_id):
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    if not messaggio.allegato_file:
+        abort(404)
+    if not current_user.is_admin and messaggio.destinatario_id not in (None, current_user.id):
+        abort(403)
+    cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "messaggi")
+    return send_from_directory(cartella, messaggio.allegato_file)
 
 
 @admin_bp.route("/record")

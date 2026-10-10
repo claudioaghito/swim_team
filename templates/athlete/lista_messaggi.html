@@ -14,6 +14,9 @@
                 <strong>{{ m.mittente.nome_completo }}</strong>
                 {% if m.is_comunicazione_generale %}<em>(a tutti)</em>{% endif %}
                 — <span class="preserve-lines">{{ m.testo }}</span>
+                {% if m.allegato_file %}
+                    <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
+                {% endif %}
                 <form method="POST" action="{{ url_for('athlete.elimina_messaggio', messaggio_id=m.id) }}"
                       onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');" style="display:inline;">
                     <input type="hidden" name="next" value="{{ url_for('athlete.lista_messaggi') }}">

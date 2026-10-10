@@ -40,6 +40,11 @@ def _migra_schema(app):
             if "evento" not in colonne_record:
                 with db.engine.begin() as conn:
                     conn.execute(text("ALTER TABLE record_societari ADD COLUMN evento VARCHAR(60)"))
+        if "messaggi" in inspector.get_table_names():
+            colonne_messaggi = {c["name"] for c in inspector.get_columns("messaggi")}
+            if "allegato_file" not in colonne_messaggi:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE messaggi ADD COLUMN allegato_file VARCHAR(255)"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
 
@@ -54,6 +59,7 @@ def create_app(config_class=Config):
     os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "cartellini"), exist_ok=True)
     os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "certificati"), exist_ok=True)
     os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "programmi_gare"), exist_ok=True)
+    os.makedirs(os.path.join(app.config["UPLOAD_FOLDER"], "messaggi"), exist_ok=True)
 
     from auth import auth_bp
     from admin import admin_bp

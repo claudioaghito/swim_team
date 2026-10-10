@@ -268,6 +268,7 @@ class Messaggio(db.Model):
     testo = db.Column(db.Text, nullable=False)
     data = db.Column(db.DateTime, default=datetime.utcnow)
     letto = db.Column(db.Boolean, default=False)
+    allegato_file = db.Column(db.String(255))  # nome file PDF/immagine, in UPLOAD_FOLDER/messaggi
 
     mittente = db.relationship("User", foreign_keys=[mittente_id])
     destinatario = db.relationship("User", foreign_keys=[destinatario_id])
