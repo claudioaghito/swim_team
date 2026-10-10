@@ -36,6 +36,7 @@
                     {{ m.testo }}
                     {% if m.allegato_file %}
                         <br><a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
+                        <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, download=1) }}">{{ icon('download') }} Scarica</a>
                     {% endif %}
                 </td>
                 <td>

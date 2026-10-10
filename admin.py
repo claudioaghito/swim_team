@@ -1486,7 +1486,8 @@ def allegato_messaggio(messaggio_id):
     if not current_user.is_admin and messaggio.destinatario_id not in (None, current_user.id):
         abort(403)
     cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "messaggi")
-    return send_from_directory(cartella, messaggio.allegato_file)
+    as_attachment = request.args.get("download") == "1"
+    return send_from_directory(cartella, messaggio.allegato_file, as_attachment=as_attachment)
 
 
 @admin_bp.route("/record")
