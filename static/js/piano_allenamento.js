@@ -182,13 +182,23 @@
         campoNome.appendChild(inputNome);
         head.appendChild(campoNome);
 
-        selectTipo.addEventListener("change", function () {
+        function proponiNomeDaTipo() {
             if (!inputNome.value.trim() || FASI_TIPI.some(function (t) { return t[1] === inputNome.value; })) {
                 var scelto = FASI_TIPI.find(function (t) { return t[0] === selectTipo.value; });
                 if (scelto) inputNome.value = scelto[1];
             }
+        }
+
+        selectTipo.addEventListener("change", function () {
+            proponiNomeDaTipo();
             applicaColoreFase(selectTipo, card);
         });
+
+        // Una fase nuova (senza nome gia' impostato) parte col tipo gia' selezionato
+        // di default (il primo di FASI_TIPI, es. "Riscaldamento"): senza questo, il
+        // "change" sopra non scatta mai e il nome proposto non compare finche' l'utente
+        // non cambia manualmente il Tipo.
+        if (!fase.nome) proponiNomeDaTipo();
 
         var campoDurata = document.createElement("div");
         campoDurata.innerHTML = "<label>Durata (min)</label>";
