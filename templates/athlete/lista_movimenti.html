@@ -9,11 +9,12 @@
 
 <div class="card">
     <p class="saldo {{ 'negativo' if saldo < 0 else 'positivo' }}">{{ "%.2f"|format(saldo) }} €</p>
-    <table class="table">
+    <div style="overflow-x:auto;">
+    <table class="table table-scroll-wide">
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Causale</th>
+                <th class="col-wide-text">Causale</th>
                 <th>Importo</th>
             </tr>
         </thead>
@@ -21,7 +22,7 @@
             {% for m in movimenti %}
             <tr>
                 <td>{{ m.data.strftime('%d/%m/%Y') }}</td>
-                <td>{{ m.causale }}</td>
+                <td class="col-wide-text">{{ m.causale }}</td>
                 <td class="saldo-cell {{ 'positivo' if m.importo >= 0 else 'negativo' }}">{{ "%.2f"|format(m.importo) }} €</td>
             </tr>
             {% else %}
@@ -29,5 +30,6 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}

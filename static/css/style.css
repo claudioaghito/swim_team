@@ -264,7 +264,7 @@ button:disabled, button:disabled:hover { background: var(--muted); box-shadow: n
     background: var(--red);
     color: white;
     border: none;
-    padding: 10px 18px;
+    padding: 7px 15px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.95em;
@@ -327,6 +327,12 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 .table th[data-sort] { cursor: pointer; user-select: none; }
 .table th[data-sort]:hover { opacity: 0.8; }
 .sort-indicator { font-size: 0.9em; }
+
+/* Tabelle con una colonna di testo libero (messaggi, causali, descrizioni):
+   invece di stringere il testo su righe strettissime, la colonna resta larga
+   e l'intera tabella scorre in orizzontale (stesso approccio di .record-table). */
+.table-scroll-wide { min-width: 680px; }
+.table-scroll-wide .col-wide-text { min-width: 280px; }
 
 .search-form { display: flex; gap: 8px; }
 .search-form input { flex: 1; margin-top: 0; }

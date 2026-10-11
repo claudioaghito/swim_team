@@ -24,11 +24,12 @@
 </div>
 
 <div class="card">
-    <table class="table">
+    <div style="overflow-x:auto;">
+    <table class="table table-scroll-wide">
         <thead>
             <tr>
                 <th data-sort="date">Data</th>
-                <th>Descrizione</th>
+                <th class="col-wide-text">Descrizione</th>
                 <th></th>
             </tr>
         </thead>
@@ -36,7 +37,7 @@
             {% for al in allenamenti %}
             <tr>
                 <td data-sort-value="{{ al.data.isoformat() }}">{{ al.data.strftime('%d/%m/%Y') }}</td>
-                <td class="preserve-lines">{{ al.descrizione or '-' }}</td>
+                <td class="preserve-lines col-wide-text">{{ al.descrizione or '-' }}</td>
                 <td class="table-actions">
                     <a class="btn" href="{{ url_for('athlete.dettaglio_allenamento', allenamento_id=al.id) }}" title="Apri">{{ icon('apri') }}</a>
                     <form method="POST" action="{{ url_for('athlete.nascondi_allenamento', allenamento_id=al.id) }}" style="display:inline;">
@@ -49,5 +50,6 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}
