@@ -43,8 +43,16 @@
     <h3>{{ icon('movimenti-contabili') }} Totale costo torneo</h3>
     <p>
         <strong>Totale calcolato (tutti gli iscritti):</strong> {{ "%.2f"|format(totale_calcolato) }} €<br>
-        <strong>Totale già addebitato:</strong> {{ "%.2f"|format(totale_addebitato) }} €
+        <strong>Totale già addebitato:</strong> {{ "%.2f"|format(totale_addebitato) }} €<br>
+        <strong>Totale da versare alla Derthona Nuoto:</strong> {{ "%.2f"|format(totale_derthona) }} €<br>
+        <strong>Totale da versare alla società del Torneo:</strong> {{ "%.2f"|format(totale_societa) }} €
     </p>
+    <p class="no-print"><small>
+        Quota Derthona Nuoto = {{ numero_gare_individuali }} gare individuali &times; tassa FIN
+        + {{ numero_staffette }} staffette formate &times; 4 &times; tassa FIN
+        (tassa FIN impostata nelle <a href="{{ url_for('admin.impostazioni') }}">impostazioni</a>).
+        {% if tipi_staffetta and not numero_staffette %}Le staffette non sono ancora state formate: il conteggio verrà aggiornato dopo la formazione delle squadre.{% endif %}
+    </small></p>
 </div>
 
 {% if tipi_staffetta %}

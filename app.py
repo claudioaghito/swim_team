@@ -45,6 +45,11 @@ def _migra_schema(app):
             if "allegato_file" not in colonne_messaggi:
                 with db.engine.begin() as conn:
                     conn.execute(text("ALTER TABLE messaggi ADD COLUMN allegato_file VARCHAR(255)"))
+        if "configurazione" in inspector.get_table_names():
+            colonne_config = {c["name"] for c in inspector.get_columns("configurazione")}
+            if "tassa_fin" not in colonne_config:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE configurazione ADD COLUMN tassa_fin FLOAT"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
 

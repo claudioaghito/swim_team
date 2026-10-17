@@ -21,6 +21,14 @@
         <label>Modalità di pagamento (uguale per tutti i tornei, visibile agli atleti)</label>
         <textarea name="modalita_pagamento" rows="3" placeholder="es. Bonifico a... oppure contanti in segreteria entro...">{{ config.modalita_pagamento or '' }}</textarea>
 
+        <label>Tassa FIN per iscrizione gara per atleta</label>
+        <input type="number" step="0.01" min="0" name="tassa_fin" value="{{ "%.2f"|format(config.tassa_fin or 0) }}">
+        <p><small>
+            Usata nel dettaglio di ogni torneo per calcolare il totale da versare alla Derthona Nuoto:
+            (numero gare individuali &times; tassa FIN) + (numero staffette formate &times; 4 &times; tassa FIN).
+            Il resto del totale calcolato per il torneo va versato alla società che organizza il torneo.
+        </small></p>
+
         <button type="submit" title="Salva">{{ icon('salva') }}</button>
     </form>
 </div>

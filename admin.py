@@ -292,6 +292,11 @@ def impostazioni():
 
         config.anno_stagione = anno
         config.modalita_pagamento = request.form.get("modalita_pagamento", "").strip()
+        try:
+            config.tassa_fin = float(request.form.get("tassa_fin", "0").replace(",", ".") or 0)
+        except ValueError:
+            flash("Tassa FIN non valida.", "danger")
+            return redirect(url_for("admin.impostazioni"))
         db.session.commit()
         flash("Impostazioni aggiornate.", "success")
         return redirect(url_for("admin.impostazioni"))
@@ -905,6 +910,15 @@ def dettaglio_gara(gara_id):
         float(q.importo) for q in quote_per_atleta.values() if q.movimento_id and q.importo
     )
 
+    # Quota FIN da versare alla Derthona Nuoto: tassa fissa per ogni gara individuale
+    # iscritta e per ogni atleta di ogni staffetta effettivamente formata (4 per staffetta).
+    # Il resto del totale calcolato va versato alla societa' che organizza il torneo.
+    tassa_fin = float(config.tassa_fin or 0)
+    numero_gare_individuali = sum(len(iscrizioni) for iscrizioni in scelte_gare_individuali.values())
+    numero_staffette = len(gara.formazioni_staffetta)
+    totale_derthona = numero_gare_individuali * tassa_fin + numero_staffette * 4 * tassa_fin
+    totale_societa = totale_calcolato - totale_derthona
+
     return render_template(
         "admin/dettaglio_gara.html",
         gara=gara,
@@ -916,6 +930,10 @@ def dettaglio_gara(gara_id):
         anno_stagione=anno_stagione,
         totale_calcolato=totale_calcolato,
         totale_addebitato=totale_addebitato,
+        numero_gare_individuali=numero_gare_individuali,
+        numero_staffette=numero_staffette,
+        totale_derthona=totale_derthona,
+        totale_societa=totale_societa,
     )
 
 

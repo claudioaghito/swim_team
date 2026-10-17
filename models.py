@@ -317,6 +317,7 @@ class Configurazione(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     anno_stagione = db.Column(db.Integer, nullable=False, default=lambda: datetime.utcnow().year)
     modalita_pagamento = db.Column(db.Text)  # testo libero, uguale per tutti i tornei, visibile agli atleti
+    tassa_fin = db.Column(db.Float, default=0)  # tassa FIN per ogni iscrizione gara/staffetta, per atleta
 
     @classmethod
     def ottieni(cls):
