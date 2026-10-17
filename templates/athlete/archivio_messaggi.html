@@ -24,6 +24,11 @@
                 <form method="POST" action="{{ url_for('athlete.ripristina_messaggio', messaggio_id=m.id) }}" style="display:inline;">
                     <button type="submit" class="btn" title="Ripristina">{{ icon('ripristina') }}</button>
                 </form>
+                <form method="POST" action="{{ url_for('athlete.elimina_messaggio', messaggio_id=m.id) }}"
+                      onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');" style="display:inline;">
+                    <input type="hidden" name="next" value="{{ url_for('athlete.archivio_messaggi') }}">
+                    <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
+                </form>
             </li>
         {% else %}
             <li>Il tuo archivio e' vuoto.</li>
