@@ -3,14 +3,14 @@ from datetime import datetime
 
 from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, abort,
-    current_app, send_from_directory, make_response,
+    current_app, send_from_directory, make_response, jsonify,
 )
 from flask_login import login_required, current_user
 
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
-    Configurazione, AllenamentoNascosto, RecordSocietario, RecordPersonale,
+    MessaggioLetto, Configurazione, AllenamentoNascosto, RecordSocietario, RecordPersonale,
 )
 from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
@@ -29,6 +29,31 @@ def _messaggi_visibili_query():
     ).filter(~Messaggio.id.in_(nascosti))
 
 
+def _messaggi_non_letti_query():
+    letti = db.session.query(MessaggioLetto.messaggio_id).filter_by(atleta_id=current_user.id)
+    return _messaggi_visibili_query().filter(~Messaggio.id.in_(letti))
+
+
+def _marca_letti(messaggi):
+    """Segna come letti, per l'atleta corrente, i messaggi passati (gia' letti vengono
+    ignorati): usato ovunque il testo dei messaggi venga mostrato per intero, cosi' il
+    pallino sull'icona dell'app (vedi /atleta/messaggi/non-letti) si aggiorna di conseguenza."""
+    if not messaggi:
+        return
+    gia_letti = {
+        r[0] for r in db.session.query(MessaggioLetto.messaggio_id)
+        .filter_by(atleta_id=current_user.id)
+        .filter(MessaggioLetto.messaggio_id.in_([m.id for m in messaggi]))
+        .all()
+    }
+    nuovi = [m.id for m in messaggi if m.id not in gia_letti]
+    if not nuovi:
+        return
+    for messaggio_id in nuovi:
+        db.session.add(MessaggioLetto(messaggio_id=messaggio_id, atleta_id=current_user.id))
+    db.session.commit()
+
+
 @athlete_bp.route("/")
 @login_required
 def dashboard():
@@ -45,6 +70,7 @@ def dashboard():
     ).order_by(MovimentoContabile.data.desc()).limit(5).all()
 
     messaggi = _messaggi_visibili_query().order_by(Messaggio.data.desc()).limit(10).all()
+    _marca_letti(messaggi)
 
     config = Configurazione.ottieni()
     categoria = current_user.categoria_master(config.anno_stagione)
@@ -65,7 +91,16 @@ def dashboard():
 @login_required
 def lista_messaggi():
     messaggi = _messaggi_visibili_query().order_by(Messaggio.data.desc()).all()
+    _marca_letti(messaggi)
     return render_template("athlete/lista_messaggi.html", messaggi=messaggi)
+
+
+@athlete_bp.route("/messaggi/non-letti")
+@login_required
+def messaggi_non_letti():
+    """Numero di messaggi non ancora visti dall'atleta corrente: interrogato dal
+    client per aggiornare il pallino sull'icona dell'app (Badging API)."""
+    return jsonify(count=_messaggi_non_letti_query().count())
 
 
 @athlete_bp.route("/messaggi/<int:messaggio_id>/elimina", methods=["POST"])

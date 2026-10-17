@@ -275,6 +275,9 @@ class Messaggio(db.Model):
     nascosto_da = db.relationship(
         "MessaggioNascosto", backref="messaggio", lazy=True, cascade="all, delete-orphan"
     )
+    letto_da = db.relationship(
+        "MessaggioLetto", backref="messaggio", lazy=True, cascade="all, delete-orphan"
+    )
 
     @property
     def is_comunicazione_generale(self):
@@ -293,6 +296,21 @@ class MessaggioNascosto(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("messaggio_id", "atleta_id", name="uq_messaggio_nascosto"),
+    )
+
+
+class MessaggioLetto(db.Model):
+    """Traccia quali messaggi un atleta ha gia' visto (comunicazioni generali o messaggi
+    diretti): serve a calcolare il numero di messaggi non letti, es. per il pallino
+    sull'icona dell'app, senza modificare la riga condivisa del messaggio."""
+    __tablename__ = "messaggi_letti"
+
+    id = db.Column(db.Integer, primary_key=True)
+    messaggio_id = db.Column(db.Integer, db.ForeignKey("messaggi.id"), nullable=False)
+    atleta_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint("messaggio_id", "atleta_id", name="uq_messaggio_letto"),
     )
 
 

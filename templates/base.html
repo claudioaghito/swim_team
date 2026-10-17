@@ -183,6 +183,27 @@
         }
     </script>
 
+    {% if current_user.is_authenticated and not current_user.is_admin %}
+    <script>
+        // Pallino rosso sull'icona dell'app (home screen/taskbar) quando ci sono
+        // messaggi non letti dall'amministratore. Supportato solo da Chrome/Edge
+        // (Android e desktop): non ha effetto sui browser che non implementano
+        // la Badging API (es. Safari/iOS), che restano comunque utilizzabili.
+        if ("setAppBadge" in navigator) {
+            fetch("{{ url_for('athlete.messaggi_non_letti') }}")
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.count > 0) {
+                        navigator.setAppBadge(data.count).catch(function () {});
+                    } else {
+                        navigator.clearAppBadge().catch(function () {});
+                    }
+                })
+                .catch(function () {});
+        }
+    </script>
+    {% endif %}
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll("th[data-sort]").forEach(function (th) {
