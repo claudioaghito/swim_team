@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Archivio messaggi{% endblock %}
+{% block content %}
+<h1>{{ icon('messaggio') }} Archivio messaggi</h1>
+
+<div class="actions">
+    <a class="btn" href="{{ url_for('athlete.lista_messaggi') }}">&larr; Messaggi</a>
+</div>
+
+<p><small>Qui trovi i messaggi che hai archiviato. Restano visibili al mittente e agli altri
+   destinatari: puoi ripristinarli nella tua lista principale in qualsiasi momento.</small></p>
+
+<div class="card">
+    <ul>
+        {% for m in messaggi %}
+            <li>
+                <strong>{{ m.mittente.nome_completo }}</strong>
+                {% if m.is_comunicazione_generale %}<em>(a tutti)</em>{% endif %}
+                — <span class="preserve-lines">{{ m.testo }}</span>
+                {% if m.allegato_file %}
+                    <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
+                    <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                {% endif %}
+                <form method="POST" action="{{ url_for('athlete.ripristina_messaggio', messaggio_id=m.id) }}" style="display:inline;">
+                    <button type="submit" class="btn" title="Ripristina">{{ icon('ripristina') }}</button>
+                </form>
+            </li>
+        {% else %}
+            <li>Il tuo archivio e' vuoto.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

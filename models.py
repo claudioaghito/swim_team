@@ -278,10 +278,28 @@ class Messaggio(db.Model):
     letto_da = db.relationship(
         "MessaggioLetto", backref="messaggio", lazy=True, cascade="all, delete-orphan"
     )
+    archiviato_da = db.relationship(
+        "MessaggioArchiviato", backref="messaggio", lazy=True, cascade="all, delete-orphan"
+    )
 
     @property
     def is_comunicazione_generale(self):
         return self.destinatario_id is None
+
+
+class MessaggioArchiviato(db.Model):
+    """Traccia quali messaggi un utente (atleta o amministratore) ha archiviato dalla propria
+    vista principale: non tocca la riga condivisa, quindi non ha effetto sul mittente ne' sugli
+    altri destinatari, e il messaggio resta recuperabile dal proprio archivio personale."""
+    __tablename__ = "messaggi_archiviati"
+
+    id = db.Column(db.Integer, primary_key=True)
+    messaggio_id = db.Column(db.Integer, db.ForeignKey("messaggi.id"), nullable=False)
+    utente_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint("messaggio_id", "utente_id", name="uq_messaggio_archiviato"),
+    )
 
 
 class MessaggioNascosto(db.Model):

@@ -10,8 +10,8 @@ from flask_login import login_required, current_user
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
-    MessaggioLetto, PushSubscription, conta_messaggi_non_letti, Configurazione, AllenamentoNascosto,
-    RecordSocietario, RecordPersonale,
+    MessaggioLetto, MessaggioArchiviato, PushSubscription, conta_messaggi_non_letti, Configurazione,
+    AllenamentoNascosto, RecordSocietario, RecordPersonale,
 )
 from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
@@ -24,10 +24,13 @@ athlete_bp = Blueprint("athlete", __name__, url_prefix="/atleta")
 
 
 def _messaggi_visibili_query():
+    """Messaggi dell'atleta corrente non eliminati dalla propria vista e non archiviati
+    (vedi archivio_messaggi per questi ultimi)."""
     nascosti = db.session.query(MessaggioNascosto.messaggio_id).filter_by(atleta_id=current_user.id)
+    archiviati = db.session.query(MessaggioArchiviato.messaggio_id).filter_by(utente_id=current_user.id)
     return Messaggio.query.filter(
         (Messaggio.destinatario_id == current_user.id) | (Messaggio.destinatario_id.is_(None))
-    ).filter(~Messaggio.id.in_(nascosti))
+    ).filter(~Messaggio.id.in_(nascosti)).filter(~Messaggio.id.in_(archiviati))
 
 
 def _marca_letti(messaggi):
@@ -89,6 +92,59 @@ def lista_messaggi():
     messaggi = _messaggi_visibili_query().order_by(Messaggio.data.desc()).all()
     _marca_letti(messaggi)
     return render_template("athlete/lista_messaggi.html", messaggi=messaggi)
+
+
+@athlete_bp.route("/messaggi/archivio")
+@login_required
+def archivio_messaggi():
+    """Messaggi che l'atleta ha archiviato dalla propria vista principale: restano
+    consultabili qui e possono essere ripristinati in qualsiasi momento."""
+    nascosti = db.session.query(MessaggioNascosto.messaggio_id).filter_by(atleta_id=current_user.id)
+    archiviati = db.session.query(MessaggioArchiviato.messaggio_id).filter_by(utente_id=current_user.id)
+    messaggi = Messaggio.query.filter(
+        (Messaggio.destinatario_id == current_user.id) | (Messaggio.destinatario_id.is_(None))
+    ).filter(~Messaggio.id.in_(nascosti)).filter(Messaggio.id.in_(archiviati)).order_by(
+        Messaggio.data.desc()
+    ).all()
+    _marca_letti(messaggi)
+    return render_template("athlete/archivio_messaggi.html", messaggi=messaggi)
+
+
+@athlete_bp.route("/messaggi/<int:messaggio_id>/archivia", methods=["POST"])
+@login_required
+def archivia_messaggio(messaggio_id):
+    """Sposta un messaggio nel proprio archivio personale, togliendolo dalla lista
+    principale: resta recuperabile e non ha alcun effetto per mittente o altri destinatari."""
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    if messaggio.destinatario_id not in (None, current_user.id):
+        abort(403)
+
+    if not MessaggioArchiviato.query.filter_by(
+        messaggio_id=messaggio.id, utente_id=current_user.id
+    ).first():
+        db.session.add(MessaggioArchiviato(messaggio_id=messaggio.id, utente_id=current_user.id))
+        db.session.commit()
+
+    flash("Messaggio archiviato.", "success")
+    next_url = request.form.get("next") or url_for("athlete.lista_messaggi")
+    return redirect(next_url)
+
+
+@athlete_bp.route("/messaggi/<int:messaggio_id>/ripristina", methods=["POST"])
+@login_required
+def ripristina_messaggio(messaggio_id):
+    """Rimuove un messaggio dal proprio archivio, riportandolo nella lista principale."""
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    if messaggio.destinatario_id not in (None, current_user.id):
+        abort(403)
+
+    MessaggioArchiviato.query.filter_by(
+        messaggio_id=messaggio.id, utente_id=current_user.id
+    ).delete()
+    db.session.commit()
+
+    flash("Messaggio ripristinato.", "success")
+    return redirect(url_for("athlete.archivio_messaggi"))
 
 
 @athlete_bp.route("/messaggi/non-letti")

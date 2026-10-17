@@ -8,8 +8,14 @@
     <a class="btn" href="{{ url_for('admin.nuovo_messaggio') }}">{{ icon('nuovo-messaggio') }} Nuovo messaggio</a>
 </div>
 
+<div class="actions">
+    {% if vista == 'attivi' %}<button type="button" disabled>Attivi</button>{% else %}<a class="btn" href="{{ url_for('admin.lista_messaggi', vista='attivi', q=q) }}">Attivi</a>{% endif %}
+    {% if vista == 'archivio' %}<button type="button" disabled>Archivio</button>{% else %}<a class="btn" href="{{ url_for('admin.lista_messaggi', vista='archivio', q=q) }}">Archivio</a>{% endif %}
+</div>
+
 <div class="card">
     <form method="GET" class="search-form">
+        <input type="hidden" name="vista" value="{{ vista }}">
         <input type="text" name="q" value="{{ q }}" placeholder="Cerca nel testo del messaggio...">
         <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
@@ -41,14 +47,23 @@
                     {% endif %}
                 </td>
                 <td class="table-actions">
+                    {% if vista == 'archivio' %}
+                    <form method="POST" action="{{ url_for('admin.ripristina_messaggio', messaggio_id=m.id) }}" style="display:inline;">
+                        <button type="submit" class="btn" title="Ripristina">{{ icon('ripristina') }}</button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('admin.archivia_messaggio', messaggio_id=m.id) }}" style="display:inline;">
+                        <button type="submit" class="btn" title="Archivia">{{ icon('archivia') }}</button>
+                    </form>
+                    {% endif %}
                     <form method="POST" action="{{ url_for('admin.elimina_messaggio', messaggio_id=m.id) }}"
-                          onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');">
+                          onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');" style="display:inline;">
                         <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
                     </form>
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="5">Nessun messaggio inviato.</td></tr>
+            <tr><td colspan="5">{{ "Il tuo archivio e' vuoto." if vista == 'archivio' else "Nessun messaggio inviato." }}</td></tr>
             {% endfor %}
         </tbody>
     </table>

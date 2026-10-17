@@ -5,6 +5,7 @@
 
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
+    <a class="btn" href="{{ url_for('athlete.archivio_messaggi') }}">{{ icon('archivia') }} Archivio messaggi</a>
 </div>
 
 <div class="card">
@@ -18,10 +19,14 @@
                     <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
                     <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, download=1) }}">{{ icon('download') }} Scarica</a>
                 {% endif %}
+                <form method="POST" action="{{ url_for('athlete.archivia_messaggio', messaggio_id=m.id) }}" style="display:inline;">
+                    <input type="hidden" name="next" value="{{ url_for('athlete.lista_messaggi') }}">
+                    <button type="submit" class="btn" title="Archivia">{{ icon('archivia') }}</button>
+                </form>
                 <form method="POST" action="{{ url_for('athlete.elimina_messaggio', messaggio_id=m.id) }}"
                       onsubmit="return confirmSubmit(this, 'Eliminare questo messaggio?');" style="display:inline;">
                     <input type="hidden" name="next" value="{{ url_for('athlete.lista_messaggi') }}">
-                    <button type="submit" class="btn-danger">{{ icon('elimina') }}</button>
+                    <button type="submit" class="btn-danger" title="Elimina">{{ icon('elimina') }}</button>
                 </form>
             </li>
         {% else %}

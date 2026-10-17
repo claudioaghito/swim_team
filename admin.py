@@ -17,8 +17,9 @@ from pywebpush import webpush, WebPushException
 
 from extensions import db
 from models import (
-    User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
-    FormazioneStaffetta, IscrizioneGara, RecordSocietario, PushSubscription, conta_messaggi_non_letti,
+    User, Allenamento, Gara, MovimentoContabile, Messaggio, MessaggioArchiviato, Presenza, QuotaTorneo,
+    Configurazione, FormazioneStaffetta, IscrizioneGara, RecordSocietario, PushSubscription,
+    conta_messaggi_non_letti,
 )
 from piani_allenamento import FASI_TIPI, FASI_TIPI_CODICI
 from piano_excel import genera_template_excel, leggi_piano_da_excel
@@ -1529,12 +1530,51 @@ def nuovo_messaggio():
 @admin_required
 def lista_messaggi():
     q = request.args.get("q", "").strip()
+    vista = request.args.get("vista", "attivi")
+    archiviati = db.session.query(MessaggioArchiviato.messaggio_id).filter_by(utente_id=current_user.id)
+
     query = Messaggio.query
+    if vista == "archivio":
+        query = query.filter(Messaggio.id.in_(archiviati))
+    else:
+        vista = "attivi"
+        query = query.filter(~Messaggio.id.in_(archiviati))
+
     if q:
         like = f"%{q}%"
         query = query.filter(Messaggio.testo.ilike(like))
     messaggi = query.order_by(Messaggio.data.desc()).all()
-    return render_template("admin/lista_messaggi.html", messaggi=messaggi, q=q)
+    return render_template("admin/lista_messaggi.html", messaggi=messaggi, q=q, vista=vista)
+
+
+@admin_bp.route("/messaggi/<int:messaggio_id>/archivia", methods=["POST"])
+@login_required
+@admin_required
+def archivia_messaggio(messaggio_id):
+    """Sposta un messaggio nel proprio archivio personale, togliendolo dalla lista
+    principale: resta recuperabile e non ha alcun effetto per destinatari o altri admin."""
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    if not MessaggioArchiviato.query.filter_by(
+        messaggio_id=messaggio.id, utente_id=current_user.id
+    ).first():
+        db.session.add(MessaggioArchiviato(messaggio_id=messaggio.id, utente_id=current_user.id))
+        db.session.commit()
+    flash("Messaggio archiviato.", "success")
+    return redirect(url_for("admin.lista_messaggi"))
+
+
+@admin_bp.route("/messaggi/<int:messaggio_id>/ripristina", methods=["POST"])
+@login_required
+@admin_required
+def ripristina_messaggio(messaggio_id):
+    """Rimuove un messaggio dal proprio archivio, riportandolo nella lista principale."""
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    MessaggioArchiviato.query.filter_by(
+        messaggio_id=messaggio.id, utente_id=current_user.id
+    ).delete()
+    db.session.commit()
+    flash("Messaggio ripristinato.", "success")
+    return redirect(url_for("admin.lista_messaggi", vista="archivio"))
 
 
 @admin_bp.route("/messaggi/<int:messaggio_id>/elimina", methods=["POST"])
