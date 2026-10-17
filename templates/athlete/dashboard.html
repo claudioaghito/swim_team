@@ -86,8 +86,11 @@
             attivaNotifichePush().then(function () {
                 document.getElementById('notifiche-push-testo').textContent = 'Notifiche attive: riceverai un avviso quando l\'amministratore invia un messaggio.';
                 document.getElementById('btn-attiva-notifiche').hidden = true;
-            }).catch(function () {
-                document.getElementById('notifiche-push-testo').textContent = 'Permesso non concesso: puoi riprovare, oppure abilitarlo dalle impostazioni di notifica del browser/telefono.';
+            }).catch(function (errore) {
+                var messaggio = (Notification.permission === 'denied')
+                    ? 'Permesso negato: abilitalo dalle impostazioni di notifica del browser/telefono per questa app, poi riprova.'
+                    : 'Attivazione non riuscita (' + (errore && errore.message ? errore.message : 'errore sconosciuto') + '). Riprova, o segnalalo all\'amministratore se persiste.';
+                document.getElementById('notifiche-push-testo').textContent = messaggio;
                 document.getElementById('btn-attiva-notifiche').disabled = false;
             });
         ">{{ icon('messaggio') }} Attiva notifiche</button>

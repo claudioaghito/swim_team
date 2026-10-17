@@ -226,8 +226,11 @@
         }
 
         function attivaNotifichePush() {
-            if (!notifichePushSupportate()) {
-                return Promise.reject(new Error("non supportate"));
+            if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+                return Promise.reject(new Error("il browser non supporta le notifiche push"));
+            }
+            if (!VAPID_PUBLIC_KEY) {
+                return Promise.reject(new Error("le notifiche push non sono configurate sul server (manca la chiave VAPID)"));
             }
             return Notification.requestPermission().then(function (permesso) {
                 if (permesso !== "granted") {
@@ -247,6 +250,10 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(sub.toJSON()),
+                }).then(function (r) {
+                    if (!r.ok) {
+                        throw new Error("il server ha rifiutato l'iscrizione (" + r.status + ")");
+                    }
                 });
             });
         }
