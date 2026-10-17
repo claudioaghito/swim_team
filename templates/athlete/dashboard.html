@@ -78,6 +78,52 @@
         <a class="btn" style="margin-top:8px;" href="{{ url_for('athlete.lista_gare') }}">Vedi tutti i tornei &rarr;</a>
     </div>
 
+    <div class="card no-print" id="card-notifiche-push" hidden>
+        <h3>{{ icon('messaggio') }} Notifiche</h3>
+        <p id="notifiche-push-testo"></p>
+        <button type="button" id="btn-attiva-notifiche" onclick="
+            this.disabled = true;
+            attivaNotifichePush().then(function () {
+                document.getElementById('notifiche-push-testo').textContent = 'Notifiche attive: riceverai un avviso quando l\'amministratore invia un messaggio.';
+                document.getElementById('btn-attiva-notifiche').hidden = true;
+            }).catch(function () {
+                document.getElementById('notifiche-push-testo').textContent = 'Permesso non concesso: puoi riprovare, oppure abilitarlo dalle impostazioni di notifica del browser/telefono.';
+                document.getElementById('btn-attiva-notifiche').disabled = false;
+            });
+        ">{{ icon('messaggio') }} Attiva notifiche</button>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var card = document.getElementById("card-notifiche-push");
+            var testo = document.getElementById("notifiche-push-testo");
+            var btn = document.getElementById("btn-attiva-notifiche");
+            if (!card) return;
+
+            if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+                card.hidden = false;
+                btn.hidden = true;
+                var standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+                testo.textContent = standalone
+                    ? "Il tuo browser non supporta le notifiche push."
+                    : "Per ricevere una notifica quando arriva un messaggio, su iPhone aggiungi prima l'app alla schermata Home (tocca Condividi, poi \"Aggiungi a Home\"); su Android installa l'app dal menu del browser. Poi riapri l'app da li'.";
+                return;
+            }
+
+            if (Notification.permission === "granted") {
+                card.hidden = false;
+                btn.hidden = true;
+                testo.textContent = "Notifiche attive: riceverai un avviso quando l'amministratore invia un messaggio.";
+            } else if (Notification.permission === "denied") {
+                card.hidden = false;
+                btn.hidden = true;
+                testo.textContent = "Notifiche bloccate: per attivarle devi riabilitarle dalle impostazioni di notifica del browser/telefono per questa app.";
+            } else {
+                card.hidden = false;
+                testo.textContent = "Attiva le notifiche per essere avvisato quando l'amministratore invia un messaggio.";
+            }
+        });
+    </script>
+
     <div class="card">
         <h3>{{ icon('messaggio') }} Comunicazioni ({{ messaggi|length }})</h3>
         <ul>

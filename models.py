@@ -314,6 +314,32 @@ class MessaggioLetto(db.Model):
     )
 
 
+class PushSubscription(db.Model):
+    """Iscrizione di un dispositivo di un atleta alle notifiche push (Web Push):
+    un atleta puo' avere piu' righe se usa l'app da piu' dispositivi/browser."""
+    __tablename__ = "push_subscriptions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    atleta_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    endpoint = db.Column(db.String(500), nullable=False, unique=True)
+    p256dh = db.Column(db.String(255), nullable=False)
+    auth = db.Column(db.String(255), nullable=False)
+    creata_il = db.Column(db.DateTime, default=datetime.utcnow)
+
+    atleta = db.relationship("User")
+
+
+def conta_messaggi_non_letti(atleta_id):
+    """Numero di messaggi (comunicazioni generali o diretti) non ancora visti da un
+    atleta: usato sia per il pallino sull'icona (Badging API) sia per il conteggio
+    da includere nelle notifiche push inviate quando l'admin scrive un messaggio."""
+    nascosti = db.session.query(MessaggioNascosto.messaggio_id).filter_by(atleta_id=atleta_id)
+    letti = db.session.query(MessaggioLetto.messaggio_id).filter_by(atleta_id=atleta_id)
+    return Messaggio.query.filter(
+        (Messaggio.destinatario_id == atleta_id) | (Messaggio.destinatario_id.is_(None))
+    ).filter(~Messaggio.id.in_(nascosti)).filter(~Messaggio.id.in_(letti)).count()
+
+
 class AllenamentoNascosto(db.Model):
     """Traccia quali allenamenti passati un atleta ha rimosso dal proprio archivio
     personale: non elimina l'allenamento (resta visibile agli altri e all'admin)."""

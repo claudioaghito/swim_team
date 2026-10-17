@@ -202,6 +202,64 @@
                 .catch(function () {});
         }
     </script>
+
+    <script>
+        // Notifiche push (Web Push): su iPhone funzionano solo se l'app e' stata
+        // aggiunta alla schermata Home (Condividi -> Aggiungi a Home), da iOS 16.4;
+        // su Android/Chrome funzionano anche solo dal browser.
+        var VAPID_PUBLIC_KEY = "{{ config.VAPID_PUBLIC_KEY }}";
+
+        function _urlBase64ToUint8Array(base64String) {
+            var padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+            var base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+            var rawData = window.atob(base64);
+            var outputArray = new Uint8Array(rawData.length);
+            for (var i = 0; i < rawData.length; i++) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        function notifichePushSupportate() {
+            return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window
+                && !!VAPID_PUBLIC_KEY;
+        }
+
+        function attivaNotifichePush() {
+            if (!notifichePushSupportate()) {
+                return Promise.reject(new Error("non supportate"));
+            }
+            return Notification.requestPermission().then(function (permesso) {
+                if (permesso !== "granted") {
+                    throw new Error("permesso negato");
+                }
+                return navigator.serviceWorker.ready;
+            }).then(function (registration) {
+                return registration.pushManager.getSubscription().then(function (sub) {
+                    if (sub) return sub;
+                    return registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: _urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+                    });
+                });
+            }).then(function (sub) {
+                return fetch("{{ url_for('athlete.push_iscrivi') }}", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(sub.toJSON()),
+                });
+            });
+        }
+
+        // Se il permesso e' gia' stato concesso in precedenza, rinnova silenziosamente
+        // l'iscrizione (senza richiedere di nuovo il permesso) cosi' resta valida anche
+        // se il server l'avesse persa o il browser ne avesse generata una nuova.
+        document.addEventListener("DOMContentLoaded", function () {
+            if (notifichePushSupportate() && Notification.permission === "granted") {
+                attivaNotifichePush().catch(function () {});
+            }
+        });
+    </script>
     {% endif %}
 
     <script>

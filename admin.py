@@ -13,11 +13,12 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from pywebpush import webpush, WebPushException
 
 from extensions import db
 from models import (
     User, Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, QuotaTorneo, Configurazione,
-    FormazioneStaffetta, IscrizioneGara, RecordSocietario,
+    FormazioneStaffetta, IscrizioneGara, RecordSocietario, PushSubscription, conta_messaggi_non_letti,
 )
 from piani_allenamento import FASI_TIPI, FASI_TIPI_CODICI
 from piano_excel import genera_template_excel, leggi_piano_da_excel
@@ -1437,6 +1438,52 @@ def elimina_movimenti():
     return redirect(next_url)
 
 
+def _notifica_push_nuovo_messaggio(messaggio):
+    """Invia una notifica push agli atleti destinatari del messaggio appena creato
+    (uno solo, o tutti se e' una comunicazione generale). Non blocca l'invio del
+    messaggio se le notifiche push non sono configurate o se una iscrizione e'
+    scaduta/invalida: in quel caso la riga di iscrizione viene semplicemente rimossa."""
+    if not current_app.config.get("VAPID_PRIVATE_KEY"):
+        return  # notifiche push non configurate (manca .env): il messaggio resta salvato comunque
+
+    if messaggio.destinatario_id:
+        atleti_target = [messaggio.destinatario_id]
+    else:
+        atleti_target = [a.id for a in User.query.filter_by(ruolo="atleta").all()]
+
+    iscrizioni_per_atleta = {}
+    for sub in PushSubscription.query.filter(PushSubscription.atleta_id.in_(atleti_target)).all():
+        iscrizioni_per_atleta.setdefault(sub.atleta_id, []).append(sub)
+
+    anteprima = messaggio.testo if len(messaggio.testo) <= 120 else messaggio.testo[:119] + "…"
+
+    for atleta_id, iscrizioni in iscrizioni_per_atleta.items():
+        payload = json.dumps({
+            "title": "Derthona Nuoto Master",
+            "body": anteprima,
+            "url": "/atleta/messaggi",
+            "count": conta_messaggi_non_letti(atleta_id),
+        })
+        for sub in iscrizioni:
+            try:
+                webpush(
+                    subscription_info={
+                        "endpoint": sub.endpoint,
+                        "keys": {"p256dh": sub.p256dh, "auth": sub.auth},
+                    },
+                    data=payload,
+                    vapid_private_key=current_app.config["VAPID_PRIVATE_KEY"],
+                    vapid_claims={"sub": current_app.config["VAPID_CLAIM_EMAIL"]},
+                )
+            except WebPushException as e:
+                stato = e.response.status_code if e.response is not None else None
+                if stato in (404, 410):
+                    db.session.delete(sub)  # iscrizione scaduta/revocata: rimuovila
+            except Exception:
+                pass  # errore di rete o simili: non deve bloccare l'invio del messaggio
+    db.session.commit()
+
+
 @admin_bp.route("/messaggi/nuovo", methods=["GET", "POST"])
 @login_required
 @admin_required
@@ -1464,6 +1511,7 @@ def nuovo_messaggio():
             return redirect(url_for("admin.nuovo_messaggio"))
 
         db.session.commit()
+        _notifica_push_nuovo_messaggio(messaggio)
         flash("Messaggio inviato.", "success")
         return redirect(url_for("admin.dashboard"))
 

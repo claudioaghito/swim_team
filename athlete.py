@@ -10,7 +10,8 @@ from flask_login import login_required, current_user
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
-    MessaggioLetto, Configurazione, AllenamentoNascosto, RecordSocietario, RecordPersonale,
+    MessaggioLetto, PushSubscription, conta_messaggi_non_letti, Configurazione, AllenamentoNascosto,
+    RecordSocietario, RecordPersonale,
 )
 from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
@@ -27,11 +28,6 @@ def _messaggi_visibili_query():
     return Messaggio.query.filter(
         (Messaggio.destinatario_id == current_user.id) | (Messaggio.destinatario_id.is_(None))
     ).filter(~Messaggio.id.in_(nascosti))
-
-
-def _messaggi_non_letti_query():
-    letti = db.session.query(MessaggioLetto.messaggio_id).filter_by(atleta_id=current_user.id)
-    return _messaggi_visibili_query().filter(~Messaggio.id.in_(letti))
 
 
 def _marca_letti(messaggi):
@@ -100,7 +96,44 @@ def lista_messaggi():
 def messaggi_non_letti():
     """Numero di messaggi non ancora visti dall'atleta corrente: interrogato dal
     client per aggiornare il pallino sull'icona dell'app (Badging API)."""
-    return jsonify(count=_messaggi_non_letti_query().count())
+    return jsonify(count=conta_messaggi_non_letti(current_user.id))
+
+
+@athlete_bp.route("/push/iscrivi", methods=["POST"])
+@login_required
+def push_iscrivi():
+    """Salva (o aggiorna) l'iscrizione alle notifiche push per questo dispositivo/browser,
+    inviata dal client dopo che l'atleta ha concesso il permesso di notifica."""
+    dati = request.get_json(silent=True) or {}
+    endpoint = dati.get("endpoint")
+    keys = dati.get("keys") or {}
+    if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+        return jsonify(ok=False), 400
+
+    sub = PushSubscription.query.filter_by(endpoint=endpoint).first()
+    if not sub:
+        sub = PushSubscription(endpoint=endpoint)
+        db.session.add(sub)
+    sub.atleta_id = current_user.id
+    sub.p256dh = keys["p256dh"]
+    sub.auth = keys["auth"]
+    db.session.commit()
+    return jsonify(ok=True)
+
+
+@athlete_bp.route("/push/disiscrivi", methods=["POST"])
+@login_required
+def push_disiscrivi():
+    """Rimuove l'iscrizione alle notifiche push per questo dispositivo/browser
+    (es. quando l'atleta disattiva le notifiche dall'app)."""
+    dati = request.get_json(silent=True) or {}
+    endpoint = dati.get("endpoint")
+    if endpoint:
+        PushSubscription.query.filter_by(
+            endpoint=endpoint, atleta_id=current_user.id
+        ).delete()
+        db.session.commit()
+    return jsonify(ok=True)
 
 
 @athlete_bp.route("/messaggi/<int:messaggio_id>/elimina", methods=["POST"])
