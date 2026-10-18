@@ -16,8 +16,11 @@
                 {% if m.is_comunicazione_generale %}<em>(a tutti)</em>{% endif %}
                 — <span class="preserve-lines">{{ m.testo }}</span>
                 {% for allegato in m.allegati %}
-                    <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
-                    <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                    <div style="margin-top:6px;">
+                        {{ allegato.nome_visualizzato }}<br>
+                        <a href="{{ url_for('admin.vedi_allegato', messaggio_id=m.id, allegato_id=allegato.id, next=request.full_path) }}">{{ icon('crea-pdf') }} Apri allegato</a><br>
+                        <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                    </div>
                 {% endfor %}
                 <form method="POST" action="{{ url_for('athlete.archivia_messaggio', messaggio_id=m.id) }}" style="display:inline;">
                     <input type="hidden" name="next" value="{{ url_for('athlete.lista_messaggi') }}">

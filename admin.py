@@ -1514,7 +1514,10 @@ def nuovo_messaggio():
                     current_app.config["ALLOWED_ALLEGATO_EXT"],
                 )
                 if nome_file:
-                    db.session.add(MessaggioAllegato(messaggio_id=messaggio.id, file_name=nome_file))
+                    db.session.add(MessaggioAllegato(
+                        messaggio_id=messaggio.id, file_name=nome_file,
+                        nome_originale=secure_filename(file_storage.filename) or file_storage.filename,
+                    ))
         except ValueError as e:
             db.session.rollback()
             flash(str(e), "danger")
@@ -1591,6 +1594,27 @@ def elimina_messaggio(messaggio_id):
     db.session.commit()
     flash("Messaggio eliminato.", "success")
     return redirect(url_for("admin.lista_messaggi"))
+
+
+@admin_bp.route("/messaggi/<int:messaggio_id>/allegato/<int:allegato_id>/vedi")
+@login_required
+def vedi_allegato(messaggio_id, allegato_id):
+    """Mostra l'allegato dentro una pagina dell'app (con un pulsante per tornare indietro),
+    invece di aprire direttamente il file: altrimenti su telefono, specialmente da app
+    installata, non c'e' alcun modo per tornare alla lista messaggi."""
+    messaggio = Messaggio.query.get_or_404(messaggio_id)
+    allegato = MessaggioAllegato.query.filter_by(id=allegato_id, messaggio_id=messaggio_id).first_or_404()
+    if not current_user.is_admin and messaggio.destinatario_id not in (None, current_user.id):
+        abort(403)
+    ext = allegato.file_name.rsplit(".", 1)[-1].lower() if "." in allegato.file_name else ""
+    is_immagine = ext in current_app.config["ALLOWED_IMAGE_EXT"]
+    torna_url = request.args.get("next") or (
+        url_for("admin.lista_messaggi") if current_user.is_admin else url_for("athlete.lista_messaggi")
+    )
+    return render_template(
+        "admin/vedi_allegato.html", messaggio=messaggio, allegato=allegato,
+        is_immagine=is_immagine, torna_url=torna_url,
+    )
 
 
 @admin_bp.route("/messaggi/<int:messaggio_id>/allegato/<int:allegato_id>")

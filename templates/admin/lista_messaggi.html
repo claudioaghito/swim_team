@@ -42,8 +42,11 @@
                 <td class="preserve-lines col-wide-text">
                     {{ m.testo }}
                     {% for allegato in m.allegati %}
-                        <br><a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
-                        <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                        <div style="margin-top:6px;">
+                            {{ allegato.nome_visualizzato }}<br>
+                            <a href="{{ url_for('admin.vedi_allegato', messaggio_id=m.id, allegato_id=allegato.id, next=request.full_path) }}">{{ icon('crea-pdf') }} Apri allegato</a><br>
+                            <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                        </div>
                     {% endfor %}
                 </td>
                 <td class="table-actions">

@@ -293,11 +293,18 @@ class MessaggioAllegato(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     messaggio_id = db.Column(db.Integer, db.ForeignKey("messaggi.id"), nullable=False)
     file_name = db.Column(db.String(255), nullable=False)  # nome file in UPLOAD_FOLDER/messaggi
+    nome_originale = db.Column(db.String(255))  # nome del file come caricato, mostrato all'utente
 
     messaggio = db.relationship(
         "Messaggio",
         backref=db.backref("allegati", cascade="all, delete-orphan", order_by="MessaggioAllegato.id"),
     )
+
+    @property
+    def nome_visualizzato(self):
+        """Nome da mostrare all'utente: quello originale, o il nome tecnico su disco per i
+        vecchi allegati migrati dalla colonna singola (nome originale non disponibile)."""
+        return self.nome_originale or self.file_name
 
 
 class MessaggioArchiviato(db.Model):

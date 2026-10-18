@@ -254,15 +254,42 @@
                     if (!r.ok) {
                         throw new Error("il server ha rifiutato l'iscrizione (" + r.status + ")");
                     }
+                    try { localStorage.removeItem("notifichePushDisattivate"); } catch (e) {}
+                });
+            });
+        }
+
+        function disattivaNotifichePush() {
+            if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+                return Promise.reject(new Error("il browser non supporta le notifiche push"));
+            }
+            // Il permesso di notifica del browser resta "granted" per sempre (JS non puo'
+            // revocarlo): per questo marchiamo la scelta dell'utente qui, cosi' il rinnovo
+            // silenzioso sotto non la sovrascrive riattivando le notifiche a sua insaputa.
+            try { localStorage.setItem("notifichePushDisattivate", "1"); } catch (e) {}
+            return navigator.serviceWorker.ready.then(function (registration) {
+                return registration.pushManager.getSubscription();
+            }).then(function (sub) {
+                if (!sub) return;
+                var endpoint = sub.endpoint;
+                return sub.unsubscribe().then(function () {
+                    return fetch("{{ url_for('athlete.push_disiscrivi') }}", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ endpoint: endpoint }),
+                    });
                 });
             });
         }
 
         // Se il permesso e' gia' stato concesso in precedenza, rinnova silenziosamente
         // l'iscrizione (senza richiedere di nuovo il permesso) cosi' resta valida anche
-        // se il server l'avesse persa o il browser ne avesse generata una nuova.
+        // se il server l'avesse persa o il browser ne avesse generata una nuova. Non lo fa
+        // se l'atleta ha esplicitamente disattivato le notifiche dall'app.
         document.addEventListener("DOMContentLoaded", function () {
-            if (notifichePushSupportate() && Notification.permission === "granted") {
+            var disattivate = false;
+            try { disattivate = localStorage.getItem("notifichePushDisattivate") === "1"; } catch (e) {}
+            if (!disattivate && notifichePushSupportate() && Notification.permission === "granted") {
                 attivaNotifichePush().catch(function () {});
             }
         });

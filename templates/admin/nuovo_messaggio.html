@@ -20,9 +20,21 @@
         <textarea name="testo" rows="4" required></textarea>
 
         <label>Allegati (PDF o immagini, facoltativi)</label>
-        <input type="file" name="allegati" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp" multiple>
+        <input type="file" id="allegati-input" name="allegati" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp" multiple>
+        <ul id="allegati-elenco"></ul>
 
         <button type="submit">{{ icon('invio-messaggio') }} Invia</button>
     </form>
 </div>
+<script>
+    document.getElementById("allegati-input").addEventListener("change", function () {
+        var elenco = document.getElementById("allegati-elenco");
+        elenco.innerHTML = "";
+        Array.prototype.forEach.call(this.files, function (file) {
+            var li = document.createElement("li");
+            li.textContent = file.name;
+            elenco.appendChild(li);
+        });
+    });
+</script>
 {% endblock %}

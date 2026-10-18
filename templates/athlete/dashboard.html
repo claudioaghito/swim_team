@@ -81,25 +81,14 @@
     <div class="card no-print" id="card-notifiche-push" hidden>
         <h3>{{ icon('messaggio') }} Notifiche</h3>
         <p id="notifiche-push-testo"></p>
-        <button type="button" id="btn-attiva-notifiche" onclick="
-            this.disabled = true;
-            attivaNotifichePush().then(function () {
-                document.getElementById('notifiche-push-testo').textContent = 'Notifiche attive: riceverai un avviso quando l\'amministratore invia un messaggio.';
-                document.getElementById('btn-attiva-notifiche').hidden = true;
-            }).catch(function (errore) {
-                var messaggio = (Notification.permission === 'denied')
-                    ? 'Permesso negato: abilitalo dalle impostazioni di notifica del browser/telefono per questa app, poi riprova.'
-                    : 'Attivazione non riuscita (' + (errore && errore.message ? errore.message : 'errore sconosciuto') + '). Riprova, o segnalalo all\'amministratore se persiste.';
-                document.getElementById('notifiche-push-testo').textContent = messaggio;
-                document.getElementById('btn-attiva-notifiche').disabled = false;
-            });
-        ">{{ icon('messaggio') }} Attiva notifiche</button>
+        <button type="button" id="btn-notifiche-push">{{ icon('messaggio') }} <span id="notifiche-push-label">Attiva notifiche</span></button>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var card = document.getElementById("card-notifiche-push");
             var testo = document.getElementById("notifiche-push-testo");
-            var btn = document.getElementById("btn-attiva-notifiche");
+            var btn = document.getElementById("btn-notifiche-push");
+            var label = document.getElementById("notifiche-push-label");
             if (!card) return;
 
             if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
@@ -112,18 +101,54 @@
                 return;
             }
 
-            if (Notification.permission === "granted") {
-                card.hidden = false;
-                btn.hidden = true;
-                testo.textContent = "Notifiche attive: riceverai un avviso quando l'amministratore invia un messaggio.";
-            } else if (Notification.permission === "denied") {
+            if (Notification.permission === "denied") {
                 card.hidden = false;
                 btn.hidden = true;
                 testo.textContent = "Notifiche bloccate: per attivarle devi riabilitarle dalle impostazioni di notifica del browser/telefono per questa app.";
-            } else {
-                card.hidden = false;
-                testo.textContent = "Attiva le notifiche per essere avvisato quando l'amministratore invia un messaggio.";
+                return;
             }
+
+            card.hidden = false;
+
+            function mostraAttive() {
+                label.textContent = "Disattiva notifiche";
+                testo.textContent = "Notifiche attive: riceverai un avviso quando l'amministratore invia un messaggio.";
+                btn.disabled = false;
+                btn.onclick = function () {
+                    btn.disabled = true;
+                    disattivaNotifichePush().then(mostraDisattive).catch(function () {
+                        btn.disabled = false;
+                    });
+                };
+            }
+
+            function mostraDisattive() {
+                label.textContent = "Attiva notifiche";
+                testo.textContent = "Attiva le notifiche per essere avvisato quando l'amministratore invia un messaggio.";
+                btn.disabled = false;
+                btn.onclick = function () {
+                    btn.disabled = true;
+                    attivaNotifichePush().then(mostraAttive).catch(function (errore) {
+                        var messaggio = (Notification.permission === "denied")
+                            ? "Permesso negato: abilitalo dalle impostazioni di notifica del browser/telefono per questa app, poi riprova."
+                            : "Attivazione non riuscita (" + (errore && errore.message ? errore.message : "errore sconosciuto") + "). Riprova, o segnalalo all'amministratore se persiste.";
+                        testo.textContent = messaggio;
+                        btn.disabled = false;
+                    });
+                };
+            }
+
+            navigator.serviceWorker.ready.then(function (registration) {
+                return registration.pushManager.getSubscription();
+            }).then(function (sub) {
+                if (sub) {
+                    mostraAttive();
+                } else {
+                    mostraDisattive();
+                }
+            }).catch(function () {
+                mostraDisattive();
+            });
         });
     </script>
 
@@ -136,8 +161,11 @@
                     {% if m.is_comunicazione_generale %}<em>(a tutti)</em>{% endif %}
                     — <span class="preserve-lines">{{ m.testo }}</span>
                     {% for allegato in m.allegati %}
-                        <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
-                        <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                        <div style="margin-top:6px;">
+                            {{ allegato.nome_visualizzato }}<br>
+                            <a href="{{ url_for('admin.vedi_allegato', messaggio_id=m.id, allegato_id=allegato.id, next=request.full_path) }}">{{ icon('crea-pdf') }} Apri allegato</a><br>
+                            <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                        </div>
                     {% endfor %}
                     <form method="POST" action="{{ url_for('athlete.archivia_messaggio', messaggio_id=m.id) }}" style="display:inline;">
                         <input type="hidden" name="next" value="{{ url_for('athlete.dashboard') }}">
