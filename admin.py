@@ -17,9 +17,9 @@ from pywebpush import webpush, WebPushException
 
 from extensions import db
 from models import (
-    User, Allenamento, Gara, MovimentoContabile, Messaggio, MessaggioArchiviato, Presenza, QuotaTorneo,
-    Configurazione, FormazioneStaffetta, IscrizioneGara, RecordSocietario, PushSubscription,
-    conta_messaggi_non_letti,
+    User, Allenamento, Gara, MovimentoContabile, Messaggio, MessaggioAllegato, MessaggioArchiviato,
+    Presenza, QuotaTorneo, Configurazione, FormazioneStaffetta, IscrizioneGara, RecordSocietario,
+    PushSubscription, conta_messaggi_non_letti,
 )
 from piani_allenamento import FASI_TIPI, FASI_TIPI_CODICI
 from piano_excel import genera_template_excel, leggi_piano_da_excel
@@ -1508,10 +1508,13 @@ def nuovo_messaggio():
         db.session.flush()
 
         try:
-            messaggio.allegato_file = _salva_upload(
-                request.files.get("allegato"), "messaggi", f"allegato_{messaggio.id}",
-                current_app.config["ALLOWED_ALLEGATO_EXT"],
-            )
+            for i, file_storage in enumerate(request.files.getlist("allegati")):
+                nome_file = _salva_upload(
+                    file_storage, "messaggi", f"allegato_{messaggio.id}_{i}",
+                    current_app.config["ALLOWED_ALLEGATO_EXT"],
+                )
+                if nome_file:
+                    db.session.add(MessaggioAllegato(messaggio_id=messaggio.id, file_name=nome_file))
         except ValueError as e:
             db.session.rollback()
             flash(str(e), "danger")
@@ -1582,24 +1585,24 @@ def ripristina_messaggio(messaggio_id):
 @admin_required
 def elimina_messaggio(messaggio_id):
     messaggio = Messaggio.query.get_or_404(messaggio_id)
-    _elimina_file("messaggi", messaggio.allegato_file)
+    for allegato in messaggio.allegati:
+        _elimina_file("messaggi", allegato.file_name)
     db.session.delete(messaggio)
     db.session.commit()
     flash("Messaggio eliminato.", "success")
     return redirect(url_for("admin.lista_messaggi"))
 
 
-@admin_bp.route("/messaggi/<int:messaggio_id>/allegato")
+@admin_bp.route("/messaggi/<int:messaggio_id>/allegato/<int:allegato_id>")
 @login_required
-def allegato_messaggio(messaggio_id):
+def allegato_messaggio(messaggio_id, allegato_id):
     messaggio = Messaggio.query.get_or_404(messaggio_id)
-    if not messaggio.allegato_file:
-        abort(404)
+    allegato = MessaggioAllegato.query.filter_by(id=allegato_id, messaggio_id=messaggio_id).first_or_404()
     if not current_user.is_admin and messaggio.destinatario_id not in (None, current_user.id):
         abort(403)
     cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "messaggi")
     as_attachment = request.args.get("download") == "1"
-    return send_from_directory(cartella, messaggio.allegato_file, as_attachment=as_attachment)
+    return send_from_directory(cartella, allegato.file_name, as_attachment=as_attachment)
 
 
 @admin_bp.route("/record")

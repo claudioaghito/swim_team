@@ -41,10 +41,10 @@
                 <td>{{ "Tutta la squadra" if m.is_comunicazione_generale else m.destinatario.nome_completo }}</td>
                 <td class="preserve-lines col-wide-text">
                     {{ m.testo }}
-                    {% if m.allegato_file %}
-                        <br><a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
-                        <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, download=1) }}">{{ icon('download') }} Scarica</a>
-                    {% endif %}
+                    {% for allegato in m.allegati %}
+                        <br><a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri allegato</a>
+                        <a href="{{ url_for('admin.allegato_messaggio', messaggio_id=m.id, allegato_id=allegato.id, download=1) }}">{{ icon('download') }} Scarica</a>
+                    {% endfor %}
                 </td>
                 <td class="table-actions">
                     {% if vista == 'archivio' %}

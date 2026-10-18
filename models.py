@@ -268,7 +268,6 @@ class Messaggio(db.Model):
     testo = db.Column(db.Text, nullable=False)
     data = db.Column(db.DateTime, default=datetime.utcnow)
     letto = db.Column(db.Boolean, default=False)
-    allegato_file = db.Column(db.String(255))  # nome file PDF/immagine, in UPLOAD_FOLDER/messaggi
 
     mittente = db.relationship("User", foreign_keys=[mittente_id])
     destinatario = db.relationship("User", foreign_keys=[destinatario_id])
@@ -285,6 +284,20 @@ class Messaggio(db.Model):
     @property
     def is_comunicazione_generale(self):
         return self.destinatario_id is None
+
+
+class MessaggioAllegato(db.Model):
+    """File allegato a un messaggio; un messaggio puo' averne piu' di uno."""
+    __tablename__ = "messaggi_allegati"
+
+    id = db.Column(db.Integer, primary_key=True)
+    messaggio_id = db.Column(db.Integer, db.ForeignKey("messaggi.id"), nullable=False)
+    file_name = db.Column(db.String(255), nullable=False)  # nome file in UPLOAD_FOLDER/messaggi
+
+    messaggio = db.relationship(
+        "Messaggio",
+        backref=db.backref("allegati", cascade="all, delete-orphan", order_by="MessaggioAllegato.id"),
+    )
 
 
 class MessaggioArchiviato(db.Model):

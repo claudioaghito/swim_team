@@ -52,6 +52,29 @@ def _migra_schema(app):
                     conn.execute(text("ALTER TABLE configurazione ADD COLUMN tassa_fin FLOAT"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
+        # Migra gli allegati singoli dei messaggi (vecchia colonna messaggi.allegato_file,
+        # ormai non piu' mappata) nella nuova tabella messaggi_allegati che ne permette piu' di uno.
+        inspector = inspect(db.engine)
+        colonne_messaggi = (
+            {c["name"] for c in inspector.get_columns("messaggi")}
+            if "messaggi" in inspector.get_table_names() else set()
+        )
+        if "allegato_file" in colonne_messaggi and "messaggi_allegati" in inspector.get_table_names():
+            with db.engine.begin() as conn:
+                righe = conn.execute(
+                    text("SELECT id, allegato_file FROM messaggi WHERE allegato_file IS NOT NULL")
+                ).fetchall()
+                for messaggio_id, file_name in righe:
+                    gia_migrato = conn.execute(
+                        text("SELECT 1 FROM messaggi_allegati WHERE messaggio_id = :mid"),
+                        {"mid": messaggio_id},
+                    ).first()
+                    if not gia_migrato:
+                        conn.execute(
+                            text("INSERT INTO messaggi_allegati (messaggio_id, file_name) VALUES (:mid, :fn)"),
+                            {"mid": messaggio_id, "fn": file_name},
+                        )
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
