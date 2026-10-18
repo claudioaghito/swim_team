@@ -99,7 +99,7 @@
                         <td rowspan="{{ n_righe }}"><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
                         <td rowspan="{{ n_righe }}">{{ atleta.categoria_master(anno_stagione) or "-" }}</td>
                     {% endif %}
-                    <td>{{ iscrizione.stile }}</td>
+                    <td style="white-space:nowrap;">{{ iscrizione.stile }}</td>
                     <td>{{ iscrizione.tempo_ottenuto or '-' }}</td>
                     {% if loop.first %}
                         <td class="no-print" rowspan="{{ n_righe }}">
