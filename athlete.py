@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime
 
@@ -6,12 +7,13 @@ from flask import (
     current_app, send_from_directory, make_response, jsonify,
 )
 from flask_login import login_required, current_user
+from pywebpush import webpush, WebPushException
 
 from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
     MessaggioLetto, MessaggioArchiviato, PushSubscription, conta_messaggi_non_letti, Configurazione,
-    AllenamentoNascosto, RecordSocietario, RecordPersonale,
+    AllenamentoNascosto, RecordSocietario, RecordPersonale, User,
 )
 from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
@@ -316,6 +318,43 @@ def lista_gare():
     return render_template("athlete/lista_gare.html", gare=gare, q=q)
 
 
+def _notifica_push_iscrizione_gara(gara, atleta):
+    """Avvisa con una notifica push tutti gli amministratori iscritti alle notifiche
+    push che un atleta ha salvato le proprie iscrizioni a un torneo: una sola notifica
+    per salvataggio (non una per ogni gara scelta), per non essere troppo rumorosa."""
+    if not current_app.config.get("VAPID_PRIVATE_KEY"):
+        return  # notifiche push non configurate (manca .env)
+
+    admin_ids = [a.id for a in User.query.filter_by(ruolo="admin").all()]
+    iscrizioni = PushSubscription.query.filter(PushSubscription.atleta_id.in_(admin_ids)).all()
+    if not iscrizioni:
+        return
+
+    payload = json.dumps({
+        "title": "Derthona Nuoto Master",
+        "body": f"{atleta.nome_completo} ha aggiornato le iscrizioni a {gara.nome}",
+        "url": url_for("admin.dettaglio_gara", gara_id=gara.id),
+    })
+    for sub in iscrizioni:
+        try:
+            webpush(
+                subscription_info={
+                    "endpoint": sub.endpoint,
+                    "keys": {"p256dh": sub.p256dh, "auth": sub.auth},
+                },
+                data=payload,
+                vapid_private_key=current_app.config["VAPID_PRIVATE_KEY"],
+                vapid_claims={"sub": current_app.config["VAPID_CLAIM_EMAIL"]},
+            )
+        except WebPushException as e:
+            stato = e.response.status_code if e.response is not None else None
+            if stato in (404, 410):
+                db.session.delete(sub)  # iscrizione scaduta/revocata: rimuovila
+        except Exception:
+            pass  # errore di rete o simili: non deve bloccare il salvataggio dell'iscrizione
+    db.session.commit()
+
+
 @athlete_bp.route("/gare/<int:gara_id>/iscrizione", methods=["GET", "POST"])
 @login_required
 def iscrizione_gara(gara_id):
@@ -350,6 +389,7 @@ def iscrizione_gara(gara_id):
                 ))
 
         db.session.commit()
+        _notifica_push_iscrizione_gara(gara, current_user)
         flash("Iscrizione aggiornata.", "success")
         return redirect(url_for("athlete.dashboard"))
 

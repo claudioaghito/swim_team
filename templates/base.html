@@ -202,7 +202,9 @@
                 .catch(function () {});
         }
     </script>
+    {% endif %}
 
+    {% if current_user.is_authenticated %}
     <script>
         // Notifiche push (Web Push): su iPhone funzionano solo se l'app e' stata
         // aggiunta alla schermata Home (Condividi -> Aggiungi a Home), da iOS 16.4;

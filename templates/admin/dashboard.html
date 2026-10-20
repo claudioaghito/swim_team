@@ -102,7 +102,76 @@
             {% endif %}
         </ul>
     </div>
+
+    <div class="card no-print" id="card-notifiche-push" hidden>
+        <h3>{{ icon('messaggio') }} Notifiche</h3>
+        <p id="notifiche-push-testo"></p>
+        <button type="button" id="btn-notifiche-push">{{ icon('messaggio') }} <span id="notifiche-push-label">Attiva notifiche</span></button>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var card = document.getElementById("card-notifiche-push");
+        var testo = document.getElementById("notifiche-push-testo");
+        var btn = document.getElementById("btn-notifiche-push");
+        var label = document.getElementById("notifiche-push-label");
+        if (!card) return;
+
+        if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+            card.hidden = false;
+            btn.hidden = true;
+            var standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+            testo.textContent = standalone
+                ? "Il tuo browser non supporta le notifiche push."
+                : "Per ricevere una notifica quando un atleta si iscrive a un torneo, su iPhone aggiungi prima l'app alla schermata Home (tocca Condividi, poi \"Aggiungi a Home\"); su Android installa l'app dal menu del browser. Poi riapri l'app da li'.";
+            return;
+        }
+
+        if (Notification.permission === "denied") {
+            card.hidden = false;
+            btn.hidden = true;
+            testo.textContent = "Notifiche bloccate: per attivarle devi riabilitarle dalle impostazioni di notifica del browser/telefono per questa app.";
+            return;
+        }
+
+        card.hidden = false;
+
+        function mostraAttive() {
+            label.textContent = "Disattiva notifiche";
+            testo.textContent = "Notifiche attive: riceverai un avviso quando un atleta si iscrive a un torneo.";
+            btn.disabled = false;
+            btn.onclick = function () {
+                btn.disabled = true;
+                disattivaNotifichePush().then(mostraDisattive).catch(function () {
+                    btn.disabled = false;
+                });
+            };
+        }
+
+        function mostraDisattive() {
+            label.textContent = "Attiva notifiche";
+            testo.textContent = "Attiva le notifiche per essere avvisato quando un atleta si iscrive a un torneo.";
+            btn.disabled = false;
+            btn.onclick = function () {
+                btn.disabled = true;
+                attivaNotifichePush().then(mostraAttive).catch(function (errore) {
+                    var messaggio = (Notification.permission === "denied")
+                        ? "Permesso negato: abilitalo dalle impostazioni di notifica del browser/telefono per questa app, poi riprova."
+                        : "Attivazione non riuscita (" + (errore && errore.message ? errore.message : "errore sconosciuto") + "). Riprova, o segnalalo se persiste.";
+                    testo.textContent = messaggio;
+                    btn.disabled = false;
+                });
+            };
+        }
+
+        navigator.serviceWorker.ready.then(function (registration) {
+            return registration.pushManager.getSubscription();
+        }).then(function (sub) {
+            if (sub) mostraAttive(); else mostraDisattive();
+        }).catch(mostraDisattive);
+    });
+</script>
 
 {% if grafico_presenze.etichette %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
