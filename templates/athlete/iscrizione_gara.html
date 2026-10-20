@@ -15,7 +15,7 @@
         {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}<br>{% endif %}
         <strong>Programma gare:</strong>
         {% if gara.programma_gare_file %}
-            <a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri PDF</a>
+            <a href="{{ url_for('admin.vedi_programma_gara', gara_id=gara.id, next=url_for('athlete.iscrizione_gara', gara_id=gara.id)) }}">{{ icon('crea-pdf') }} Apri PDF</a>
         {% else %}
             non ancora caricato
         {% endif %}

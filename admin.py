@@ -1365,6 +1365,21 @@ def programma_gara(gara_id):
     return send_from_directory(cartella, gara.programma_gare_file)
 
 
+@admin_bp.route("/gare/<int:gara_id>/programma/vedi")
+@login_required
+def vedi_programma_gara(gara_id):
+    """Mostra il programma gare dentro una pagina dell'app (con un pulsante per tornare
+    indietro), invece di aprire direttamente il PDF: altrimenti su telefono, specialmente
+    da app installata, non c'e' alcun modo per tornare alla pagina della gara."""
+    gara = Gara.query.get_or_404(gara_id)
+    if not gara.programma_gare_file:
+        abort(404)
+    torna_url = request.args.get("next") or (
+        url_for("admin.lista_gare") if current_user.is_admin else url_for("athlete.lista_gare")
+    )
+    return render_template("admin/vedi_programma_gara.html", gara=gara, torna_url=torna_url)
+
+
 @admin_bp.route("/movimenti")
 @login_required
 @admin_required

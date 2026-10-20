@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Programma {{ gara.nome }}{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ torna_url }}">&larr; Torna indietro</a>
+    <a class="btn" href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}">{{ icon('download') }} Scarica</a>
+</div>
+<div class="card">
+    <h3>Programma gare — {{ gara.nome }}</h3>
+    <div id="pdf-container"><p>Caricamento del PDF...</p></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        (function () {
+            var url = {{ url_for('admin.programma_gara', gara_id=gara.id)|tojson }};
+            var container = document.getElementById("pdf-container");
+
+            function mostraErrore() {
+                container.innerHTML = "<p>Impossibile visualizzare l'anteprima del PDF in questa pagina. " +
+                    "<a href=\"" + url + "\">Scaricalo</a> per aprirlo.</p>";
+            }
+
+            if (!window.pdfjsLib) {
+                mostraErrore();
+                return;
+            }
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+            function renderPagina(pdf, numeroPagina) {
+                return pdf.getPage(numeroPagina).then(function (pagina) {
+                    var viewportBase = pagina.getViewport({ scale: 1 });
+                    var scala = Math.min(2, container.clientWidth / viewportBase.width);
+                    var viewport = pagina.getViewport({ scale: scala });
+
+                    var canvas = document.createElement("canvas");
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    canvas.style.display = "block";
+                    canvas.style.maxWidth = "100%";
+                    canvas.style.marginBottom = "12px";
+                    container.appendChild(canvas);
+
+                    return pagina.render({ canvasContext: canvas.getContext("2d"), viewport: viewport }).promise;
+                });
+            }
+
+            pdfjsLib.getDocument(url).promise.then(function (pdf) {
+                container.innerHTML = "";
+                var catena = Promise.resolve();
+                for (var i = 1; i <= pdf.numPages; i++) {
+                    (function (numeroPagina) {
+                        catena = catena.then(function () { return renderPagina(pdf, numeroPagina); });
+                    })(i);
+                }
+                catena.catch(mostraErrore);
+            }).catch(mostraErrore);
+        })();
+    </script>
+</div>
+{% endblock %}
