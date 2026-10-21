@@ -945,6 +945,47 @@ def dettaglio_gara(gara_id):
     )
 
 
+@admin_bp.route("/gare/<int:gara_id>/esporta")
+@login_required
+@admin_required
+def esporta_iscritti_gara(gara_id):
+    gara = Gara.query.get_or_404(gara_id)
+    scelte_per_atleta = gara.iscrizioni_per_atleta()
+
+    quote_per_atleta = {
+        q.atleta_id: q
+        for q in QuotaTorneo.query.filter_by(gara_id=gara.id).all()
+    }
+    config = Configurazione.ottieni()
+    anno_stagione = config.anno_stagione
+
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter=";")
+    writer.writerow(["Nome", "Cognome", "Categoria", "Gara", "Tempo", "Quota (€)", "Quota addebitata"])
+    for atleta, iscrizioni in scelte_per_atleta.items():
+        quota = quote_per_atleta.get(atleta.id)
+        quota_addebitata = bool(quota and quota.movimento_id)
+        importo = (
+            float(quota.importo) if quota_addebitata and quota.importo
+            else gara.calcola_quota(iscrizioni)
+        )
+        for iscrizione in iscrizioni:
+            writer.writerow([
+                atleta.nome,
+                atleta.cognome,
+                atleta.categoria_master(anno_stagione) or "",
+                iscrizione.stile or "",
+                iscrizione.tempo_ottenuto or "",
+                f"{importo:.2f}",
+                "Si" if quota_addebitata else "No",
+            ])
+
+    resp = Response(output.getvalue().encode("cp1252", errors="replace"), mimetype="text/csv")
+    resp.headers["Content-Type"] = "text/csv; charset=windows-1252"
+    resp.headers["Content-Disposition"] = f"attachment; filename=iscritti_{secure_filename(gara.nome)}.csv"
+    return resp
+
+
 @admin_bp.route("/gare/<int:gara_id>/staffetta/<path:tipo>", methods=["GET", "POST"])
 @login_required
 @admin_required
