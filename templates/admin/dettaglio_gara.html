@@ -89,11 +89,11 @@
                 <th class="no-print"></th>
             </tr>
         </thead>
-        <tbody>
             {% for atleta, iscrizioni in scelte_per_atleta.items() %}
                 {% set quota = quote_per_atleta.get(atleta.id) %}
                 {% set individuali = scelte_gare_individuali[atleta] %}
                 {% set n_righe = individuali|length if individuali else 1 %}
+                <tbody class="atleta-group">
                 {% for iscrizione in individuali %}
                 <tr>
                     {% if loop.first %}
@@ -160,10 +160,10 @@
                     </td>
                 </tr>
                 {% endfor %}
+                </tbody>
             {% else %}
-            <tr><td colspan="6">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
+            <tbody><tr><td colspan="6">Nessun atleta si è ancora iscritto a questo torneo.</td></tr></tbody>
             {% endfor %}
-        </tbody>
     </table>
     </div>
 </div>
@@ -172,6 +172,11 @@
 @media print {
     .no-print, .navbar, .flash { display: none !important; }
     .card { box-shadow: none; border: none; }
+    thead { display: table-header-group; }
+    tbody.atleta-group {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
 }
 </style>
 {% endblock %}
