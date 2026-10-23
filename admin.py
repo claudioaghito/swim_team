@@ -626,6 +626,25 @@ def cartellino_atleta(atleta_id):
     return send_from_directory(cartella, atleta.cartellino_file)
 
 
+@admin_bp.route("/atleti/<int:atleta_id>/cartellino/vedi")
+@login_required
+@admin_required
+def vedi_cartellino_atleta(atleta_id):
+    """Mostra il cartellino dentro una pagina dell'app (con un pulsante per tornare
+    indietro), invece di aprire direttamente il file: altrimenti su telefono, specialmente
+    da app installata, non c'e' alcun modo per tornare alla pagina dell'atleta."""
+    atleta = User.query.filter_by(id=atleta_id, ruolo="atleta").first_or_404()
+    if not atleta.cartellino_file:
+        abort(404)
+    torna_url = request.args.get("next") or url_for("admin.dettaglio_atleta", atleta_id=atleta.id)
+    return render_template(
+        "admin/vedi_documento.html", titolo="Cartellino — " + atleta.nome_completo,
+        view_url=url_for("admin.cartellino_atleta", atleta_id=atleta.id),
+        download_url=url_for("admin.cartellino_atleta", atleta_id=atleta.id),
+        is_immagine=True, torna_url=torna_url,
+    )
+
+
 @admin_bp.route("/atleti/<int:atleta_id>/certificato")
 @login_required
 @admin_required
@@ -635,6 +654,27 @@ def certificato_atleta(atleta_id):
         abort(404)
     cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "certificati")
     return send_from_directory(cartella, atleta.certificato_medico_file)
+
+
+@admin_bp.route("/atleti/<int:atleta_id>/certificato/vedi")
+@login_required
+@admin_required
+def vedi_certificato_atleta(atleta_id):
+    """Mostra il certificato medico dentro una pagina dell'app (con un pulsante per tornare
+    indietro), invece di aprire direttamente il file: altrimenti su telefono, specialmente
+    da app installata, non c'e' alcun modo per tornare alla pagina dell'atleta."""
+    atleta = User.query.filter_by(id=atleta_id, ruolo="atleta").first_or_404()
+    if not atleta.certificato_medico_file:
+        abort(404)
+    ext = atleta.certificato_medico_file.rsplit(".", 1)[-1].lower() if "." in atleta.certificato_medico_file else ""
+    is_immagine = ext in current_app.config["ALLOWED_IMAGE_EXT"]
+    torna_url = request.args.get("next") or url_for("admin.dettaglio_atleta", atleta_id=atleta.id)
+    return render_template(
+        "admin/vedi_documento.html", titolo="Certificato medico — " + atleta.nome_completo,
+        view_url=url_for("admin.certificato_atleta", atleta_id=atleta.id),
+        download_url=url_for("admin.certificato_atleta", atleta_id=atleta.id),
+        is_immagine=is_immagine, torna_url=torna_url,
+    )
 
 
 @admin_bp.route("/allenamenti/nuovo", methods=["GET", "POST"])

@@ -425,6 +425,22 @@ def cartellino():
     return send_from_directory(cartella, current_user.cartellino_file)
 
 
+@athlete_bp.route("/documenti/cartellino/vedi")
+@login_required
+def vedi_cartellino():
+    """Mostra il cartellino dentro una pagina dell'app (con un pulsante per tornare
+    indietro), invece di aprire direttamente il file: altrimenti su telefono, specialmente
+    da app installata, non c'e' alcun modo per tornare alla pagina dei documenti."""
+    if not current_user.cartellino_file:
+        abort(404)
+    torna_url = request.args.get("next") or url_for("athlete.documenti")
+    return render_template(
+        "admin/vedi_documento.html", titolo="Cartellino",
+        view_url=url_for("athlete.cartellino"), download_url=url_for("athlete.cartellino"),
+        is_immagine=True, torna_url=torna_url,
+    )
+
+
 @athlete_bp.route("/documenti/certificato")
 @login_required
 def certificato():
@@ -432,6 +448,24 @@ def certificato():
         abort(404)
     cartella = os.path.join(current_app.config["UPLOAD_FOLDER"], "certificati")
     return send_from_directory(cartella, current_user.certificato_medico_file)
+
+
+@athlete_bp.route("/documenti/certificato/vedi")
+@login_required
+def vedi_certificato():
+    """Mostra il certificato medico dentro una pagina dell'app (con un pulsante per tornare
+    indietro), invece di aprire direttamente il file: altrimenti su telefono, specialmente
+    da app installata, non c'e' alcun modo per tornare alla pagina dei documenti."""
+    if not current_user.certificato_medico_file:
+        abort(404)
+    ext = current_user.certificato_medico_file.rsplit(".", 1)[-1].lower() if "." in current_user.certificato_medico_file else ""
+    is_immagine = ext in current_app.config["ALLOWED_IMAGE_EXT"]
+    torna_url = request.args.get("next") or url_for("athlete.documenti")
+    return render_template(
+        "admin/vedi_documento.html", titolo="Certificato medico",
+        view_url=url_for("athlete.certificato"), download_url=url_for("athlete.certificato"),
+        is_immagine=is_immagine, torna_url=torna_url,
+    )
 
 
 @athlete_bp.route("/record")

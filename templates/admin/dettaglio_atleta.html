@@ -41,11 +41,11 @@
         <h3>{{ icon('crea-pdf') }} Certificato medico</h3>
         {% if atleta.certificato_medico_file %}
             <p>
-                <a class="btn" href="{{ url_for('admin.certificato_atleta', atleta_id=atleta.id) }}" target="_blank">
+                <a class="btn" href="{{ url_for('admin.vedi_certificato_atleta', atleta_id=atleta.id, next=request.full_path) }}">
                     {{ icon('crea-pdf') }} Apri / Stampa certificato
                 </a>
             </p>
-            <p><small>Il certificato si apre in una nuova scheda: usa il comando di stampa del visualizzatore PDF del browser.</small></p>
+            <p><small>Usa il comando di stampa del browser per stampare il certificato.</small></p>
             {% if atleta.certificato_medico_scadenza %}
                 <p>
                     <span class="status-dot {{ 'green' if atleta.certificato_medico_valido else 'red' }}"></span>

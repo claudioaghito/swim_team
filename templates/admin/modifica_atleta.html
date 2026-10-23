@@ -40,13 +40,13 @@
 
         <label>Cartellino (immagine)</label>
         {% if atleta.cartellino_file %}
-            <p><small>Attuale: <a href="{{ url_for('admin.cartellino_atleta', atleta_id=atleta.id) }}" target="_blank">visualizza</a></small></p>
+            <p><small>Attuale: <a href="{{ url_for('admin.vedi_cartellino_atleta', atleta_id=atleta.id, next=request.full_path) }}">visualizza</a></small></p>
         {% endif %}
         <input type="file" name="cartellino" accept=".png,.jpg,.jpeg,.gif,.webp">
 
         <label>Certificato medico (PDF o immagine)</label>
         {% if atleta.certificato_medico_file %}
-            <p><small>Attuale: <a href="{{ url_for('admin.certificato_atleta', atleta_id=atleta.id) }}" target="_blank">visualizza</a></small></p>
+            <p><small>Attuale: <a href="{{ url_for('admin.vedi_certificato_atleta', atleta_id=atleta.id, next=request.full_path) }}">visualizza</a></small></p>
         {% endif %}
         <input type="file" name="certificato_medico" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp">
 

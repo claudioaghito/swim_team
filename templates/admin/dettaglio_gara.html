@@ -24,7 +24,7 @@
         <strong>Tipologie disponibili:</strong> {{ gara.lista_tipologie|join(', ') }}<br>
         <strong>Programma gare:</strong>
         {% if gara.programma_gare_file %}
-            <a href="{{ url_for('admin.programma_gara', gara_id=gara.id) }}" target="_blank">{{ icon('crea-pdf') }} Apri PDF</a>
+            <a href="{{ url_for('admin.vedi_programma_gara', gara_id=gara.id, next=request.full_path) }}">{{ icon('crea-pdf') }} Apri PDF</a>
         {% else %}
             non caricato
         {% endif %}
