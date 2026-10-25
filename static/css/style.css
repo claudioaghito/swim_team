@@ -200,10 +200,13 @@ h3 { font-size: 1.05em; margin-top: 0; color: var(--blue-dark); }
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 .card.warning { border-left: 4px solid var(--red); }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+.grid > .card { min-width: 0; }
 .actions { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Menu a tendina "Stampa / Esporta PDF" con scelta formato foglio */
@@ -332,7 +335,7 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
    invece di stringere il testo su righe strettissime, la colonna resta larga
    e l'intera tabella scorre in orizzontale (stesso approccio di .record-table). */
 .table-scroll-wide { min-width: 680px; }
-.table-scroll-wide .col-wide-text { min-width: 280px; }
+.table-scroll-wide .col-wide-text { min-width: 280px; overflow-wrap: break-word; word-break: break-word; }
 
 .search-form { display: flex; gap: 8px; }
 .search-form input { flex: 1; margin-top: 0; }
