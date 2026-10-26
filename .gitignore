@@ -7,3 +7,4 @@ instance/uploads/
 instance/backups/
 .env
 .vs/
+venv_old/

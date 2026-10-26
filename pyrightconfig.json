@@ -1,0 +1,5 @@
+{
+  "venvPath": ".",
+  "venv": "venv",
+  "exclude": ["venv", "venv_old", "**/__pycache__"]
+}
