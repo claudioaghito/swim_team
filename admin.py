@@ -23,10 +23,10 @@ from models import (
 )
 from piani_allenamento import FASI_TIPI, FASI_TIPI_CODICI
 from piano_excel import genera_template_excel, leggi_piano_da_excel
-from records import STILI_RECORD, STILI_CODICI, STILI_NOMI, CATEGORIE_RECORD, griglia_record
+from records import STILI_CODICI, STILI_NOMI, CATEGORIE_RECORD, griglia_record
 from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
 from utils import (
-    tempo_a_secondi as _tempo_a_secondi, secondi_a_tempo as _secondi_a_tempo,
+    secondi_a_tempo as _secondi_a_tempo,
     min_sec_a_secondi, tempo_stringa_a_min_sec_str,
 )
 
