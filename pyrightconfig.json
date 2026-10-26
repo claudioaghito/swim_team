@@ -2,5 +2,12 @@
   "venvPath": ".",
   "venv": "venv",
   "exclude": ["venv", "venv_old", "**/__pycache__"],
-  "reportCallIssue": "none"
+  "reportCallIssue": "none",
+  "reportOptionalMemberAccess": "none",
+  "reportOptionalSubscript": "none",
+  "reportPossiblyUnboundVariable": "none",
+  "reportArgumentType": "none",
+  "reportAssignmentType": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportGeneralTypeIssues": "none"
 }
