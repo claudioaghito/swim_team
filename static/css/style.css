@@ -323,6 +323,12 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
     letter-spacing: 0.03em;
 }
 .table tbody tr:hover { background: var(--table-hover-bg); }
+/* Elenco tornei: colonne brevi su una riga sola (niente "22/ 11/ 202 6"), solo
+   "Nome" e "Tipologie" vanno a capo. Se non c'e' spazio la card scorre in orizzontale. */
+.tornei-table { min-width: 960px; }
+.tornei-table th, .tornei-table td { white-space: nowrap; vertical-align: top; }
+.tornei-table th:nth-child(2), .tornei-table td:nth-child(2) { white-space: normal; min-width: 180px; }
+.tornei-table th:nth-child(6), .tornei-table td:nth-child(6) { white-space: normal; min-width: 320px; }
 .table-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 .table-actions .btn, .table-actions form { flex-shrink: 0; }
 .table-actions form { display: inline-flex; }
