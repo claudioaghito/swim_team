@@ -323,15 +323,27 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
     letter-spacing: 0.03em;
 }
 .table tbody tr:hover { background: var(--table-hover-bg); }
-/* Elenco tornei: colonne brevi su una riga sola (niente "22/ 11/ 202 6"), solo
-   "Nome" e "Tipologie" vanno a capo. Se non c'e' spazio la card scorre in orizzontale. */
+/* Regola generale per tutte le tabelle a schermo: intestazioni e celle brevi su una
+   riga sola (niente date o titoli spezzati lettera per lettera) e la card scorre in
+   orizzontale se la tabella non ci sta. Le celle di testo libero (.col-wide-text,
+   .preserve-lines, .col-wrap) vanno invece a capo tra le parole. */
+@media screen {
+    .table th, .table td { word-break: normal; overflow-wrap: normal; }
+    .table th { white-space: nowrap; }
+    .table:not(.responsive-cards):not(.fase-table) td { white-space: nowrap; }
+    .table:not(.responsive-cards):not(.fase-table) td.col-wide-text,
+    .table:not(.responsive-cards):not(.fase-table) td.col-wrap { white-space: normal; min-width: 220px; }
+    .table:not(.responsive-cards):not(.fase-table) td.preserve-lines { white-space: pre-line; min-width: 220px; }
+}
+@media screen and (min-width: 641px) {
+    .table.responsive-cards td { white-space: nowrap; }
+    .table.responsive-cards td.preserve-lines { white-space: pre-line; min-width: 220px; }
+}
+/* Elenco tornei: solo "Nome" e "Tipologie" (.col-wrap) vanno a capo. */
 .tornei-table { min-width: 960px; }
-.tornei-table th, .tornei-table td { white-space: nowrap; vertical-align: top; }
-.tornei-table th:nth-child(2), .tornei-table td:nth-child(2) { white-space: normal; min-width: 180px; }
-.tornei-table th:nth-child(6), .tornei-table td:nth-child(6) { white-space: normal; min-width: 320px; }
 .tornei-atleta-table { min-width: 820px; }
-.tornei-atleta-table th, .tornei-atleta-table td { white-space: nowrap; vertical-align: top; }
-.tornei-atleta-table th:nth-child(2), .tornei-atleta-table td:nth-child(2) { white-space: normal; min-width: 180px; }
+.tornei-table td, .tornei-atleta-table td { vertical-align: top; }
+.tornei-table td.col-wrap.col-tipologie { min-width: 320px; }
 .table-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 .table-actions .btn, .table-actions form { flex-shrink: 0; }
 .table-actions form { display: inline-flex; }
