@@ -329,6 +329,9 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 .tornei-table th, .tornei-table td { white-space: nowrap; vertical-align: top; }
 .tornei-table th:nth-child(2), .tornei-table td:nth-child(2) { white-space: normal; min-width: 180px; }
 .tornei-table th:nth-child(6), .tornei-table td:nth-child(6) { white-space: normal; min-width: 320px; }
+.tornei-atleta-table { min-width: 820px; }
+.tornei-atleta-table th, .tornei-atleta-table td { white-space: nowrap; vertical-align: top; }
+.tornei-atleta-table th:nth-child(2), .tornei-atleta-table td:nth-child(2) { white-space: normal; min-width: 180px; }
 .table-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 .table-actions .btn, .table-actions form { flex-shrink: 0; }
 .table-actions form { display: inline-flex; }
