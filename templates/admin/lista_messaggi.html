@@ -36,8 +36,8 @@
         <tbody>
             {% for m in messaggi %}
             <tr>
-                <td>{{ m.data.strftime('%d/%m/%Y %H:%M') }}</td>
-                <td>{{ m.mittente.nome_completo }}</td>
+                <td>{{ m.data.strftime('%d/%m/%Y') }}<br>{{ m.data.strftime('%H:%M') }}</td>
+                <td>{{ m.mittente.nome }}<br>{{ m.mittente.cognome }}</td>
                 <td>{{ "Tutta la squadra" if m.is_comunicazione_generale else m.destinatario.nome_completo }}</td>
                 <td class="preserve-lines col-wide-text">
                     {{ m.testo }}
