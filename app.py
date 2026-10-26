@@ -113,7 +113,7 @@ def create_app(config_class=Config):
             cosi' un deploy invalida subito la cache del browser (il file statico
             non ha header di cache espliciti, quindi altrimenti puo' restare
             in cache euristica del browser anche dopo un refresh normale)."""
-            path = os.path.join(app.static_folder, filename)
+            path = os.path.join(app.static_folder or "static", filename)
             try:
                 v = int(os.path.getmtime(path))
             except OSError:

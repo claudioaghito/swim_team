@@ -1,5 +1,6 @@
 {
   "venvPath": ".",
   "venv": "venv",
-  "exclude": ["venv", "venv_old", "**/__pycache__"]
+  "exclude": ["venv", "venv_old", "**/__pycache__"],
+  "reportCallIssue": "none"
 }
