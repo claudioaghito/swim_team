@@ -355,6 +355,18 @@ def _notifica_push_iscrizione_gara(gara, atleta):
     db.session.commit()
 
 
+@athlete_bp.route("/gare/<int:gara_id>/iscritti")
+@login_required
+def iscritti_gara(gara_id):
+    gara = Gara.query.get_or_404(gara_id)
+    return render_template(
+        "iscritti_gara.html",
+        gara=gara,
+        scelte_per_atleta=gara.iscrizioni_per_atleta(),
+        indietro_url=url_for("athlete.dashboard"),
+    )
+
+
 @athlete_bp.route("/gare/<int:gara_id>/iscrizione", methods=["GET", "POST"])
 @login_required
 def iscrizione_gara(gara_id):

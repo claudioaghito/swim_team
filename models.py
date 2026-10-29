@@ -191,6 +191,11 @@ class Gara(db.Model):
             return False
         return (self.scadenza_iscrizione - datetime.utcnow().date()).days <= 3
 
+    @property
+    def numero_iscritti(self):
+        """Numero di atleti distinti iscritti al torneo (non di gare scelte)."""
+        return len({i.atleta_id for i in self.iscrizioni})
+
     def iscrizioni_per_atleta(self):
         raggruppate = {}
         for iscrizione in self.iscrizioni:

@@ -920,6 +920,19 @@ def lista_gare():
     return render_template("admin/lista_gare.html", gare=gare, q=q)
 
 
+@admin_bp.route("/gare/<int:gara_id>/iscritti")
+@login_required
+@admin_required
+def iscritti_gara(gara_id):
+    gara = Gara.query.get_or_404(gara_id)
+    return render_template(
+        "iscritti_gara.html",
+        gara=gara,
+        scelte_per_atleta=gara.iscrizioni_per_atleta(),
+        indietro_url=url_for("admin.dashboard"),
+    )
+
+
 @admin_bp.route("/gare/<int:gara_id>")
 @login_required
 @admin_required

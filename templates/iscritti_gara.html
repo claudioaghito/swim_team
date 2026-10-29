@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Iscritti - {{ gara.nome }}{% endblock %}
+{% block content %}
+<div class="actions">
+    <a class="btn" href="{{ indietro_url }}">&larr; Indietro</a>
+</div>
+
+<div class="card">
+    <h2>{{ icon('tornei') }} {{ gara.nome }}</h2>
+    <p>
+        <strong>Data:</strong> {{ gara.data.strftime('%d/%m/%Y') }}{% if gara.luogo %} — {{ gara.luogo }}{% endif %}
+    </p>
+    <h3><span class="status-dot {{ 'green' if scelte_per_atleta else 'red' }}"></span>Iscritti ({{ scelte_per_atleta|length }})</h3>
+    <div style="overflow-x:auto;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Atleta</th>
+                <th class="col-wide-text">Gare</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for atleta, iscrizioni in scelte_per_atleta.items() %}
+            <tr>
+                <td>{{ atleta.nome_completo }}</td>
+                <td class="col-wrap">{{ iscrizioni|map(attribute='stile')|select|join(', ') or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">Nessun atleta si è ancora iscritto a questo torneo.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}
