@@ -5,3 +5,15 @@
     <span class="esaurito-dot"></span>
 </label>
 {% endmacro %}
+
+{# Elenco delle tipologie di un torneo: quelle con i posti terminati sono grigie con il cerchio rosso #}
+{% macro elenco_tipologie(gara) -%}
+{%- for tipo in gara.lista_tipologie -%}
+    {%- if gara.is_esaurita(tipo) -%}
+        <span class="tipo-esaurita" title="Posti esauriti"><span class="status-dot red"></span>{{ tipo }}</span>
+    {%- else -%}
+        {{ tipo }}
+    {%- endif -%}
+    {%- if not loop.last %}, {% endif -%}
+{%- endfor -%}
+{%- endmacro %}

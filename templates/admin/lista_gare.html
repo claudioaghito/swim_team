@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/esaurito.html" import elenco_tipologie %}
 {% block title %}Tornei{% endblock %}
 {% block content %}
 <h1>{{ icon('tornei') }} Tornei</h1>
@@ -38,7 +39,7 @@
                 <td data-label="Luogo">{{ g.luogo or '-' }}</td>
                 <td data-label="Quota gara">{{ "%.2f"|format(g.quota_gara or 0) }} €</td>
                 <td data-label="Quota staffetta">{{ "%.2f"|format(g.quota_staffetta or 0) }} €</td>
-                <td data-label="Tipologie" class="col-wrap col-tipologie">{{ g.lista_tipologie|join(', ') }}</td>
+                <td data-label="Tipologie" class="col-wrap col-tipologie">{{ elenco_tipologie(g) }}</td>
                 <td data-label="Iscritti">
                     {% set n_iscritti = g.iscrizioni|map(attribute='atleta_id')|unique|list|length %}
                     <span class="status-dot {{ 'green' if n_iscritti > 0 else 'red' }}"></span>{{ n_iscritti }}

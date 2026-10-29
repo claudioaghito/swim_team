@@ -386,6 +386,8 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 .esaurito-toggle input:focus-visible + .esaurito-dot { outline: 2px solid var(--blue); outline-offset: 2px; }
 .checkbox-item:has(.esaurito-toggle input:checked) > label,
 .checkbox-item:has(.esaurito-toggle input:checked) > span:not(.esaurito-toggle) { color: var(--muted); opacity: 0.6; }
+.tipo-esaurita { color: var(--muted); opacity: 0.75; white-space: nowrap; }
+.tipo-esaurita .status-dot { margin-right: 4px; }
 tr.gara-esaurita td { background: rgba(128, 128, 128, 0.18); color: var(--muted); }
 .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 0 2px rgba(0,0,0,0.04); }
 .status-dot.green { background: var(--green); }

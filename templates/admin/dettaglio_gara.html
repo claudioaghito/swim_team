@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/esaurito.html" import elenco_tipologie %}
 {% block title %}{{ gara.nome }}{% endblock %}
 {% block content %}
 <div class="actions no-print">
@@ -21,7 +22,7 @@
         <strong>Quota staffetta:</strong> {{ "%.2f"|format(gara.quota_staffetta or 0) }} €<br>
         {% if gara.scadenza_iscrizione %}<strong>Scadenza iscrizione:</strong> {{ gara.scadenza_iscrizione.strftime('%d/%m/%Y') }}<br>{% endif %}
         <strong>Iscrizioni:</strong> {{ "aperte" if gara.iscrizioni_aperte else "chiuse" }}<br>
-        <strong>Tipologie disponibili:</strong> {{ gara.lista_tipologie|join(', ') }}<br>
+        <strong>Tipologie disponibili:</strong> {{ elenco_tipologie(gara) }}<br>
         <strong>Programma gare:</strong>
         {% if gara.programma_gare_file %}
             <a href="{{ url_for('admin.vedi_programma_gara', gara_id=gara.id, next=request.full_path) }}">{{ icon('crea-pdf') }} Apri PDF</a>
