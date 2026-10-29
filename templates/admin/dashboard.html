@@ -66,6 +66,7 @@
             {% for g in prossime_gare %}
                 <li>
                     <a href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">{{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo }})</a>
+                    {% if g.scadenza_iscrizione %}<small>— scadenza iscrizioni: {{ g.scadenza_iscrizione.strftime('%d/%m/%Y') }}</small>{% endif %}
                     {% if g.scadenza_vicina %}<span class="status-dot red" title="Iscrizioni in scadenza"></span><small>iscrizioni in scadenza</small>{% endif %}
                     — <span class="status-dot {{ 'green' if g.numero_iscritti else 'red' }}"></span>{% if g.numero_iscritti %}<a href="{{ url_for('admin.iscritti_gara', gara_id=g.id) }}" title="Vedi la lista degli iscritti">Iscritti ({{ g.numero_iscritti }})</a>{% else %}Iscritti ({{ g.numero_iscritti }}){% endif %}
                     {% if g.lista_tipologie %}<br><small>{{ g.lista_tipologie|join(', ') }}</small>{% endif %}
