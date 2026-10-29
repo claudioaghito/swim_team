@@ -1,0 +1,7 @@
+{# Cerchio cliccabile: rosso = posti terminati per questa tipologia di gara #}
+{% macro esaurito_toggle(tipo, esaurita=False) %}
+<label class="esaurito-toggle" title="Posti esauriti per {{ tipo }}">
+    <input type="checkbox" name="esaurite" value="{{ tipo }}" {% if esaurita %}checked{% endif %}>
+    <span class="esaurito-dot"></span>
+</label>
+{% endmacro %}

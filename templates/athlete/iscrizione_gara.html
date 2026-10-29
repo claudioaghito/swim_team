@@ -40,16 +40,20 @@
             <tbody>
                 {% for tipo in gara.lista_tipologie %}
                 {% set default_min, default_sec = tempi_min_sec.get(tipo, ("", "")) %}
-                <tr>
-                    <td><input type="checkbox" name="tipologie" value="{{ tipo }}" style="width:auto;margin-top:0;" {% if tipo in iscrizioni_correnti %}checked{% endif %}></td>
-                    <td>{{ tipo }}</td>
+                {% set esaurita = gara.is_esaurita(tipo) %}
+                <tr class="{{ 'gara-esaurita' if esaurita }}">
+                    <td><input type="checkbox" name="tipologie" value="{{ tipo }}" style="width:auto;margin-top:0;" {% if tipo in iscrizioni_correnti %}checked{% endif %} {% if esaurita %}disabled{% endif %}></td>
+                    <td>
+                        {{ tipo }}
+                        {% if esaurita %}<span class="status-dot red" title="Posti esauriti"></span><small>posti esauriti</small>{% endif %}
+                    </td>
                     <td>
                         <div style="display:flex;gap:6px;align-items:center;white-space:nowrap;">
                             <input type="number" min="0" max="59" step="1" style="width:64px;margin-top:0;"
-                                   name="tempo_{{ tipo }}_min" value="{{ default_min }}">
+                                   name="tempo_{{ tipo }}_min" value="{{ default_min }}" {% if esaurita %}disabled{% endif %}>
                             <small>min</small>
                             <input type="number" min="0" max="59.99" step="0.01" style="width:80px;margin-top:0;"
-                                   name="tempo_{{ tipo }}_sec" value="{{ default_sec }}">
+                                   name="tempo_{{ tipo }}_sec" value="{{ default_sec }}" {% if esaurita %}disabled{% endif %}>
                             <small>sec</small>
                         </div>
                     </td>

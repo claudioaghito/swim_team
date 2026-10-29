@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/esaurito.html" import esaurito_toggle %}
 {% block title %}Modifica Torneo{% endblock %}
 {% block content %}
 <div class="actions">
@@ -27,16 +28,28 @@
         <input type="date" name="scadenza_iscrizione" value="{{ gara.scadenza_iscrizione.isoformat() if gara.scadenza_iscrizione else '' }}">
 
         <label>Tipologie di gara</label>
+        <p><small>Il cerchio accanto a ogni gara, se cliccato diventa <span class="status-dot red"></span>rosso: i posti per quella gara sono terminati e gli atleti non potranno più sceglierla.</small></p>
         <div class="checkbox-list checkbox-list-scroll">
             {% for tipo in tipi_gara_base %}
-                <label class="checkbox-item">
-                    <input type="checkbox" name="tipologie" value="{{ tipo }}" {% if tipo in gara.lista_tipologie %}checked{% endif %}> {{ tipo }}
-                </label>
+                <div class="checkbox-item">
+                    <label><input type="checkbox" name="tipologie" value="{{ tipo }}" {% if tipo in gara.lista_tipologie %}checked{% endif %}> {{ tipo }}</label>
+                    {{ esaurito_toggle(tipo, gara.is_esaurita(tipo)) }}
+                </div>
             {% endfor %}
         </div>
 
         <label>Altre tipologie (facoltativo, separate da virgola)</label>
         <input type="text" name="altre_tipologie" value="{{ tipi_extra }}" placeholder="es. 400 SL, Staffetta 4x50">
+        {% if tipi_extra_lista %}
+        <div class="checkbox-list">
+            {% for tipo in tipi_extra_lista %}
+                <div class="checkbox-item">
+                    <span>{{ tipo }}</span>
+                    {{ esaurito_toggle(tipo, gara.is_esaurita(tipo)) }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <label>Programma gare (PDF)</label>
         {% if gara.programma_gare_file %}

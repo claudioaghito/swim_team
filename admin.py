@@ -860,6 +860,13 @@ def elimina_allenamento(allenamento_id):
     return redirect(url_for("admin.lista_allenamenti"))
 
 
+def _esaurite_valide(tipologie):
+    """Tipologie con posti terminati segnate nel form, limitate a quelle effettivamente
+    offerte dal torneo (senza duplicati, nello stesso ordine delle tipologie)."""
+    segnate = set(request.form.getlist("esaurite"))
+    return [t for t in dict.fromkeys(tipologie) if t in segnate]
+
+
 @admin_bp.route("/gare/nuova", methods=["GET", "POST"])
 @login_required
 @admin_required
@@ -885,6 +892,7 @@ def nuova_gara():
                 if request.form.get("scadenza_iscrizione") else None
             ),
             tipologie_gara=",".join(tipologie),
+            tipologie_esaurite=",".join(_esaurite_valide(tipologie)),
             note=request.form.get("note", "").strip(),
         )
         db.session.add(gara)
@@ -1409,6 +1417,7 @@ def modifica_gara(gara_id):
             if request.form.get("scadenza_iscrizione") else None
         )
         gara.tipologie_gara = ",".join(tipologie)
+        gara.tipologie_esaurite = ",".join(_esaurite_valide(tipologie))
         gara.note = request.form.get("note", "").strip()
 
         try:
@@ -1427,9 +1436,10 @@ def modifica_gara(gara_id):
         flash("Torneo aggiornato.", "success")
         return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
 
-    tipi_extra = ", ".join(t for t in gara.lista_tipologie if t not in TIPI_GARA_BASE)
+    tipi_extra_lista = [t for t in gara.lista_tipologie if t not in TIPI_GARA_BASE]
     return render_template(
-        "admin/modifica_gara.html", gara=gara, tipi_gara_base=TIPI_GARA_BASE, tipi_extra=tipi_extra
+        "admin/modifica_gara.html", gara=gara, tipi_gara_base=TIPI_GARA_BASE,
+        tipi_extra=", ".join(tipi_extra_lista), tipi_extra_lista=tipi_extra_lista,
     )
 
 

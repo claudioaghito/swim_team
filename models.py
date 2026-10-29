@@ -169,6 +169,7 @@ class Gara(db.Model):
     note = db.Column(db.Text)
     tipologie_gara = db.Column(db.Text)  # tipi di gara offerti, separati da virgola (es. "50 SL,100 DO")
     programma_gare_file = db.Column(db.String(255))  # nome file PDF, in UPLOAD_FOLDER/programmi_gare
+    tipologie_esaurite = db.Column(db.Text)  # tipologie con posti terminati, separate da virgola (sottoinsieme di tipologie_gara)
 
     iscrizioni = db.relationship("IscrizioneGara", backref="gara", lazy=True, cascade="all, delete-orphan")
 
@@ -177,6 +178,16 @@ class Gara(db.Model):
         if not self.tipologie_gara:
             return []
         return [t.strip() for t in self.tipologie_gara.split(",") if t.strip()]
+
+    @property
+    def lista_esaurite(self):
+        if not self.tipologie_esaurite:
+            return []
+        return [t.strip() for t in self.tipologie_esaurite.split(",") if t.strip()]
+
+    def is_esaurita(self, tipo):
+        """True se l'amministratore ha segnato come terminati i posti per questa tipologia."""
+        return tipo in self.lista_esaurite
 
     @property
     def iscrizioni_aperte(self):

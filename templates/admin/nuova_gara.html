@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/esaurito.html" import esaurito_toggle %}
 {% block title %}Nuovo Torneo{% endblock %}
 {% block content %}
 <div class="actions">
@@ -26,11 +27,13 @@
         <input type="date" name="scadenza_iscrizione">
 
         <label>Tipologie di gara</label>
+        <p><small>Il cerchio accanto a ogni gara, se cliccato diventa <span class="status-dot red"></span>rosso: i posti per quella gara sono terminati e gli atleti non potranno più sceglierla.</small></p>
         <div class="checkbox-list checkbox-list-scroll">
             {% for tipo in tipi_gara_base %}
-                <label class="checkbox-item">
-                    <input type="checkbox" name="tipologie" value="{{ tipo }}"> {{ tipo }}
-                </label>
+                <div class="checkbox-item">
+                    <label><input type="checkbox" name="tipologie" value="{{ tipo }}"> {{ tipo }}</label>
+                    {{ esaurito_toggle(tipo) }}
+                </div>
             {% endfor %}
         </div>
 

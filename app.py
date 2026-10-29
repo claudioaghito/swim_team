@@ -55,6 +55,11 @@ def _migra_schema(app):
             if "nome_originale" not in colonne_allegati:
                 with db.engine.begin() as conn:
                     conn.execute(text("ALTER TABLE messaggi_allegati ADD COLUMN nome_originale VARCHAR(255)"))
+        if "gare" in inspector.get_table_names():
+            colonne_gare = {c["name"] for c in inspector.get_columns("gare")}
+            if "tipologie_esaurite" not in colonne_gare:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE gare ADD COLUMN tipologie_esaurite TEXT"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
         # Migra gli allegati singoli dei messaggi (vecchia colonna messaggi.allegato_file,
