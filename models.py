@@ -169,7 +169,10 @@ class Gara(db.Model):
     note = db.Column(db.Text)
     tipologie_gara = db.Column(db.Text)  # tipi di gara offerti, separati da virgola (es. "50 SL,100 DO")
     programma_gare_file = db.Column(db.String(255))  # nome file PDF, in UPLOAD_FOLDER/programmi_gare
-    tipologie_esaurite = db.Column(db.Text)  # tipologie con posti terminati, separate da virgola (sottoinsieme di tipologie_gara)
+    # Tipologie con posti terminati, separate da virgola (sottoinsieme di tipologie_gara),
+    # distinte per sesso dell'atleta.
+    tipologie_esaurite_m = db.Column(db.Text)
+    tipologie_esaurite_f = db.Column(db.Text)
 
     iscrizioni = db.relationship("IscrizioneGara", backref="gara", lazy=True, cascade="all, delete-orphan")
 
@@ -179,15 +182,32 @@ class Gara(db.Model):
             return []
         return [t.strip() for t in self.tipologie_gara.split(",") if t.strip()]
 
-    @property
-    def lista_esaurite(self):
-        if not self.tipologie_esaurite:
+    @staticmethod
+    def _elenco(valore):
+        if not valore:
             return []
-        return [t.strip() for t in self.tipologie_esaurite.split(",") if t.strip()]
+        return [t.strip() for t in valore.split(",") if t.strip()]
 
-    def is_esaurita(self, tipo):
-        """True se l'amministratore ha segnato come terminati i posti per questa tipologia."""
-        return tipo in self.lista_esaurite
+    @property
+    def lista_esaurite_m(self):
+        return self._elenco(self.tipologie_esaurite_m)
+
+    @property
+    def lista_esaurite_f(self):
+        return self._elenco(self.tipologie_esaurite_f)
+
+    def lista_esaurite_per(self, sesso):
+        """Tipologie con i posti terminati per il sesso indicato ("M" o "F"). Se il sesso
+        dell'atleta non e' noto si considerano esaurite solo quelle chiuse per entrambi."""
+        if sesso == "M":
+            return self.lista_esaurite_m
+        if sesso == "F":
+            return self.lista_esaurite_f
+        return [t for t in self.lista_esaurite_m if t in self.lista_esaurite_f]
+
+    def is_esaurita(self, tipo, sesso=None):
+        """True se i posti per questa tipologia sono terminati per il sesso indicato."""
+        return tipo in self.lista_esaurite_per(sesso)
 
     @property
     def iscrizioni_aperte(self):

@@ -57,9 +57,19 @@ def _migra_schema(app):
                     conn.execute(text("ALTER TABLE messaggi_allegati ADD COLUMN nome_originale VARCHAR(255)"))
         if "gare" in inspector.get_table_names():
             colonne_gare = {c["name"] for c in inspector.get_columns("gare")}
-            if "tipologie_esaurite" not in colonne_gare:
+            for colonna in ("tipologie_esaurite_m", "tipologie_esaurite_f"):
+                if colonna not in colonne_gare:
+                    with db.engine.begin() as conn:
+                        conn.execute(text(f"ALTER TABLE gare ADD COLUMN {colonna} TEXT"))
+            # Prima i posti esauriti valevano per tutti (colonna unica): le gare gia' segnate
+            # restano esaurite sia per i maschi sia per le femmine.
+            if "tipologie_esaurite" in colonne_gare:
                 with db.engine.begin() as conn:
-                    conn.execute(text("ALTER TABLE gare ADD COLUMN tipologie_esaurite TEXT"))
+                    for colonna in ("tipologie_esaurite_m", "tipologie_esaurite_f"):
+                        conn.execute(text(
+                            f"UPDATE gare SET {colonna} = tipologie_esaurite "
+                            f"WHERE {colonna} IS NULL AND tipologie_esaurite IS NOT NULL AND tipologie_esaurite <> ''"
+                        ))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
         # Migra gli allegati singoli dei messaggi (vecchia colonna messaggi.allegato_file,

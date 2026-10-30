@@ -1,16 +1,31 @@
-{# Cerchio cliccabile: rosso = posti terminati per questa tipologia di gara #}
-{% macro esaurito_toggle(tipo, esaurita=False) %}
-<label class="esaurito-toggle" title="Posti esauriti per {{ tipo }}">
-    <input type="checkbox" name="esaurite" value="{{ tipo }}" {% if esaurita %}checked{% endif %}>
+{# Cerchio cliccabile: rosso = posti terminati per questa tipologia di gara, per il sesso
+   indicato ("m" o "f"). Il campo inviato e' esaurite_m / esaurite_f. #}
+{% macro esaurito_toggle(tipo, esaurita=False, sesso="m") %}
+<label class="esaurito-toggle" title="Posti esauriti {{ 'maschi' if sesso == 'm' else 'femmine' }}: {{ tipo }}">
+    <input type="checkbox" name="esaurite_{{ sesso }}" value="{{ tipo }}" {% if esaurita %}checked{% endif %}>
     <span class="esaurito-dot"></span>
+    <span class="esaurito-sesso">{{ sesso|upper }}</span>
 </label>
 {% endmacro %}
 
-{# Elenco delle tipologie di un torneo: quelle con i posti terminati sono grigie con il cerchio rosso #}
+{# Coppia di cerchi (maschi / femmine) per una tipologia #}
+{% macro esaurito_toggles(tipo, gara=None) %}
+<span class="esaurito-coppia">
+    {{ esaurito_toggle(tipo, gara.is_esaurita(tipo, "M") if gara else False, "m") }}
+    {{ esaurito_toggle(tipo, gara.is_esaurita(tipo, "F") if gara else False, "f") }}
+</span>
+{% endmacro %}
+
+{# Elenco delle tipologie di un torneo: se i posti sono terminati per entrambi i sessi la voce
+   e' grigia con il cerchio rosso; se solo per uno, accanto compare il cerchio rosso con M o F #}
 {% macro elenco_tipologie(gara) -%}
 {%- for tipo in gara.lista_tipologie -%}
-    {%- if gara.is_esaurita(tipo) -%}
-        <span class="tipo-esaurita" title="Posti esauriti"><span class="status-dot red"></span>{{ tipo }}</span>
+    {%- set m = gara.is_esaurita(tipo, "M") -%}
+    {%- set f = gara.is_esaurita(tipo, "F") -%}
+    {%- if m and f -%}
+        <span class="tipo-esaurita" title="Posti esauriti (maschi e femmine)"><span class="status-dot red"></span>{{ tipo }}</span>
+    {%- elif m or f -%}
+        <span class="nowrap-tipo">{{ tipo }} <span class="tipo-parziale" title="Posti esauriti {{ 'maschi' if m else 'femmine' }}"><span class="status-dot red"></span>{{ 'M' if m else 'F' }}</span></span>
     {%- else -%}
         {{ tipo }}
     {%- endif -%}

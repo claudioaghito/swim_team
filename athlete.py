@@ -383,10 +383,11 @@ def iscrizione_gara(gara_id):
             return redirect(url_for("athlete.iscrizione_gara", gara_id=gara.id))
 
         scelte = set(request.form.getlist("tipologie"))
-        esaurite = set(gara.lista_esaurite)
+        esaurite = set(gara.lista_esaurite_per(current_user.sesso))
 
-        # Le gare con i posti terminati non si possono ne' scegliere ne' togliere da qui:
-        # chi era gia' iscritto resta iscritto (il campo e' disabilitato e non viene inviato).
+        # Le gare con i posti terminati per il sesso dell'atleta non si possono ne' scegliere
+        # ne' togliere da qui: chi era gia' iscritto resta iscritto (il campo e' disabilitato
+        # e non viene inviato).
         scelte -= esaurite
 
         for tipo, iscrizione in list(iscrizioni_correnti.items()):

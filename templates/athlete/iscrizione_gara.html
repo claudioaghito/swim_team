@@ -40,7 +40,7 @@
             <tbody>
                 {% for tipo in gara.lista_tipologie %}
                 {% set default_min, default_sec = tempi_min_sec.get(tipo, ("", "")) %}
-                {% set esaurita = gara.is_esaurita(tipo) %}
+                {% set esaurita = gara.is_esaurita(tipo, current_user.sesso) %}
                 <tr class="{{ 'gara-esaurita' if esaurita }}">
                     <td><input type="checkbox" name="tipologie" value="{{ tipo }}" style="width:auto;margin-top:0;" {% if tipo in iscrizioni_correnti %}checked{% endif %} {% if esaurita %}disabled{% endif %}></td>
                     <td>

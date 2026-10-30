@@ -860,10 +860,11 @@ def elimina_allenamento(allenamento_id):
     return redirect(url_for("admin.lista_allenamenti"))
 
 
-def _esaurite_valide(tipologie):
-    """Tipologie con posti terminati segnate nel form, limitate a quelle effettivamente
-    offerte dal torneo (senza duplicati, nello stesso ordine delle tipologie)."""
-    segnate = set(request.form.getlist("esaurite"))
+def _esaurite_valide(tipologie, sesso):
+    """Tipologie con posti terminati segnate nel form per il sesso indicato ("m" o "f"),
+    limitate a quelle effettivamente offerte dal torneo (senza duplicati, nello stesso
+    ordine delle tipologie)."""
+    segnate = set(request.form.getlist(f"esaurite_{sesso}"))
     return [t for t in dict.fromkeys(tipologie) if t in segnate]
 
 
@@ -892,7 +893,8 @@ def nuova_gara():
                 if request.form.get("scadenza_iscrizione") else None
             ),
             tipologie_gara=",".join(tipologie),
-            tipologie_esaurite=",".join(_esaurite_valide(tipologie)),
+            tipologie_esaurite_m=",".join(_esaurite_valide(tipologie, "m")),
+            tipologie_esaurite_f=",".join(_esaurite_valide(tipologie, "f")),
             note=request.form.get("note", "").strip(),
         )
         db.session.add(gara)
@@ -1417,7 +1419,8 @@ def modifica_gara(gara_id):
             if request.form.get("scadenza_iscrizione") else None
         )
         gara.tipologie_gara = ",".join(tipologie)
-        gara.tipologie_esaurite = ",".join(_esaurite_valide(tipologie))
+        gara.tipologie_esaurite_m = ",".join(_esaurite_valide(tipologie, "m"))
+        gara.tipologie_esaurite_f = ",".join(_esaurite_valide(tipologie, "f"))
         gara.note = request.form.get("note", "").strip()
 
         try:

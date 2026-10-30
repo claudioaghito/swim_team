@@ -379,13 +379,19 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
    riga/voce corrispondente diventa grigia e non e' piu' selezionabile dagli atleti. */
 .checkbox-item:has(.esaurito-toggle) { justify-content: space-between; gap: 10px; }
 .checkbox-item label { display: inline-flex; align-items: center; gap: 4px; margin: 0; }
+.esaurito-coppia { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.esaurito-sesso { font-size: 0.75em; font-weight: 700; margin-left: 3px; color: var(--muted); }
+.tipo-parziale { white-space: nowrap; font-size: 0.85em; color: var(--muted); }
+.tipo-parziale .status-dot { margin-right: 3px; }
+.nowrap-tipo { white-space: nowrap; }
 .esaurito-toggle { position: relative; display: inline-flex; align-items: center; cursor: pointer; margin: 0; }
 .esaurito-toggle input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
 .esaurito-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--muted); display: inline-block; box-sizing: border-box; transition: background-color 0.15s ease, border-color 0.15s ease; }
 .esaurito-toggle input:checked + .esaurito-dot { background: var(--red); border-color: var(--red); }
 .esaurito-toggle input:focus-visible + .esaurito-dot { outline: 2px solid var(--blue); outline-offset: 2px; }
-.checkbox-item:has(.esaurito-toggle input:checked) > label,
-.checkbox-item:has(.esaurito-toggle input:checked) > span:not(.esaurito-toggle) { color: var(--muted); opacity: 0.6; }
+/* La voce diventa grigia solo quando i posti sono terminati sia per i maschi sia per le femmine */
+.checkbox-item:has(input[name="esaurite_m"]:checked):has(input[name="esaurite_f"]:checked) > label,
+.checkbox-item:has(input[name="esaurite_m"]:checked):has(input[name="esaurite_f"]:checked) > span:not(.esaurito-coppia) { color: var(--muted); opacity: 0.6; }
 .tipo-esaurita { color: var(--muted); opacity: 0.75; white-space: nowrap; }
 .tipo-esaurita .status-dot { margin-right: 4px; }
 tr.gara-esaurita td { background: rgba(128, 128, 128, 0.18); color: var(--muted); }
