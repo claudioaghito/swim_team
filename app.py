@@ -57,6 +57,9 @@ def _migra_schema(app):
                     conn.execute(text("ALTER TABLE messaggi_allegati ADD COLUMN nome_originale VARCHAR(255)"))
         if "gare" in inspector.get_table_names():
             colonne_gare = {c["name"] for c in inspector.get_columns("gare")}
+            if "inizio_iscrizione" not in colonne_gare:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE gare ADD COLUMN inizio_iscrizione DATE"))
             for colonna in ("tipologie_esaurite_m", "tipologie_esaurite_f"):
                 if colonna not in colonne_gare:
                     with db.engine.begin() as conn:

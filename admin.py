@@ -888,6 +888,10 @@ def nuova_gara():
             luogo=request.form.get("luogo", ""),
             quota_gara=request.form.get("quota_gara", 0) or 0,
             quota_staffetta=request.form.get("quota_staffetta", 0) or 0,
+            inizio_iscrizione=(
+                datetime.strptime(request.form["inizio_iscrizione"], "%Y-%m-%d").date()
+                if request.form.get("inizio_iscrizione") else None
+            ),
             scadenza_iscrizione=(
                 datetime.strptime(request.form["scadenza_iscrizione"], "%Y-%m-%d").date()
                 if request.form.get("scadenza_iscrizione") else None
@@ -1414,6 +1418,10 @@ def modifica_gara(gara_id):
         gara.luogo = request.form.get("luogo", "")
         gara.quota_gara = request.form.get("quota_gara", 0) or 0
         gara.quota_staffetta = request.form.get("quota_staffetta", 0) or 0
+        gara.inizio_iscrizione = (
+            datetime.strptime(request.form["inizio_iscrizione"], "%Y-%m-%d").date()
+            if request.form.get("inizio_iscrizione") else None
+        )
         gara.scadenza_iscrizione = (
             datetime.strptime(request.form["scadenza_iscrizione"], "%Y-%m-%d").date()
             if request.form.get("scadenza_iscrizione") else None

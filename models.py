@@ -165,6 +165,7 @@ class Gara(db.Model):
     luogo = db.Column(db.String(120))
     quota_gara = db.Column(db.Numeric(8, 2), default=0)
     quota_staffetta = db.Column(db.Numeric(8, 2), default=0)
+    inizio_iscrizione = db.Column(db.Date)  # facoltativa, solo informativa
     scadenza_iscrizione = db.Column(db.Date)
     note = db.Column(db.Text)
     tipologie_gara = db.Column(db.Text)  # tipi di gara offerti, separati da virgola (es. "50 SL,100 DO")

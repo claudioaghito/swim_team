@@ -24,6 +24,9 @@
         <label>Quota staffetta (€)</label>
         <input type="number" step="0.01" name="quota_staffetta" value="{{ gara.quota_staffetta }}">
 
+        <label>Inizio iscrizioni (facoltativo)</label>
+        <input type="date" name="inizio_iscrizione" value="{{ gara.inizio_iscrizione.isoformat() if gara.inizio_iscrizione else '' }}">
+
         <label>Scadenza iscrizione</label>
         <input type="date" name="scadenza_iscrizione" value="{{ gara.scadenza_iscrizione.isoformat() if gara.scadenza_iscrizione else '' }}">
 
