@@ -385,13 +385,13 @@ def iscrizione_gara(gara_id):
         scelte = set(request.form.getlist("tipologie"))
         esaurite = set(gara.lista_esaurite_per(current_user.sesso))
 
-        # Le gare con i posti terminati per il sesso dell'atleta non si possono ne' scegliere
-        # ne' togliere da qui: chi era gia' iscritto resta iscritto (il campo e' disabilitato
-        # e non viene inviato).
-        scelte -= esaurite
+        # Le gare con i posti terminati per il sesso dell'atleta non si possono piu' scegliere
+        # (campo disabilitato, e comunque scartate qui). Chi era gia' iscritto puo' invece
+        # modificare il tempo o togliersi; una volta tolto non potra' piu' iscriversi.
+        scelte -= (esaurite - set(iscrizioni_correnti))
 
         for tipo, iscrizione in list(iscrizioni_correnti.items()):
-            if tipo not in scelte and tipo not in esaurite:
+            if tipo not in scelte:
                 db.session.delete(iscrizione)
 
         for tipo in scelte:
