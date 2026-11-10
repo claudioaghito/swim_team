@@ -8,3 +8,6 @@ instance/backups/
 .env
 .vs/
 venv_old/
+
+.claude/
+.mcp.json
