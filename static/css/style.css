@@ -377,6 +377,8 @@ form input[readonly] { background: var(--checkbox-bg); color: var(--muted); curs
 /* Un atleta per riga: nome e cognome sempre su una riga sola, con la casella a fianco */
 .checkbox-list.checkbox-list-single { grid-template-columns: 1fr; }
 .checkbox-list-single .checkbox-item { white-space: nowrap; }
+/* Voci con testo lungo (es. strategie): una per riga a tutta larghezza, il testo puo' andare a capo */
+.checkbox-list.checkbox-list-full { grid-template-columns: 1fr; }
 
 /* Posti esauriti per una tipologia di gara: cerchio cliccabile che diventa rosso; la
    riga/voce corrispondente diventa grigia e non e' piu' selezionabile dagli atleti. */
