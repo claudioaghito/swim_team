@@ -1084,9 +1084,11 @@ def formazione_staffetta(gara_id, tipo):
     senza_sesso = [a.nome_completo for a in iscritti if not a.sesso] if tipo_squadra else []
 
     id_iscritti = {a.id for a in iscritti}
+    # atleti iscritti al torneo (a una qualsiasi altra gara): proposti per default tra i convocabili
+    id_iscritti_torneo = {i.atleta_id for i in gara.iscrizioni if not i.convocata}
     atleti_convocabili = sorted(
         (a for a in User.query.filter_by(ruolo="atleta").all() if a.id not in id_iscritti),
-        key=lambda a: (a.cognome, a.nome),
+        key=lambda a: (a.id not in id_iscritti_torneo, a.cognome, a.nome),
     )
 
     risultati = None
@@ -1206,6 +1208,7 @@ def formazione_staffetta(gara_id, tipo):
         tipo=tipo,
         iscritti=iscritti,
         atleti_convocabili=atleti_convocabili,
+        id_iscritti_torneo=id_iscritti_torneo,
         tempo_registrato_min_sec=tempo_registrato_min_sec,
         prove_uniche=prove_uniche,
         anno_stagione=anno_stagione,
