@@ -73,6 +73,12 @@ def _migra_schema(app):
                             f"UPDATE gare SET {colonna} = tipologie_esaurite "
                             f"WHERE {colonna} IS NULL AND tipologie_esaurite IS NOT NULL AND tipologie_esaurite <> ''"
                         ))
+        for tabella, colonna in (("iscrizioni_gare", "convocata"), ("formazioni_staffetta", "confermata")):
+            if tabella in inspector.get_table_names():
+                colonne = {c["name"] for c in inspector.get_columns(tabella)}
+                if colonna not in colonne:
+                    with db.engine.begin() as conn:
+                        conn.execute(text(f"ALTER TABLE {tabella} ADD COLUMN {colonna} BOOLEAN DEFAULT 0"))
         db.create_all()  # crea le tabelle introdotte da nuove funzionalita', lascia intatte le altre
 
         # Migra gli allegati singoli dei messaggi (vecchia colonna messaggi.allegato_file,

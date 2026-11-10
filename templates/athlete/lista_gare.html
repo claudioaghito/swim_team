@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Tornei{% endblock %}
+{% block title %}Trofei{% endblock %}
 {% block content %}
-<h1>{{ icon('tornei') }} Tornei</h1>
+<h1>{{ icon('tornei') }} Trofei</h1>
 
 <div class="actions">
     <a class="btn" href="{{ url_for('athlete.dashboard') }}">&larr; La mia area</a>
@@ -52,7 +52,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="7">Nessun torneo disponibile.</td></tr>
+            <tr><td colspan="7">Nessun trofeo disponibile.</td></tr>
             {% endfor %}
         </tbody>
     </table>

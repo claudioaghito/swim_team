@@ -154,6 +154,46 @@ def tutte_le_formazioni_possibili(candidati, prove, tipo_squadra=None, strategia
     return migliori
 
 
+def tutte_le_formazioni_per_somma_eta(candidati, prove, tipo_squadra=None):
+    """Strategia "eta_minima_fascia": invece di una sola formazione per categoria,
+    genera una formazione per OGNI somma d'eta' distinta ottenibile combinando i
+    candidati (quindi il numero massimo di combinazioni d'eta' possibili).
+
+    A parita' di somma d'eta' si preferisce la formazione col tempo totale migliore,
+    se i tempi sono stati inseriti (il tempo resta facoltativo).
+
+    Ritorna un dict {somma_eta: Formazione}, ordinato per somma d'eta' crescente,
+    con solo le somme che rientrano in una categoria di RELAY_BRACKETS."""
+    if len(prove) != 4:
+        raise ValueError("Una staffetta richiede esattamente 4 prove/frazioni")
+
+    migliori = {}
+    for gruppo in combinations(candidati, 4):
+        somma_eta = sum(n.eta for n in gruppo)
+        if _categoria_per_somma_eta(somma_eta) is None:
+            continue
+        if not _composizione_valida(gruppo, tipo_squadra):
+            continue
+        frazioni, tempo_totale = _migliore_assegnazione(gruppo, prove, richiedi_tempi=False)
+        formazione = Formazione(frazioni, tempo_totale, somma_eta)
+
+        attuale = migliori.get(somma_eta)
+        if attuale is None:
+            migliori[somma_eta] = formazione
+        elif (
+            formazione.tempo_totale is not None
+            and (attuale.tempo_totale is None or formazione.tempo_totale < attuale.tempo_totale)
+        ):
+            migliori[somma_eta] = formazione
+
+    return dict(sorted(migliori.items()))
+
+
+def categoria_per_somma_eta(somma_eta):
+    """Chiave di RELAY_BRACKETS per la somma d'eta' indicata (None se fuori fascia)."""
+    return _categoria_per_somma_eta(somma_eta)
+
+
 def formazione_migliore_per_categoria_target(
     candidati,
     categoria_target,

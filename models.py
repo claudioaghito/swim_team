@@ -225,26 +225,38 @@ class Gara(db.Model):
 
     @property
     def numero_iscritti(self):
-        """Numero di atleti distinti iscritti al torneo (non di gare scelte)."""
-        return len({i.atleta_id for i in self.iscrizioni})
+        """Numero di atleti distinti iscritti al trofeo (non di gare scelte)."""
+        return len({i.atleta_id for i in self.iscrizioni if not i.convocata})
 
     def iscrizioni_per_atleta(self):
+        """Iscrizioni raggruppate per atleta. Le convocazioni di staffetta non ancora
+        confermate (convocata=True) non contano come iscrizioni ne' come costi."""
         raggruppate = {}
         for iscrizione in self.iscrizioni:
+            if iscrizione.convocata:
+                continue
             raggruppate.setdefault(iscrizione.atleta, []).append(iscrizione)
         return dict(sorted(raggruppate.items(), key=lambda kv: (kv[0].cognome, kv[0].nome)))
 
-    def calcola_quota(self, iscrizioni):
-        """Quota gara moltiplicata per il numero di gare scelte; le gare la cui
-        descrizione contiene "staffetta" usano la quota_staffetta al posto della quota_gara."""
+    def staffette_confermate_per_atleta(self, atleta_id):
+        """Numero di formazioni di staffetta confermate in cui l'atleta e' schierato."""
+        return sum(
+            1 for f in self.formazioni_staffetta
+            if f.confermata and atleta_id in f.atleta_ids
+        )
+
+    def calcola_quota(self, iscrizioni, atleta_id=None):
+        """Quota gara per ogni gara individuale scelta, piu' la quota staffetta per ogni
+        formazione di staffetta confermata in cui l'atleta e' schierato (una staffetta
+        per ogni formazione: chi fa piu' staffette paga piu' quote)."""
         quota_gara = float(self.quota_gara or 0)
         quota_staffetta = float(self.quota_staffetta or 0)
-        totale = 0.0
-        for iscrizione in iscrizioni:
-            if iscrizione.stile and "staffetta" in iscrizione.stile.lower():
-                totale += quota_staffetta
-            else:
-                totale += quota_gara
+        totale = sum(
+            quota_gara for i in iscrizioni
+            if not (i.stile and "staffetta" in i.stile.lower())
+        )
+        if atleta_id is not None:
+            totale += quota_staffetta * self.staffette_confermate_per_atleta(atleta_id)
         return totale
 
     def __repr__(self):
@@ -260,6 +272,9 @@ class IscrizioneGara(db.Model):
     stile = db.Column(db.String(64))  # es. "100 stile libero"
     tempo_ottenuto = db.Column(db.String(20))  # es. "01:02.35" - stringa per semplicità
     confermata = db.Column(db.Boolean, default=False)
+    # Staffetta a cui l'atleta e' stato convocato dall'admin senza auto-iscriversi: diventa
+    # un'iscrizione effettiva (con i relativi costi) solo quando la formazione e' confermata.
+    convocata = db.Column(db.Boolean, default=False)
 
     __table_args__ = (db.UniqueConstraint("atleta_id", "gara_id", "stile", name="uq_iscrizione"),)
 
@@ -279,7 +294,7 @@ class MovimentoContabile(db.Model):
 
 
 class QuotaTorneo(db.Model):
-    """Quota gara addebitata a un singolo atleta per un torneo: crea/aggiorna un
+    """Quota gara addebitata a un singolo atleta per un trofeo: crea/aggiorna un
     MovimentoContabile in negativo quando l'admin la conferma."""
     __tablename__ = "quote_torneo"
 
@@ -435,7 +450,7 @@ class Configurazione(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     anno_stagione = db.Column(db.Integer, nullable=False, default=lambda: datetime.utcnow().year)
-    modalita_pagamento = db.Column(db.Text)  # testo libero, uguale per tutti i tornei, visibile agli atleti
+    modalita_pagamento = db.Column(db.Text)  # testo libero, uguale per tutti i trofei, visibile agli atleti
     tassa_fin = db.Column(db.Float, default=0)  # tassa FIN per ogni iscrizione gara/staffetta, per atleta
 
     @classmethod
@@ -476,14 +491,14 @@ class RecordSocietario(db.Model):
 
 class RecordPersonale(db.Model):
     """Record personale che un atleta registra per se stesso (tempo ottenuto in un
-    torneo): gestito interamente dall'atleta, non dall'amministratore. La categoria
+    trofeo): gestito interamente dall'atleta, non dall'amministratore. La categoria
     e' calcolata in automatico da User.categoria_master alla stagione corrente."""
     __tablename__ = "record_personali"
 
     id = db.Column(db.Integer, primary_key=True)
     atleta_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     torneo = db.Column(db.String(120), nullable=False)
-    tipo_gara = db.Column(db.String(60), nullable=False)  # dalla stessa lista usata per i tornei (TIPI_GARA_BASE)
+    tipo_gara = db.Column(db.String(60), nullable=False)  # dalla stessa lista usata per i trofei (TIPI_GARA_BASE)
     vasca = db.Column(db.Integer, nullable=False, default=25)  # metri (25 o 50)
     tempo = db.Column(db.String(20), nullable=False)  # es. "01:02.35"
     data = db.Column(db.Date, nullable=False)
@@ -495,7 +510,7 @@ class RecordPersonale(db.Model):
 
 
 class FormazioneStaffetta(db.Model):
-    """Formazione staffetta calcolata e salvata dall'admin per un torneo/tipologia/categoria."""
+    """Formazione staffetta calcolata e salvata dall'admin per un trofeo/tipologia/categoria."""
     __tablename__ = "formazioni_staffetta"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -508,6 +523,8 @@ class FormazioneStaffetta(db.Model):
     tempo_totale = db.Column(db.String(20), nullable=False)  # es. "01:53.20"
     frazioni_json = db.Column(db.Text, nullable=False)  # lista di {"nome","sesso","prova","tempo"}
     creata_il = db.Column(db.DateTime, default=datetime.utcnow)
+    # Solo le formazioni confermate abilitano la staffetta e i relativi costi per gli atleti
+    confermata = db.Column(db.Boolean, default=False)
 
     gara = db.relationship("Gara", backref=db.backref("formazioni_staffetta", cascade="all, delete-orphan"))
 
@@ -518,3 +535,27 @@ class FormazioneStaffetta(db.Model):
     @property
     def frazioni(self):
         return json.loads(self.frazioni_json)
+
+    @property
+    def categoria_base(self):
+        """Categoria senza il suffisso della somma d'eta' (es. "160-175" -> "160")."""
+        return self.categoria.split("-")[0]
+
+    @property
+    def atleta_ids(self):
+        """Id degli atleti schierati. Le formazioni salvate prima dell'introduzione
+        dell'id nelle frazioni vengono risolte tramite il nome completo."""
+        ids = set()
+        per_nome = None
+        for fr in self.frazioni:
+            if fr.get("atleta_id"):
+                ids.add(fr["atleta_id"])
+                continue
+            if per_nome is None:
+                per_nome = {
+                    u.nome_completo: u.id
+                    for u in User.query.filter_by(ruolo="atleta").all()
+                }
+            if fr.get("nome") in per_nome:
+                ids.add(per_nome[fr["nome"]])
+        return ids

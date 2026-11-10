@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% from "macros/esaurito.html" import esaurito_toggles %}
-{% block title %}Modifica Torneo{% endblock %}
+{% block title %}Modifica Trofeo{% endblock %}
 {% block content %}
 <div class="actions">
-    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; Torneo</a>
-    <a class="btn" href="{{ url_for('admin.lista_gare') }}">{{ icon('tornei') }} Tutti i tornei</a>
+    <a class="btn" href="{{ url_for('admin.dettaglio_gara', gara_id=gara.id) }}">&larr; Trofeo</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">{{ icon('tornei') }} Tutti i trofei</a>
 </div>
 <div class="card">
-    <h2>Modifica Torneo</h2>
+    <h2>Modifica Trofeo</h2>
     <form method="POST" enctype="multipart/form-data">
-        <label>Nome torneo</label>
+        <label>Nome trofeo</label>
         <input type="text" name="nome" value="{{ gara.nome }}" required>
 
         <label>Data</label>
@@ -63,7 +63,7 @@
         <label>Nota per gli atleti (visibile solo in visualizzazione)</label>
         <textarea name="note" rows="3" placeholder="es. Ritrovo alle 8:00, portare cartellino...">{{ gara.note or '' }}</textarea>
 
-        <p><small>La modalità di pagamento è unica per tutti i tornei: si imposta in
+        <p><small>La modalità di pagamento è unica per tutti i trofei: si imposta in
            <a href="{{ url_for('admin.impostazioni') }}">Impostazioni</a>.</small></p>
 
         <button type="submit" title="Salva modifiche">{{ icon('salva') }}</button>

@@ -30,7 +30,7 @@
 {% endif %}
 
 <div class="actions">
-    <a class="btn" href="{{ url_for('athlete.lista_gare') }}">{{ icon('tornei') }} Tornei &amp; iscrizioni gare</a>
+    <a class="btn" href="{{ url_for('athlete.lista_gare') }}">{{ icon('tornei') }} Trofei &amp; iscrizioni gare</a>
     <a class="btn" href="{{ url_for('athlete.documenti') }}">{{ icon('cartellino') }} I miei documenti</a>
     <a class="btn" href="{{ url_for('athlete.lista_record') }}">{{ icon('record') }} Record societari</a>
     <a class="btn" href="{{ url_for('athlete.record_personali') }}">{{ icon('medaglia') }} I miei record</a>
@@ -78,7 +78,7 @@
                 <li>Nessuna gara programmata.</li>
             {% endfor %}
         </ul>
-        <a class="btn" style="margin-top:8px;" href="{{ url_for('athlete.lista_gare') }}">Vedi tutti i tornei &rarr;</a>
+        <a class="btn" style="margin-top:8px;" href="{{ url_for('athlete.lista_gare') }}">Vedi tutti i trofei &rarr;</a>
     </div>
 
     <div class="card no-print" id="card-notifiche-push" hidden>

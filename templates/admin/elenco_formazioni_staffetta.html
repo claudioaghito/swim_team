@@ -21,7 +21,7 @@
 
 <div class="card">
     <form method="POST" action="{{ url_for('admin.elimina_formazioni_staffetta') }}"
-          onsubmit="return confirmSubmit(this, 'Eliminare le formazioni selezionate?');">
+          onsubmit="if (event.submitter && event.submitter.dataset.noConfirm) return true; return confirmSubmit(this, 'Eliminare le formazioni selezionate?');">
         {% if gara_provenienza %}<input type="hidden" name="next" value="{{ url_for('admin.elenco_formazioni_staffetta', gara_id=gara_provenienza.id) }}">{% endif %}
         <div style="overflow-x:auto;">
         <table class="table">
@@ -30,7 +30,8 @@
                     <th class="no-print">
                         <input type="checkbox" onclick="document.querySelectorAll('.staffetta-check').forEach(c => c.checked = this.checked)">
                     </th>
-                    <th data-sort="date">Torneo</th>
+                    <th data-sort="date">Trofeo</th>
+                    <th data-sort="text">Stato</th>
                     <th data-sort="text">Tipologia</th>
                     <th data-sort="text">Categoria</th>
                     <th>Frazione</th>
@@ -54,8 +55,11 @@
                             <td rowspan="{{ f.frazioni|length }}" data-sort-value="{{ f.gara.data.isoformat() }}">
                                 {{ f.gara.nome }} ({{ f.gara.data.strftime('%d/%m/%Y') }})
                             </td>
+                            <td rowspan="{{ f.frazioni|length }}">
+                                {% if f.confermata %}<span class="status-dot green"></span>Confermata{% else %}<span class="status-dot red"></span>Da confermare{% endif %}
+                            </td>
                             <td rowspan="{{ f.frazioni|length }}">{{ f.tipo }}</td>
-                            <td rowspan="{{ f.frazioni|length }}">{{ f.categoria }} <small>(fascia {{ f.fascia_eta }})</small></td>
+                            <td rowspan="{{ f.frazioni|length }}">{{ f.categoria_base }} <small>(fascia {{ f.fascia_eta }})</small></td>
                         {% endif %}
                         <td>{{ loop.index }}</td>
                         <td>{{ fr.nome }}</td>
@@ -72,13 +76,21 @@
                     </tr>
                     {% endfor %}
                 {% else %}
-                <tr><td colspan="12">Nessuna formazione salvata. Generane una dalla pagina di un torneo, sezione "Formazione staffette".</td></tr>
+                <tr><td colspan="13">Nessuna formazione salvata. Generane una dalla pagina di un trofeo, sezione "Formazione staffette".</td></tr>
                 {% endfor %}
             </tbody>
         </table>
         </div>
         {% if formazioni %}
-        <button type="submit" class="btn-danger no-print" style="margin-top:16px;" title="Elimina selezionate">{{ icon('elimina') }}</button>
+        <p class="no-print"><small>Conferma la staffetta per abilitarla agli atleti schierati e addebitarne i costi
+           (la quota staffetta si applica a ogni staffetta confermata in cui l'atleta e' schierato).</small></p>
+        <div class="actions no-print" style="margin-top:16px;">
+            <button type="submit" formaction="{{ url_for('admin.conferma_formazioni_staffetta') }}"
+                    data-no-confirm="1" title="Conferma selezionate">{{ icon('conferma') }} Conferma selezionate</button>
+            <button type="submit" class="btn" formaction="{{ url_for('admin.annulla_conferma_formazioni_staffetta') }}"
+                    data-no-confirm="1" title="Annulla conferma selezionate">Annulla conferma</button>
+            <button type="submit" class="btn-danger" title="Elimina selezionate">{{ icon('elimina') }}</button>
+        </div>
         {% endif %}
     </form>
 </div>

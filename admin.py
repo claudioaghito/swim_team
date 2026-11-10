@@ -24,7 +24,10 @@ from models import (
 from piani_allenamento import FASI_TIPI, FASI_TIPI_CODICI
 from piano_excel import genera_template_excel, leggi_piano_da_excel
 from records import STILI_CODICI, STILI_NOMI, CATEGORIE_RECORD, griglia_record
-from relay_master import Nuotatore, RELAY_BRACKETS, tutte_le_formazioni_possibili
+from relay_master import (
+    Nuotatore, RELAY_BRACKETS, categoria_per_somma_eta, tutte_le_formazioni_per_somma_eta,
+    tutte_le_formazioni_possibili,
+)
 from utils import (
     secondi_a_tempo as _secondi_a_tempo,
     min_sec_a_secondi, tempo_stringa_a_min_sec_str,
@@ -862,7 +865,7 @@ def elimina_allenamento(allenamento_id):
 
 def _esaurite_valide(tipologie, sesso):
     """Tipologie con posti terminati segnate nel form per il sesso indicato ("m" o "f"),
-    limitate a quelle effettivamente offerte dal torneo (senza duplicati, nello stesso
+    limitate a quelle effettivamente offerte dal trofeo (senza duplicati, nello stesso
     ordine delle tipologie)."""
     segnate = set(request.form.getlist(f"esaurite_{sesso}"))
     return [t for t in dict.fromkeys(tipologie) if t in segnate]
@@ -879,7 +882,7 @@ def nuova_gara():
             tipologie += [t.strip() for t in altre.split(",") if t.strip()]
 
         if not tipologie:
-            flash("Seleziona almeno una tipologia di gara per poter salvare il torneo.", "danger")
+            flash("Seleziona almeno una tipologia di gara per poter salvare il trofeo.", "danger")
             return redirect(url_for("admin.nuova_gara"))
 
         gara = Gara(
@@ -915,7 +918,7 @@ def nuova_gara():
             return redirect(url_for("admin.nuova_gara"))
 
         db.session.commit()
-        flash("Torneo creato.", "success")
+        flash("Trofeo creato.", "success")
         return redirect(url_for("admin.dashboard"))
 
     return render_template("admin/nuova_gara.html", tipi_gara_base=TIPI_GARA_BASE)
@@ -972,13 +975,13 @@ def dettaglio_gara(gara_id):
     config = Configurazione.ottieni()
     anno_stagione = config.anno_stagione
 
-    # Totale costo torneo: per ogni atleta usa la quota gia' addebitata (comprese le
+    # Totale costo trofeo: per ogni atleta usa la quota gia' addebitata (comprese le
     # modifiche manuali fatte dall'admin in fase di conferma), altrimenti quella
     # calcolata di default (gara + staffetta secondo il tipo di iscrizione).
     totale_calcolato = sum(
         float(quote_per_atleta[atleta.id].importo)
         if atleta.id in quote_per_atleta and quote_per_atleta[atleta.id].movimento_id
-        else gara.calcola_quota(iscrizioni)
+        else gara.calcola_quota(iscrizioni, atleta.id)
         for atleta, iscrizioni in scelte_per_atleta.items()
     )
     totale_addebitato = sum(
@@ -987,10 +990,10 @@ def dettaglio_gara(gara_id):
 
     # Quota FIN da versare alla Derthona Nuoto: tassa fissa per ogni gara individuale
     # iscritta e per ogni atleta di ogni staffetta effettivamente formata (4 per staffetta).
-    # Il resto del totale calcolato va versato alla societa' che organizza il torneo.
+    # Il resto del totale calcolato va versato alla societa' che organizza il trofeo.
     tassa_fin = float(config.tassa_fin or 0)
     numero_gare_individuali = sum(len(iscrizioni) for iscrizioni in scelte_gare_individuali.values())
-    numero_staffette = len(gara.formazioni_staffetta)
+    numero_staffette = sum(1 for f in gara.formazioni_staffetta if f.confermata)
     totale_derthona = numero_gare_individuali * tassa_fin + numero_staffette * 4 * tassa_fin
     totale_societa = totale_calcolato - totale_derthona
 
@@ -1034,7 +1037,7 @@ def esporta_iscritti_gara(gara_id):
         quota_addebitata = bool(quota and quota.movimento_id)
         importo = (
             float(quota.importo) if quota_addebitata and quota.importo
-            else gara.calcola_quota(iscrizioni)
+            else gara.calcola_quota(iscrizioni, atleta.id)
         )
         for iscrizione in iscrizioni:
             writer.writerow([
@@ -1096,6 +1099,7 @@ def formazione_staffetta(gara_id, tipo):
         valori_form = request.form
 
         candidati = []
+        id_per_nome = {a.nome_completo: a.id for a in iscritti}
         for atleta in iscritti:
             if not atleta.data_nascita:
                 continue
@@ -1118,61 +1122,83 @@ def formazione_staffetta(gara_id, tipo):
                 "per calcolare una formazione. Il tempo e' obbligatorio solo con la strategia 'tempo minimo'."
             )
         else:
-            formazioni_per_categoria = tutte_le_formazioni_possibili(
-                candidati, prove, tipo_squadra=tipo_squadra, strategia=strategia
-            )
+            if strategia == "eta_minima_fascia":
+                # una formazione per ogni somma d'eta' distinta ottenibile (non solo una per categoria)
+                per_somma = tutte_le_formazioni_per_somma_eta(candidati, prove, tipo_squadra=tipo_squadra)
+                voci = []
+                for somma, formazione in per_somma.items():
+                    categoria_base = categoria_per_somma_eta(somma)
+                    eta_min, eta_max = RELAY_BRACKETS[categoria_base]
+                    fascia = f"{eta_min}+" if eta_max is None else f"{eta_min}-{eta_max}"
+                    voci.append((f"{categoria_base}-{somma}", categoria_base, fascia, formazione))
+            else:
+                formazioni_per_categoria = tutte_le_formazioni_possibili(
+                    candidati, prove, tipo_squadra=tipo_squadra, strategia=strategia
+                )
+                voci = []
+                for categoria, (eta_min, eta_max) in RELAY_BRACKETS.items():
+                    fascia = f"{eta_min}+" if eta_max is None else f"{eta_min}-{eta_max}"
+                    formazione = formazioni_per_categoria.get(categoria)
+                    if formazione:
+                        voci.append((categoria, categoria, fascia, formazione))
+
             risultati = []
-            for categoria, (eta_min, eta_max) in RELAY_BRACKETS.items():
-                formazione = formazioni_per_categoria.get(categoria)
-                fascia = f"{eta_min}+" if eta_max is None else f"{eta_min}-{eta_max}"
-                if formazione:
-                    righe = [
-                        {
-                            "nome": n.nome, "prova": p, "sesso": n.sesso,
-                            "tempo": _secondi_a_tempo(n.tempi[p]) if p in n.tempi else "n/d",
-                        }
-                        for n, p in formazione.frazioni
-                    ]
-                    tempo_totale_fmt = (
-                        _secondi_a_tempo(formazione.tempo_totale)
-                        if formazione.tempo_totale is not None else "n/d"
-                    )
-                else:
-                    righe = None
-                    tempo_totale_fmt = None
+            chiavi_generate = set()
+            for chiave, categoria, fascia, formazione in voci:
+                righe = [
+                    {
+                        "nome": n.nome, "atleta_id": id_per_nome.get(n.nome), "prova": p, "sesso": n.sesso,
+                        "tempo": _secondi_a_tempo(n.tempi[p]) if p in n.tempi else "n/d",
+                    }
+                    for n, p in formazione.frazioni
+                ]
+                tempo_totale_fmt = (
+                    _secondi_a_tempo(formazione.tempo_totale)
+                    if formazione.tempo_totale is not None else "n/d"
+                )
                 risultati.append({
                     "categoria": categoria,
                     "fascia": fascia,
                     "righe": righe,
                     "tempo_totale": tempo_totale_fmt,
-                    "somma_eta": formazione.somma_eta if formazione else None,
+                    "somma_eta": formazione.somma_eta,
                 })
 
-                if formazione:
-                    salvata = FormazioneStaffetta.query.filter_by(
-                        gara_id=gara.id, tipo=tipo, categoria=categoria
-                    ).first()
-                    if not salvata:
-                        salvata = FormazioneStaffetta(gara_id=gara.id, tipo=tipo, categoria=categoria)
-                        db.session.add(salvata)
-                    salvata.fascia_eta = fascia
-                    salvata.strategia = strategia
-                    salvata.somma_eta = formazione.somma_eta
-                    salvata.tempo_totale = tempo_totale_fmt
-                    salvata.frazioni_json = json.dumps(righe)
-                    salvata.creata_il = datetime.utcnow()
+                chiavi_generate.add(chiave)
+                salvata = FormazioneStaffetta.query.filter_by(
+                    gara_id=gara.id, tipo=tipo, categoria=chiave
+                ).first()
+                if not salvata:
+                    salvata = FormazioneStaffetta(gara_id=gara.id, tipo=tipo, categoria=chiave)
+                    db.session.add(salvata)
+                elif salvata.confermata:
+                    # la formazione cambia: la conferma (e i costi) va rifatta sulla nuova
+                    _annulla_conferma_formazione(salvata)
+                salvata.fascia_eta = fascia
+                salvata.strategia = strategia
+                salvata.somma_eta = formazione.somma_eta
+                salvata.tempo_totale = tempo_totale_fmt
+                salvata.frazioni_json = json.dumps(righe)
+                salvata.creata_il = datetime.utcnow()
 
-            if not formazioni_per_categoria:
+            if strategia == "eta_minima_fascia":
+                # rimuove le combinazioni d'eta' salvate in precedenza e non piu' ottenibili
+                # (quelle gia' confermate si conservano)
+                for vecchia in FormazioneStaffetta.query.filter_by(
+                    gara_id=gara.id, tipo=tipo, strategia="eta_minima_fascia"
+                ).all():
+                    if vecchia.categoria not in chiavi_generate and not vecchia.confermata:
+                        db.session.delete(vecchia)
+
+            if not voci:
+                db.session.rollback()
                 errore = (
                     "Nessuna combinazione di 4 atleti tra quelli inseriti rispetta la composizione "
                     "richiesta (" + (tipo_squadra or "libera") + ") in nessuna categoria."
                 )
             else:
                 db.session.commit()
-                flash(
-                    f"{len(formazioni_per_categoria)} formazione/i salvata/e nell'elenco staffette.",
-                    "success",
-                )
+                flash(f"{len(voci)} formazione/i salvata/e nell'elenco staffette.", "success")
 
     return render_template(
         "admin/formazione_staffetta.html",
@@ -1215,11 +1241,15 @@ def convoca_atleti_staffetta(gara_id, tipo):
         atleta_id = int(atleta_id)
         if atleta_id in gia_iscritti:
             continue
-        db.session.add(IscrizioneGara(atleta_id=atleta_id, gara_id=gara.id, stile=tipo))
+        db.session.add(IscrizioneGara(atleta_id=atleta_id, gara_id=gara.id, stile=tipo, convocata=True))
         convocati += 1
 
     db.session.commit()
-    flash(f"{convocati} atleta/i convocato/i per \"{tipo}\".", "success")
+    flash(
+        f"{convocati} atleta/i convocato/i per \"{tipo}\": l'iscrizione e i costi diventano effettivi "
+        "solo quando confermi la staffetta nell'elenco delle formazioni salvate.",
+        "success",
+    )
     return redirect(url_for("admin.formazione_staffetta", gara_id=gara.id, tipo=tipo))
 
 
@@ -1263,6 +1293,96 @@ def ordina_formazione_staffetta(formazione_id):
     )
 
 
+def _aggiusta_quota_staffetta(formazione, segno):
+    """Se l'atleta ha gia' la quota del trofeo addebitata, aggiunge (segno=1) o toglie
+    (segno=-1) la quota di una staffetta, aggiornando il movimento contabile. Se la quota
+    non e' ancora stata addebitata non serve: il calcolo la includera' da solo."""
+    gara = formazione.gara
+    quota_staffetta = float(gara.quota_staffetta or 0)
+    if not quota_staffetta:
+        return
+    for atleta_id in formazione.atleta_ids:
+        quota = QuotaTorneo.query.filter_by(atleta_id=atleta_id, gara_id=gara.id).first()
+        if not quota or not quota.movimento_id:
+            continue
+        movimento = MovimentoContabile.query.get(quota.movimento_id)
+        nuovo = max(0.0, float(quota.importo or 0) + segno * quota_staffetta)
+        quota.importo = nuovo
+        if movimento:
+            movimento.importo = -nuovo
+
+
+def _annulla_conferma_formazione(formazione):
+    """Toglie la conferma e il costo di una formazione (gli atleti restano iscritti)."""
+    if not formazione.confermata:
+        return
+    formazione.confermata = False
+    db.session.flush()
+    _aggiusta_quota_staffetta(formazione, -1)
+
+
+@admin_bp.route("/staffette/conferma", methods=["POST"])
+@login_required
+@admin_required
+def conferma_formazioni_staffetta():
+    """Conferma una o piu' formazioni: abilita la staffetta agli atleti schierati (i
+    convocati diventano iscritti a tutti gli effetti) e ne addebita la quota. Chi e'
+    schierato in piu' staffette paga la quota staffetta per ciascuna."""
+    ids = request.form.getlist("formazione_ids")
+    next_url = request.form.get("next") or url_for("admin.elenco_formazioni_staffetta")
+    if not ids:
+        flash("Nessuna formazione selezionata.", "warning")
+        return redirect(next_url)
+
+    confermate = 0
+    for f in FormazioneStaffetta.query.filter(FormazioneStaffetta.id.in_(ids)).all():
+        if f.confermata:
+            continue
+        for atleta_id in f.atleta_ids:
+            iscrizione = IscrizioneGara.query.filter_by(
+                atleta_id=atleta_id, gara_id=f.gara_id, stile=f.tipo
+            ).first()
+            if not iscrizione:
+                db.session.add(IscrizioneGara(atleta_id=atleta_id, gara_id=f.gara_id, stile=f.tipo))
+            elif iscrizione.convocata:
+                iscrizione.convocata = False
+        f.confermata = True
+        db.session.flush()
+        _aggiusta_quota_staffetta(f, 1)
+        confermate += 1
+
+    db.session.commit()
+    if confermate:
+        flash(
+            f"{confermate} formazione/i confermata/e: staffetta e costi abilitati per gli atleti schierati. "
+            "Le quote non ancora addebitate le includono, quelle gia' addebitate sono state aggiornate.",
+            "success",
+        )
+    else:
+        flash("Le formazioni selezionate erano gia' confermate.", "info")
+    return redirect(next_url)
+
+
+@admin_bp.route("/staffette/annulla-conferma", methods=["POST"])
+@login_required
+@admin_required
+def annulla_conferma_formazioni_staffetta():
+    ids = request.form.getlist("formazione_ids")
+    next_url = request.form.get("next") or url_for("admin.elenco_formazioni_staffetta")
+    if not ids:
+        flash("Nessuna formazione selezionata.", "warning")
+        return redirect(next_url)
+
+    annullate = 0
+    for f in FormazioneStaffetta.query.filter(FormazioneStaffetta.id.in_(ids)).all():
+        if f.confermata:
+            _annulla_conferma_formazione(f)
+            annullate += 1
+    db.session.commit()
+    flash(f"{annullate} conferma/e annullata/e: i costi della staffetta sono stati tolti.", "success")
+    return redirect(next_url)
+
+
 @admin_bp.route("/staffette/elimina", methods=["POST"])
 @login_required
 @admin_required
@@ -1273,9 +1393,12 @@ def elimina_formazioni_staffetta():
         flash("Nessuna formazione selezionata.", "warning")
         return redirect(next_url)
 
-    eliminate = FormazioneStaffetta.query.filter(FormazioneStaffetta.id.in_(ids)).delete(
-        synchronize_session=False
-    )
+    daeliminare = FormazioneStaffetta.query.filter(FormazioneStaffetta.id.in_(ids)).all()
+    for f in daeliminare:
+        if f.confermata:
+            _annulla_conferma_formazione(f)
+        db.session.delete(f)
+    eliminate = len(daeliminare)
     db.session.commit()
     flash(f"{eliminate} formazione/i eliminata/e.", "success")
     return redirect(next_url)
@@ -1286,7 +1409,12 @@ def elimina_formazioni_staffetta():
 @admin_required
 def elimina_tutte_formazioni_staffetta():
     next_url = request.form.get("next") or url_for("admin.elenco_formazioni_staffetta")
-    eliminate = FormazioneStaffetta.query.delete()
+    daeliminare = FormazioneStaffetta.query.all()
+    for f in daeliminare:
+        if f.confermata:
+            _annulla_conferma_formazione(f)
+        db.session.delete(f)
+    eliminate = len(daeliminare)
     db.session.commit()
     flash(f"{eliminate} formazione/i eliminata/e.", "success")
     return redirect(next_url)
@@ -1371,7 +1499,7 @@ def conferma_tutte_quote(gara_id):
         if quota and quota.movimento_id:
             continue  # già addebitata, non toccarla
 
-        importo = gara.calcola_quota(iscrizioni)
+        importo = gara.calcola_quota(iscrizioni, atleta.id)
 
         if not quota:
             quota = QuotaTorneo(atleta_id=atleta.id, gara_id=gara.id)
@@ -1410,7 +1538,7 @@ def modifica_gara(gara_id):
             tipologie += [t.strip() for t in altre.split(",") if t.strip()]
 
         if not tipologie:
-            flash("Seleziona almeno una tipologia di gara per poter salvare il torneo.", "danger")
+            flash("Seleziona almeno una tipologia di gara per poter salvare il trofeo.", "danger")
             return redirect(url_for("admin.modifica_gara", gara_id=gara.id))
 
         gara.nome = request.form["nome"].strip()
@@ -1444,7 +1572,7 @@ def modifica_gara(gara_id):
             return redirect(url_for("admin.modifica_gara", gara_id=gara.id))
 
         db.session.commit()
-        flash("Torneo aggiornato.", "success")
+        flash("Trofeo aggiornato.", "success")
         return redirect(url_for("admin.dettaglio_gara", gara_id=gara.id))
 
     tipi_extra_lista = [t for t in gara.lista_tipologie if t not in TIPI_GARA_BASE]
@@ -1466,7 +1594,7 @@ def elimina_gara(gara_id):
     nome = gara.nome
     db.session.delete(gara)
     db.session.commit()
-    flash(f"Torneo {nome} eliminato.", "success")
+    flash(f"Trofeo {nome} eliminato.", "success")
     return redirect(url_for("admin.lista_gare"))
 
 

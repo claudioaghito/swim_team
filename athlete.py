@@ -18,7 +18,7 @@ from models import (
 from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
 
-# Stessa lista di tipologie di gara usata per i tornei (vedi admin.py), riusata qui
+# Stessa lista di tipologie di gara usata per i trofei (vedi admin.py), riusata qui
 # per il menu a tendina del tipo di gara nei record personali.
 from admin import TIPI_GARA_BASE
 
@@ -320,7 +320,7 @@ def lista_gare():
 
 def _notifica_push_iscrizione_gara(gara, atleta):
     """Avvisa con una notifica push tutti gli amministratori iscritti alle notifiche
-    push che un atleta ha salvato le proprie iscrizioni a un torneo: una sola notifica
+    push che un atleta ha salvato le proprie iscrizioni a un trofeo: una sola notifica
     per salvataggio (non una per ogni gara scelta), per non essere troppo rumorosa."""
     if not current_app.config.get("VAPID_PRIVATE_KEY"):
         return  # notifiche push non configurate (manca .env)
@@ -372,14 +372,14 @@ def iscritti_gara(gara_id):
 def iscrizione_gara(gara_id):
     gara = Gara.query.get_or_404(gara_id)
 
-    iscrizioni_correnti = {
-        i.stile: i
-        for i in IscrizioneGara.query.filter_by(atleta_id=current_user.id, gara_id=gara.id).all()
-    }
+    tutte_iscrizioni = IscrizioneGara.query.filter_by(atleta_id=current_user.id, gara_id=gara.id).all()
+    iscrizioni_correnti = {i.stile: i for i in tutte_iscrizioni if not i.convocata}
+    # convocazioni dell'admin non ancora confermate: se l'atleta si iscrive da solo si riutilizzano
+    convocazioni = {i.stile: i for i in tutte_iscrizioni if i.convocata}
 
     if request.method == "POST":
         if not gara.iscrizioni_aperte:
-            flash("Le iscrizioni a questo torneo sono chiuse.", "warning")
+            flash("Le iscrizioni a questo trofeo sono chiuse.", "warning")
             return redirect(url_for("athlete.iscrizione_gara", gara_id=gara.id))
 
         scelte = set(request.form.getlist("tipologie"))
@@ -401,6 +401,9 @@ def iscrizione_gara(gara_id):
             tempo = secondi_a_tempo(secondi) if secondi is not None else None
             if tipo in iscrizioni_correnti:
                 iscrizioni_correnti[tipo].tempo_ottenuto = tempo
+            elif tipo in convocazioni:
+                convocazioni[tipo].convocata = False
+                convocazioni[tipo].tempo_ottenuto = tempo
             else:
                 db.session.add(IscrizioneGara(
                     atleta_id=current_user.id, gara_id=gara.id, stile=tipo, tempo_ottenuto=tempo

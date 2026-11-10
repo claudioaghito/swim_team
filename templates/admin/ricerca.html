@@ -9,7 +9,7 @@
 
 <div class="card">
     <form method="GET" class="search-form">
-        <input type="text" name="q" value="{{ q }}" placeholder="Cerca atleti, tornei, allenamenti, movimenti...">
+        <input type="text" name="q" value="{{ q }}" placeholder="Cerca atleti, trofei, allenamenti, movimenti...">
         <button type="submit">{{ icon('cerca') }} Cerca</button>
     </form>
 </div>
@@ -30,7 +30,7 @@
 
     {% if risultati.tornei %}
     <div class="card">
-        <h3>{{ icon('tornei') }} Tornei ({{ risultati.tornei|length }})</h3>
+        <h3>{{ icon('tornei') }} Trofei ({{ risultati.tornei|length }})</h3>
         <ul>
             {% for g in risultati.tornei %}
                 <li><a href="{{ url_for('admin.dettaglio_gara', gara_id=g.id) }}">{{ g.data.strftime('%d/%m/%Y') }} — {{ g.nome }} ({{ g.luogo or '-' }})</a></li>

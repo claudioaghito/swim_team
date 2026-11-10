@@ -16,8 +16,8 @@
     <a class="btn" href="{{ url_for('admin.lista_atleti') }}">{{ icon('atleti') }} Atleti</a>
     <a class="btn" href="{{ url_for('admin.lista_allenamenti') }}">{{ icon('allenamenti') }} Allenamenti</a>
     <a class="btn" href="{{ url_for('admin.nuovo_allenamento') }}">{{ icon('nuovo-allenamento') }} Nuovo allenamento</a>
-    <a class="btn" href="{{ url_for('admin.lista_gare') }}">{{ icon('tornei') }} Tornei</a>
-    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">{{ icon('nuovo-torneo') }} Nuovo Torneo</a>
+    <a class="btn" href="{{ url_for('admin.lista_gare') }}">{{ icon('tornei') }} Trofei</a>
+    <a class="btn" href="{{ url_for('admin.nuova_gara') }}">{{ icon('nuovo-torneo') }} Nuovo Trofeo</a>
     <a class="btn" href="{{ url_for('admin.elenco_formazioni_staffetta') }}">{{ icon('presenze') }} Formazioni staffetta</a>
     <a class="btn" href="{{ url_for('admin.lista_record') }}">{{ icon('record') }} Record societari</a>
     <a class="btn" href="{{ url_for('admin.lista_movimenti') }}">{{ icon('movimenti-contabili') }} Movimenti contabili</a>
@@ -128,7 +128,7 @@
             var standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
             testo.textContent = standalone
                 ? "Il tuo browser non supporta le notifiche push."
-                : "Per ricevere una notifica quando un atleta si iscrive a un torneo, su iPhone aggiungi prima l'app alla schermata Home (tocca Condividi, poi \"Aggiungi a Home\"); su Android installa l'app dal menu del browser. Poi riapri l'app da li'.";
+                : "Per ricevere una notifica quando un atleta si iscrive a un trofeo, su iPhone aggiungi prima l'app alla schermata Home (tocca Condividi, poi \"Aggiungi a Home\"); su Android installa l'app dal menu del browser. Poi riapri l'app da li'.";
             return;
         }
 
@@ -143,7 +143,7 @@
 
         function mostraAttive() {
             label.textContent = "Disattiva notifiche";
-            testo.textContent = "Notifiche attive: riceverai un avviso quando un atleta si iscrive a un torneo.";
+            testo.textContent = "Notifiche attive: riceverai un avviso quando un atleta si iscrive a un trofeo.";
             btn.disabled = false;
             btn.onclick = function () {
                 btn.disabled = true;
@@ -155,7 +155,7 @@
 
         function mostraDisattive() {
             label.textContent = "Attiva notifiche";
-            testo.textContent = "Attiva le notifiche per essere avvisato quando un atleta si iscrive a un torneo.";
+            testo.textContent = "Attiva le notifiche per essere avvisato quando un atleta si iscrive a un trofeo.";
             btn.disabled = false;
             btn.onclick = function () {
                 btn.disabled = true;
