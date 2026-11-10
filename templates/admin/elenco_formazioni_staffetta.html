@@ -23,65 +23,69 @@
     <form method="POST" action="{{ url_for('admin.elimina_formazioni_staffetta') }}"
           onsubmit="if (event.submitter && event.submitter.dataset.noConfirm) return true; return confirmSubmit(this, 'Eliminare le formazioni selezionate?');">
         {% if gara_provenienza %}<input type="hidden" name="next" value="{{ url_for('admin.elenco_formazioni_staffetta', gara_id=gara_provenienza.id) }}">{% endif %}
-        <div style="overflow-x:auto;">
+        {% if formazioni %}
+        <label class="no-print" style="display:flex;align-items:center;gap:6px;font-weight:normal;">
+            <input type="checkbox" style="width:auto;margin-top:0;" onclick="document.querySelectorAll('.staffetta-check').forEach(c => c.checked = this.checked)">
+            Seleziona tutte
+        </label>
+        {% endif %}
+        {% for f in formazioni %}
+        {# ogni staffetta ha il proprio scorrimento orizzontale #}
+        <div class="formazione-blocco" style="overflow-x:auto;margin-top:12px;">
         <table class="table">
             <thead>
                 <tr>
-                    <th class="no-print">
-                        <input type="checkbox" onclick="document.querySelectorAll('.staffetta-check').forEach(c => c.checked = this.checked)">
-                    </th>
-                    <th data-sort="date">Trofeo</th>
-                    <th data-sort="text">Stato</th>
-                    <th data-sort="text">Tipologia</th>
-                    <th data-sort="text">Categoria</th>
+                    <th class="no-print"></th>
+                    <th>Trofeo</th>
+                    <th>Stato</th>
+                    <th>Tipologia</th>
+                    <th>Categoria</th>
                     <th>Frazione</th>
                     <th>Atleta</th>
                     <th>Sesso</th>
                     <th>Tempo</th>
-                    <th data-sort="text">Tempo totale</th>
-                    <th data-sort="number">Somma età</th>
+                    <th>Tempo totale</th>
+                    <th>Somma età</th>
                     <th>Strategia</th>
                     <th class="no-print">Azioni</th>
                 </tr>
             </thead>
             <tbody>
-                {% for f in formazioni %}
-                    {% for fr in f.frazioni %}
-                    <tr class="{{ 'formazione-inizio' if loop.first else '' }}">
-                        {% if loop.first %}
-                            <td class="no-print" rowspan="{{ f.frazioni|length }}">
-                                <input type="checkbox" class="staffetta-check" name="formazione_ids" value="{{ f.id }}">
-                            </td>
-                            <td rowspan="{{ f.frazioni|length }}" data-sort-value="{{ f.gara.data.isoformat() }}">
-                                {{ f.gara.nome }} ({{ f.gara.data.strftime('%d/%m/%Y') }})
-                            </td>
-                            <td rowspan="{{ f.frazioni|length }}">
-                                {% if f.confermata %}<span class="status-dot green"></span>Confermata{% else %}<span class="status-dot red"></span>Da confermare{% endif %}
-                            </td>
-                            <td rowspan="{{ f.frazioni|length }}">{{ f.tipo }}</td>
-                            <td rowspan="{{ f.frazioni|length }}">{{ f.categoria_base }} <small>(fascia {{ f.fascia_eta }})</small></td>
-                        {% endif %}
-                        <td>{{ loop.index }}</td>
-                        <td>{{ fr.nome }}</td>
-                        <td>{{ fr.sesso or "-" }}</td>
-                        <td>{{ fr.tempo }}</td>
-                        {% if loop.first %}
-                            <td rowspan="{{ f.frazioni|length }}">{{ f.tempo_totale }}</td>
-                            <td rowspan="{{ f.frazioni|length }}">{{ f.somma_eta }}</td>
-                            <td rowspan="{{ f.frazioni|length }}">{{ "Tempo minimo" if f.strategia == "tempo_minimo" else "Età minima fascia" }}</td>
-                            <td class="no-print" rowspan="{{ f.frazioni|length }}">
-                                <a class="btn" href="{{ url_for('admin.ordina_formazione_staffetta', formazione_id=f.id) }}" title="Ordina">{{ icon('modifica') }} Ordina</a>
-                            </td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                <tr><td colspan="13">Nessuna formazione salvata. Generane una dalla pagina di un trofeo, sezione "Formazione staffette".</td></tr>
+                {% for fr in f.frazioni %}
+                <tr>
+                    {% if loop.first %}
+                        <td class="no-print" rowspan="{{ f.frazioni|length }}">
+                            <input type="checkbox" class="staffetta-check" name="formazione_ids" value="{{ f.id }}">
+                        </td>
+                        <td rowspan="{{ f.frazioni|length }}">
+                            {{ f.gara.nome }} ({{ f.gara.data.strftime('%d/%m/%Y') }})
+                        </td>
+                        <td rowspan="{{ f.frazioni|length }}">
+                            {% if f.confermata %}<span class="status-dot green"></span>Confermata{% else %}<span class="status-dot red"></span>Da confermare{% endif %}
+                        </td>
+                        <td rowspan="{{ f.frazioni|length }}">{{ f.tipo }}</td>
+                        <td rowspan="{{ f.frazioni|length }}">{{ f.categoria_base }} <small>(fascia {{ f.fascia_eta }})</small></td>
+                    {% endif %}
+                    <td>{{ loop.index }}</td>
+                    <td>{{ fr.nome }}</td>
+                    <td>{{ fr.sesso or "-" }}</td>
+                    <td>{{ fr.tempo }}</td>
+                    {% if loop.first %}
+                        <td rowspan="{{ f.frazioni|length }}">{{ f.tempo_totale }}</td>
+                        <td rowspan="{{ f.frazioni|length }}">{{ f.somma_eta }}</td>
+                        <td rowspan="{{ f.frazioni|length }}">{{ "Tempo minimo" if f.strategia == "tempo_minimo" else "Età minima fascia" }}</td>
+                        <td class="no-print" rowspan="{{ f.frazioni|length }}">
+                            <a class="btn" href="{{ url_for('admin.ordina_formazione_staffetta', formazione_id=f.id) }}" title="Ordina">{{ icon('modifica') }} Ordina</a>
+                        </td>
+                    {% endif %}
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
         </div>
-        {% if formazioni %}
+        {% else %}
+        <p>Nessuna formazione salvata. Generane una dalla pagina di un trofeo, sezione "Formazione staffette".</p>
+        {% endfor %}        {% if formazioni %}
         <p class="no-print"><small>Conferma la staffetta per abilitarla agli atleti schierati e addebitarne i costi
            (la quota staffetta si applica a ogni staffetta confermata in cui l'atleta e' schierato).</small></p>
         <div class="actions no-print" style="margin-top:16px;">
