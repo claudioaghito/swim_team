@@ -111,7 +111,7 @@
                 {% for iscrizione in iscrizioni %}
                 <tr>
                     {% if loop.first %}
-                        <td rowspan="{{ iscrizioni|length }}">{{ atleta.nome_completo }}</td>
+                        <td rowspan="{{ iscrizioni|length }}">{{ atleta.nome_elenco }}</td>
                     {% endif %}
                     <td>{{ iscrizione.stile }}</td>
                     <td>{{ iscrizione.tempo_ottenuto or '-' }}</td>

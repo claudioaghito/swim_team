@@ -20,8 +20,7 @@
     <table class="table responsive-cards">
         <thead>
             <tr>
-                <th data-sort="text">Nome</th>
-                <th data-sort="text">Cognome</th>
+                <th data-sort="text">Atleta</th>
                 <th data-sort="text">Sesso</th>
                 <th data-sort="number">Età</th>
                 <th data-sort="text">Categoria</th>
@@ -36,8 +35,7 @@
             {% for a in atleti %}
             {% set saldo = a.saldo_attuale() %}
             <tr>
-                <td data-label="Nome">{{ a.nome }}</td>
-                <td data-label="Cognome">{{ a.cognome }}</td>
+                <td data-label="Atleta">{{ a.nome_elenco }}</td>
                 <td data-label="Sesso">{{ a.sesso or "-" }}</td>
                 <td data-label="Età">{{ a.eta if a.eta is not none else "-" }}</td>
                 <td data-label="Categoria">{{ a.categoria_master(anno_stagione) or "-" }}</td>

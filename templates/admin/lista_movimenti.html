@@ -36,7 +36,7 @@
                 <tr>
                     <td><input type="checkbox" class="mov-check" name="movimento_ids" value="{{ m.id }}"></td>
                     <td data-sort-value="{{ m.data.isoformat() }}">{{ m.data.strftime('%d/%m/%Y') }}</td>
-                    <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=m.atleta.id) }}">{{ m.atleta.nome_completo }}</a></td>
+                    <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=m.atleta.id) }}">{{ m.atleta.nome_elenco }}</a></td>
                     <td class="col-wide-text">{{ m.causale }}</td>
                     <td class="saldo-cell {{ 'positivo' if m.importo >= 0 else 'negativo' }}">{{ "%.2f"|format(m.importo) }} €</td>
                 </tr>

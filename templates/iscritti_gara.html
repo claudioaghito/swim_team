@@ -22,7 +22,7 @@
         <tbody>
             {% for atleta, iscrizioni in scelte_per_atleta.items() %}
             <tr>
-                <td>{{ atleta.nome_completo }}</td>
+                <td>{{ atleta.nome_elenco }}</td>
                 <td class="col-wrap">{{ iscrizioni|map(attribute='stile')|select|join(', ') or '-' }}</td>
             </tr>
             {% else %}

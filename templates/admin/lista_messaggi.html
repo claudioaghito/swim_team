@@ -38,7 +38,7 @@
             <tr>
                 <td>{{ m.data.strftime('%d/%m/%Y') }}<br>{{ m.data.strftime('%H:%M') }}</td>
                 <td>{{ m.mittente.nome }}<br>{{ m.mittente.cognome }}</td>
-                <td>{{ "Tutta la squadra" if m.is_comunicazione_generale else m.destinatario.nome_completo }}</td>
+                <td>{{ "Tutta la squadra" if m.is_comunicazione_generale else m.destinatario.nome_elenco }}</td>
                 <td class="preserve-lines col-wide-text">
                     {{ m.testo }}
                     {% for allegato in m.allegati %}

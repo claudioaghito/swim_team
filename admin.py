@@ -1,4 +1,4 @@
-import csv
+﻿import csv
 import io
 import json
 import os
@@ -178,7 +178,7 @@ TIPI_GARA_BASE = [
 @login_required
 @admin_required
 def dashboard():
-    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome).all()
+    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome, User.nome).all()
     prossimi_allenamenti = Allenamento.query.filter(
         Allenamento.data >= datetime.utcnow().date()
     ).order_by(Allenamento.data).limit(5).all()
@@ -776,8 +776,6 @@ def statistiche_presenze():
         ).filter(Allenamento.data <= oggi).count()
         percentuale = (presenze / totale_allenamenti * 100) if totale_allenamenti else 0
         statistiche.append({"atleta": atleta, "presenze": presenze, "percentuale": percentuale})
-
-    statistiche.sort(key=lambda s: s["percentuale"], reverse=True)
 
     return render_template(
         "admin/statistiche_presenze.html",
@@ -1670,7 +1668,7 @@ def esporta_movimenti():
 @login_required
 @admin_required
 def nuovo_movimento():
-    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome).all()
+    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome, User.nome).all()
 
     if request.method == "POST":
         movimento = MovimentoContabile(
@@ -1756,7 +1754,7 @@ def _notifica_push_nuovo_messaggio(messaggio):
 @login_required
 @admin_required
 def nuovo_messaggio():
-    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome).all()
+    atleti = User.query.filter_by(ruolo="atleta").order_by(User.cognome, User.nome).all()
 
     if request.method == "POST":
         destinatario_id = request.form.get("destinatario_id") or None

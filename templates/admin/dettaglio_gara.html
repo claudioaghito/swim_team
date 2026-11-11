@@ -99,7 +99,7 @@
                 {% for iscrizione in individuali %}
                 <tr>
                     {% if loop.first %}
-                        <td rowspan="{{ n_righe }}"><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
+                        <td rowspan="{{ n_righe }}"><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_elenco }}</a></td>
                         <td rowspan="{{ n_righe }}">{{ atleta.categoria_master(anno_stagione) or "-" }}</td>
                     {% endif %}
                     <td style="white-space:nowrap;">{{ iscrizione.stile }}</td>
@@ -117,7 +117,7 @@
                                 <div style="display:flex;gap:4px;align-items:center;">
                                     <button type="button" disabled style="cursor:not-allowed;" title="Confermata">{{ icon('conferma') }}</button>
                                     <form method="POST" action="{{ url_for('admin.annulla_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}"
-                                          onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
+                                          onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_elenco }}?');">
                                         <button type="submit" class="btn-danger" title="Annulla">{{ icon('annulla') }}</button>
                                     </form>
                                 </div>
@@ -133,7 +133,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_completo }}</a></td>
+                    <td><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=atleta.id) }}">{{ atleta.nome_elenco }}</a></td>
                     <td>{{ atleta.categoria_master(anno_stagione) or "-" }}</td>
                     <td colspan="2"><em>Solo staffette: {{ gara.staffette_confermate_per_atleta(atleta.id) }} confermate (vedi sezione "Formazione staffette")</em></td>
                     <td class="no-print">
@@ -148,7 +148,7 @@
                             <div style="display:flex;gap:4px;align-items:center;">
                                 <button type="button" disabled style="cursor:not-allowed;" title="Confermata">{{ icon('conferma') }}</button>
                                 <form method="POST" action="{{ url_for('admin.annulla_quota_gara', gara_id=gara.id, atleta_id=atleta.id) }}"
-                                      onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_completo }}?');">
+                                      onsubmit="return confirmSubmit(this, 'Annullare la quota e rimuovere il movimento contabile creato per {{ atleta.nome_elenco }}?');">
                                     <button type="submit" class="btn-danger" title="Annulla">{{ icon('annulla') }}</button>
                                 </form>
                             </div>

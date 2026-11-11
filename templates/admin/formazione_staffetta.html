@@ -27,7 +27,7 @@
         <div class="checkbox-list checkbox-list-single">
             {% for a in atleti_convocabili %}
                 <label class="checkbox-item">
-                    <input type="checkbox" name="atleta_ids" value="{{ a.id }}" {% if a.id in id_iscritti_torneo %}checked{% endif %}> {{ a.nome_completo }}{% if a.id in id_iscritti_torneo %} <small>(iscritto al torneo)</small>{% endif %}
+                    <input type="checkbox" name="atleta_ids" value="{{ a.id }}" {% if a.id in id_iscritti_torneo %}checked{% endif %}> {{ a.nome_elenco }}{% if a.id in id_iscritti_torneo %} <small>(iscritto al torneo)</small>{% endif %}
                 </label>
             {% endfor %}
         </div>
@@ -69,7 +69,7 @@
             <tbody>
                 {% for atleta in iscritti %}
                 <tr>
-                    <td>{{ atleta.nome_completo }}</td>
+                    <td>{{ atleta.nome_elenco }}</td>
                     <td>{{ atleta.sesso or "-" }}</td>
                     {% for prova in prove_uniche %}
                     {% set default_min, default_sec = tempo_registrato_min_sec.get(atleta.id, ("", "")) if prove_uniche|length == 1 else ("", "") %}

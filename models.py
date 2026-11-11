@@ -52,6 +52,11 @@ class User(db.Model, UserMixin):
         return f"{self.nome} {self.cognome}"
 
     @property
+    def nome_elenco(self):
+        """Formato per gli elenchi atleti: 'Cognome - Nome'."""
+        return f"{self.cognome} - {self.nome}"
+
+    @property
     def eta(self):
         if not self.data_nascita:
             return None

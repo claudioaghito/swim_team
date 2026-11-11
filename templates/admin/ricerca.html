@@ -22,7 +22,7 @@
         <h3>{{ icon('atleti') }} Atleti ({{ risultati.atleti|length }})</h3>
         <ul>
             {% for a in risultati.atleti %}
-                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_completo }}</a> ({{ a.username }})</li>
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=a.id) }}">{{ a.nome_elenco }}</a> ({{ a.username }})</li>
             {% endfor %}
         </ul>
     </div>
@@ -55,7 +55,7 @@
         <h3>{{ icon('movimenti-contabili') }} Movimenti contabili ({{ risultati.movimenti|length }})</h3>
         <ul>
             {% for m in risultati.movimenti %}
-                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=m.atleta.id) }}">{{ m.atleta.nome_completo }}</a> — {{ m.causale }}
+                <li><a href="{{ url_for('admin.dettaglio_atleta', atleta_id=m.atleta.id) }}">{{ m.atleta.nome_elenco }}</a> — {{ m.causale }}
                     (<span class="saldo-cell {{ 'positivo' if m.importo >= 0 else 'negativo' }}">{{ "%.2f"|format(m.importo) }} €</span>, {{ m.data.strftime('%d/%m/%Y') }})</li>
             {% endfor %}
         </ul>
