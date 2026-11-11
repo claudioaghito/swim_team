@@ -280,6 +280,9 @@ class IscrizioneGara(db.Model):
     # Staffetta a cui l'atleta e' stato convocato dall'admin senza auto-iscriversi: diventa
     # un'iscrizione effettiva (con i relativi costi) solo quando la formazione e' confermata.
     convocata = db.Column(db.Boolean, default=False)
+    # Iscrizione nata da una convocazione e resa effettiva dalla conferma di una formazione:
+    # se la conferma viene tolta, torna a essere una semplice convocazione.
+    da_convocazione = db.Column(db.Boolean, default=False)
 
     __table_args__ = (db.UniqueConstraint("atleta_id", "gara_id", "stile", name="uq_iscrizione"),)
 

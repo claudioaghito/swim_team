@@ -73,7 +73,10 @@ def _migra_schema(app):
                             f"UPDATE gare SET {colonna} = tipologie_esaurite "
                             f"WHERE {colonna} IS NULL AND tipologie_esaurite IS NOT NULL AND tipologie_esaurite <> ''"
                         ))
-        for tabella, colonna in (("iscrizioni_gare", "convocata"), ("formazioni_staffetta", "confermata")):
+        for tabella, colonna in (
+            ("iscrizioni_gare", "convocata"), ("iscrizioni_gare", "da_convocazione"),
+            ("formazioni_staffetta", "confermata"),
+        ):
             if tabella in inspector.get_table_names():
                 colonne = {c["name"] for c in inspector.get_columns(tabella)}
                 if colonna not in colonne:

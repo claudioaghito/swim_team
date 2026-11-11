@@ -1321,6 +1321,23 @@ def _annulla_conferma_formazione(formazione):
     db.session.flush()
     _aggiusta_quota_staffetta(formazione, -1)
 
+    # I convocati resi iscritti dalla conferma tornano convocati (quindi di nuovo selezionabili
+    # e senza costi), a meno che siano schierati in un'altra formazione ancora confermata.
+    ancora_schierati = set()
+    for altra in FormazioneStaffetta.query.filter_by(
+        gara_id=formazione.gara_id, tipo=formazione.tipo, confermata=True
+    ).all():
+        ancora_schierati.update(altra.atleta_ids)
+    for atleta_id in formazione.atleta_ids:
+        if atleta_id in ancora_schierati:
+            continue
+        iscrizione = IscrizioneGara.query.filter_by(
+            atleta_id=atleta_id, gara_id=formazione.gara_id, stile=formazione.tipo
+        ).first()
+        if iscrizione and iscrizione.da_convocazione and not iscrizione.convocata:
+            iscrizione.convocata = True
+            iscrizione.da_convocazione = False
+
 
 @admin_bp.route("/staffette/conferma", methods=["POST"])
 @login_required
@@ -1347,6 +1364,7 @@ def conferma_formazioni_staffetta():
                 db.session.add(IscrizioneGara(atleta_id=atleta_id, gara_id=f.gara_id, stile=f.tipo))
             elif iscrizione.convocata:
                 iscrizione.convocata = False
+                iscrizione.da_convocazione = True
         f.confermata = True
         db.session.flush()
         _aggiusta_quota_staffetta(f, 1)
