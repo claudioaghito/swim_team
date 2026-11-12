@@ -1084,10 +1084,13 @@ def formazione_staffetta(gara_id, tipo):
     id_iscritti = {a.id for a in iscritti}
     # atleti iscritti al torneo (a una qualsiasi altra gara): proposti per default tra i convocabili
     id_iscritti_torneo = {i.atleta_id for i in gara.iscrizioni if not i.convocata}
+    # tutti gli atleti della squadra; spuntati quelli gia' iscritti/convocati alla staffetta
+    # (se non c'e' ancora nessuno, si parte dai partecipanti al torneo)
     atleti_convocabili = sorted(
-        (a for a in User.query.filter_by(ruolo="atleta").all() if a.id not in id_iscritti),
-        key=lambda a: (a.id not in id_iscritti_torneo, a.cognome, a.nome),
+        User.query.filter_by(ruolo="atleta").all(),
+        key=lambda a: (a.cognome, a.nome),
     )
+    id_selezionati = id_iscritti if id_iscritti else id_iscritti_torneo
 
     risultati = None
     errore = None
@@ -1207,6 +1210,7 @@ def formazione_staffetta(gara_id, tipo):
         iscritti=iscritti,
         atleti_convocabili=atleti_convocabili,
         id_iscritti_torneo=id_iscritti_torneo,
+        id_selezionati=id_selezionati,
         tempo_registrato_min_sec=tempo_registrato_min_sec,
         prove_uniche=prove_uniche,
         anno_stagione=anno_stagione,
@@ -1223,34 +1227,38 @@ def formazione_staffetta(gara_id, tipo):
 @login_required
 @admin_required
 def convoca_atleti_staffetta(gara_id, tipo):
-    """Convoca manualmente altri atleti per una staffetta, anche se non si sono
-    auto-iscritti: crea l'iscrizione (senza tempo) cosi' compaiono tra i candidati."""
+    """Salva la lista dei convocati di una staffetta: gli atleti spuntati vengono
+    convocati (iscrizione senza tempo), quelli deselezionati vengono tolti."""
     gara = Gara.query.get_or_404(gara_id)
     if tipo not in gara.lista_tipologie or "staffetta" not in tipo.lower():
         abort(404)
 
-    atleta_ids = request.form.getlist("atleta_ids")
-    if not atleta_ids:
-        flash("Seleziona almeno un atleta da convocare.", "warning")
-        return redirect(url_for("admin.formazione_staffetta", gara_id=gara.id, tipo=tipo))
+    selezionati = {int(x) for x in request.form.getlist("atleta_ids") if x.isdigit()}
+    esistenti = {i.atleta_id: i for i in gara.iscrizioni if i.stile == tipo}
+    schierati = set()
+    for f in FormazioneStaffetta.query.filter_by(gara_id=gara.id, tipo=tipo, confermata=True).all():
+        schierati.update(f.atleta_ids)
 
-    gia_iscritti = {
-        i.atleta_id for i in gara.iscrizioni if i.stile == tipo
-    }
-    convocati = 0
-    for atleta_id in atleta_ids:
-        atleta_id = int(atleta_id)
-        if atleta_id in gia_iscritti:
-            continue
+    convocati = rimossi = 0
+    bloccati = []
+    for atleta_id in selezionati - set(esistenti):
         db.session.add(IscrizioneGara(atleta_id=atleta_id, gara_id=gara.id, stile=tipo, convocata=True))
         convocati += 1
+    for atleta_id, iscrizione in esistenti.items():
+        if atleta_id in selezionati:
+            continue
+        if atleta_id in schierati:
+            bloccati.append(iscrizione.atleta.nome_completo)
+            continue
+        db.session.delete(iscrizione)
+        rimossi += 1
 
     db.session.commit()
-    flash(
-        f"{convocati} atleta/i convocato/i per \"{tipo}\": l'iscrizione e i costi diventano effettivi "
-        "solo quando confermi la staffetta nell'elenco delle formazioni salvate.",
-        "success",
-    )
+    flash(f"Convocazioni aggiornate per \"{tipo}\": {convocati} aggiunti, {rimossi} rimossi. "
+          "L'iscrizione e i costi dei convocati diventano effettivi solo quando confermi la staffetta.",
+          "success")
+    if bloccati:
+        flash("Non rimossi perche' schierati in una formazione confermata: " + ", ".join(bloccati), "warning")
     return redirect(url_for("admin.formazione_staffetta", gara_id=gara.id, tipo=tipo))
 
 

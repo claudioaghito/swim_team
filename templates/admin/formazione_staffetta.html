@@ -21,24 +21,25 @@
 {% if atleti_convocabili %}
 <div class="card no-print">
     <h3>{{ icon('crea-atleta') }} Convoca altri atleti</h3>
-    <p><small>Aggiungi al gruppo di candidati anche atleti che non si sono auto-iscritti a questa staffetta.
-       L'iscrizione e i costi diventano effettivi solo quando confermi la formazione nell'elenco delle formazioni salvate.</small></p>
+    <p><small>Sono spuntati gli atleti che partecipano alla staffetta: aggiungine altri o togli la spunta,
+       poi salva. Gli atleti spuntati compaiono qui sotto per l'inserimento dei tempi.
+       L'iscrizione e i costi dei convocati diventano effettivi solo quando confermi la formazione nell'elenco delle formazioni salvate.</small></p>
     <form method="POST" action="{{ url_for('admin.convoca_atleti_staffetta', gara_id=gara.id, tipo=tipo) }}">
         <div class="checkbox-list checkbox-list-single">
             {% for a in atleti_convocabili %}
                 <label class="checkbox-item">
-                    <input type="checkbox" name="atleta_ids" value="{{ a.id }}" {% if a.id in id_iscritti_torneo %}checked{% endif %}> {{ a.nome_elenco }}{% if a.id in id_iscritti_torneo %} <small>(iscritto al torneo)</small>{% endif %}
+                    <input type="checkbox" name="atleta_ids" value="{{ a.id }}" {% if a.id in id_selezionati %}checked{% endif %}> {{ a.nome_elenco }}{% if a.id in id_iscritti_torneo %} <small>(iscritto al torneo)</small>{% endif %}
                 </label>
             {% endfor %}
         </div>
-        <button type="submit">{{ icon('conferma') }} Convoca selezionati</button>
+        <button type="submit">{{ icon('conferma') }} Salva convocati</button>
     </form>
 </div>
 {% endif %}
 
 {% if not iscritti %}
 <div class="card warning">
-    <p>Nessun atleta si e' ancora iscritto a "{{ tipo }}" per questo trofeo: non c'e' nessun candidato tra cui scegliere. Puoi comunque convocarne manualmente qui sopra.</p>
+    <p>Nessun atleta si e' ancora iscritto a "{{ tipo }}" per questo trofeo: non c'e' nessun candidato tra cui scegliere. Spunta gli atleti convocati qui sopra e salva.</p>
 </div>
 {% else %}
 {% if senza_sesso %}
