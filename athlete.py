@@ -13,7 +13,7 @@ from extensions import db
 from models import (
     Allenamento, Gara, MovimentoContabile, Messaggio, Presenza, IscrizioneGara, MessaggioNascosto,
     MessaggioLetto, MessaggioArchiviato, PushSubscription, conta_messaggi_non_letti, Configurazione,
-    AllenamentoNascosto, RecordSocietario, RecordPersonale, User,
+    AllenamentoNascosto, RecordSocietario, RecordPersonale, User, FormazioneStaffetta,
 )
 from records import griglia_record
 from utils import min_sec_a_secondi, secondi_a_tempo, tempo_stringa_a_min_sec_str
@@ -393,6 +393,17 @@ def iscrizione_gara(gara_id):
         for tipo, iscrizione in list(iscrizioni_correnti.items()):
             if tipo not in scelte:
                 db.session.delete(iscrizione)
+
+        # se l'atleta annulla tutte le sue gare esce dal torneo: cadono anche le convocazioni
+        # alle staffette non ancora schierate in una formazione confermata
+        if iscrizioni_correnti and not scelte:
+            schierati = set()
+            for f in FormazioneStaffetta.query.filter_by(gara_id=gara.id, confermata=True).all():
+                if current_user.id in f.atleta_ids:
+                    schierati.add(f.tipo)
+            for tipo, convocazione in convocazioni.items():
+                if tipo not in schierati:
+                    db.session.delete(convocazione)
 
         for tipo in scelte:
             secondi = min_sec_a_secondi(
